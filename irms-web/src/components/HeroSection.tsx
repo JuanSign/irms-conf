@@ -32,7 +32,8 @@ export default function HeroSection() {
     menuRefs.current[index] = el;
   };
 
-useEffect(() => {
+  useEffect(() => {
+    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
       const blocks = blockRefs.current.filter(
         (el): el is HTMLDivElement => Boolean(el)
@@ -42,11 +43,39 @@ useEffect(() => {
         textShadow: `0 0 0px ${neonColor}00`
       });
 
-      if (blocks[0]) gsap.to(blocks[0], { duration: 2, x: -120, y: -200, scale: 2, ease: "expo.inOut" });
-      if (blocks[1]) gsap.to(blocks[1], { duration: 2, x: -240, y: 200, scale: 1.2, ease: "expo.inOut" });
-      if (blocks[2]) gsap.to(blocks[2], { duration: 2, x: 290, y: -290, scale: 1.1, ease: "expo.inOut" });
-      if (blocks[3]) gsap.to(blocks[3], { duration: 2, x: 230, y: 240, scale: 0.8, ease: "expo.inOut" });
-      if (blocks[4]) gsap.to(blocks[4], { duration: 2, x: 190, y: 0, scale: 0.8, ease: "expo.inOut" });
+      const animateLetters = (offsets: Array<{ x: number; y: number; scale: number }>) => {
+        offsets.forEach((offset, idx) => {
+          if (blocks[idx]) {
+            gsap.to(blocks[idx], {
+              duration: 2,
+              x: offset.x,
+              y: offset.y,
+              scale: offset.scale,
+              ease: "expo.inOut",
+            });
+          }
+        });
+      };
+
+      mm.add("(max-width: 640px)", () => {
+        animateLetters([
+          { x: -15, y: -120, scale: 1.5 }, // R
+          { x: 160, y: -140, scale: 1.7 }, // O
+          { x: -150, y: 80, scale: 1.05 }, // C
+          { x: -70, y: 170, scale: 1.25 }, // K
+          { x: 10, y: 130, scale: 1.1 }, // S
+        ]);
+      });
+
+      mm.add("(min-width: 641px)", () => {
+        animateLetters([
+          { x: -120, y: -200, scale: 2 },
+          { x: -240, y: 200, scale: 1.2 },
+          { x: 290, y: -290, scale: 1.1 },
+          { x: 230, y: 240, scale: 0.8 },
+          { x: 190, y: 0, scale: 0.8 },
+        ]);
+      });
 
       if (blocks.length) {
         gsap.to(blocks, {
@@ -59,18 +88,26 @@ useEffect(() => {
       }
 
       if (circleShowRef.current) {
-        gsap.fromTo(circleShowRef.current, 
-          { scale: 0, opacity: 0 }, 
-          { duration: 2, scale: 1, opacity: 1, ease: "expo.inOut", delay: 0.2 }
-        );
+        gsap.to(circleShowRef.current, { 
+          duration: 2, 
+          scale: 1, 
+          opacity: 1, 
+          ease: "expo.inOut", 
+          delay: 0.2 
+        });
       }
       
       const circles = [circleOneRef.current].filter((el) => Boolean(el));
       if (circles.length) {
-        gsap.from(circles, { duration: 2.4, scale: 0, ease: "expo.inOut", stagger: 0.05 });
+        gsap.to(circles, { 
+          duration: 2.4, 
+          scale: 1, 
+          opacity: 1,
+          ease: "expo.inOut", 
+          stagger: 0.05 
+        });
       }
 
-      
       const exitTimeline = gsap.timeline({
         scrollTrigger: {
           trigger: rootRef.current,
@@ -102,7 +139,10 @@ useEffect(() => {
 
     }, rootRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      mm.revert();
+    };
   }, []);
 
   return (
@@ -121,17 +161,17 @@ useEffect(() => {
         aria-hidden
       />
 
-      <div className="relative flex h-[90vh] w-full items-center justify-center">
+      <div className="relative flex h-[90vh] w-full items-center justify-center px-4 sm:px-8">
         <div
           ref={circleOneRef}
-          className="pointer-events-none absolute h-[52rem] w-[52rem] rounded-full border border-white/10"
+          className="opacity-0 scale-0 pointer-events-none absolute h-[22rem] w-[22rem] rounded-full border border-white/10 sm:h-[36rem] sm:w-[36rem] md:h-[44rem] md:w-[44rem] xl:h-[52rem] xl:w-[52rem]"
           aria-hidden
         />
 
         <div className="relative z-10 flex items-center justify-center">
           <div
             ref={circleShowRef}
-            className="absolute z-0 grid h-40 w-40 place-items-center rounded-full border border-white/30 bg-black/60 backdrop-blur"
+            className="opacity-0 scale-0 absolute z-0 grid h-28 w-28 place-items-center rounded-full border border-white/30 bg-black/60 backdrop-blur sm:h-40 sm:w-40 md:h-48 md:w-48"
             style={{ boxShadow: "inset 0 0 50px rgba(0,0,0,0.9)" }}
           >
             <div className="relative h-full w-full overflow-hidden rounded-full">
@@ -146,7 +186,7 @@ useEffect(() => {
             </div>
           </div>
           
-          <div className="flex items-center gap-4 text-[110px] font-black leading-none sm:text-[140px]">
+          <div className="flex items-center gap-2 text-[64px] font-black leading-none sm:gap-4 sm:text-[110px] md:text-[140px]">
             {letters.map((char, index) => (
               <div
                 key={char}

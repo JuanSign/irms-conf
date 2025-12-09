@@ -61,7 +61,7 @@ export default function NewsRunningText() {
   }, []);
 
   const Separator = () => (
-    <span className="mx-6 text-2xl text-[#AD0D0E] select-none">•</span>
+    <span className="mx-6 text-xl md:text-2xl text-[#AD0D0E] select-none">•</span>
   );
 
   return (
@@ -84,7 +84,7 @@ export default function NewsRunningText() {
       <div className="relative mb-6 flex w-full -rotate-1 transform opacity-80 transition-opacity hover:opacity-100">
         <div ref={row1Ref} className="flex whitespace-nowrap">
           {[...newsRow1, ...newsRow1, ...newsRow1].map((item, i) => (
-            <div key={i} className="flex items-center text-xl font-medium text-gray-400">
+            <div key={i} className="flex items-center text-sm md:text-xl font-medium text-gray-400">
               <span className="uppercase tracking-wide transition-colors hover:text-white">
                 {item}
               </span>
@@ -97,7 +97,7 @@ export default function NewsRunningText() {
       <div className="relative mb-6 flex w-full rotate-1 transform bg-[#AD0D0E]/5 py-4 backdrop-blur-sm">
         <div ref={row2Ref} className="flex whitespace-nowrap">
           {[...newsRow2, ...newsRow2, ...newsRow2].map((item, i) => (
-            <div key={i} className="flex items-center text-4xl font-black uppercase italic tracking-tighter text-white/90">
+            <div key={i} className="flex items-center text-2xl sm:text-3xl md:text-4xl font-black uppercase italic tracking-tighter text-white/90">
               <span 
                 className="transition-colors hover:text-[#AD0D0E]"
                 style={{ 
@@ -117,7 +117,7 @@ export default function NewsRunningText() {
               >
                 {item}
               </span>
-              <span className="mx-8 text-3xl text-[#AD0D0E] opacity-50">///</span>
+              <span className="mx-8 text-xl sm:text-2xl md:text-3xl text-[#AD0D0E] opacity-50">///</span>
             </div>
           ))}
         </div>
@@ -126,7 +126,7 @@ export default function NewsRunningText() {
       <div className="relative flex w-full -rotate-1 transform opacity-60 transition-opacity hover:opacity-100">
         <div ref={row3Ref} className="flex whitespace-nowrap">
           {[...newsRow3, ...newsRow3, ...newsRow3].map((item, i) => (
-            <div key={i} className="flex items-center text-lg font-medium text-gray-500">
+            <div key={i} className="flex items-center text-sm md:text-lg font-medium text-gray-500">
               <span className="uppercase tracking-wide transition-colors hover:text-white">
                 {item}
               </span>
