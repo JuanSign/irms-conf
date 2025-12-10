@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import InteractiveGridBackground from "./InteractiveGridBackground"; 
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -108,10 +109,12 @@ export default function ImportantDates() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full overflow-hidden bg-black pt-20 pb-40 text-white"
+      className="relative w-full overflow-hidden pt-20 pb-40 text-white"
     >
-      <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-red-900/10 blur-[120px]" />
-      <div className="absolute left-0 bottom-0 h-96 w-96 rounded-full bg-red-900/10 blur-[120px]" />
+      <InteractiveGridBackground />
+      
+      <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-red-900/10 blur-[120px]" />
+      <div className="pointer-events-none absolute left-0 bottom-0 h-96 w-96 rounded-full bg-red-900/10 blur-[120px]" />
 
       <div className="container mx-auto px-4 sm:px-6">
         <div className="mb-20 text-center">
