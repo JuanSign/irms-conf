@@ -65,7 +65,7 @@ export default function SpeechSection() {
   }, []);
 
   return (
-    <div className="relative w-full h-full min-h-svh flex justify-center items-center overflow-hidden bg-black">
+    <div className="relative w-full h-screen min-h-svh flex justify-center items-center overflow-hidden bg-background">
         <div ref={containerRef} className="w-full h-full flex justify-center items-center gap-2 max-[1000px]:flex-col text-[#fdb1b1] [text-shadow:0_0px_20px_rgb(239_22_24/0.8)] p-10"> 
             
         {/* Kolom Kiri (Images) */}
@@ -99,7 +99,7 @@ export default function SpeechSection() {
 
         {/* Kolom Kanan (Copy/Text) */}
         <div className="flex-1 mr-10 max-[1000px]:mr-0 max-[1000px]:mt-10 relative">
-            <div className="red-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] bg-[rgb(239,22,24)] rounded-full blur-[100px] opacity-25 pointer-events-none z-0 mix-blend-screen"></div> 
+            {/* <div className="red-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] bg-[rgb(239,22,24)] rounded-full blur-[100px] opacity-25 pointer-events-none z-0 mix-blend-screen"></div>  */}
             <div className="relative z-10 flex flex-col gap-4">
             
             {/* Tambah class "welcome-header" */}

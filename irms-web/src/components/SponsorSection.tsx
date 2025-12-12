@@ -26,9 +26,9 @@ export default function SponsorSection() {
         const cardRight = row.querySelector(".cta-card-right") as HTMLElement;
 
         // Config Animasi (Angka ini mengatur seberapa jauh gambar "terbang")
-        const leftXValues = [-1100, -1300, -700]; // Jarak terbang ke kiri
-        const rightXValues = [1100, 1300, 700];   // Jarak terbang ke kanan
-        const yValues = [-500, 100, 600];       // Jarak terbang vertikal (atas/bawah)
+        const leftXValues = [-500, -700, -300]; // Jarak terbang ke kiri
+        const rightXValues = [500, 700, 300];   // Jarak terbang ke kanan
+        const yValues = [-300, 100, 400];       // Jarak terbang vertikal (atas/bawah)
         const leftRotationValues = [-15, -20, -10];
         const rightRotationValues = [15, 20, 10];
 
@@ -37,13 +37,13 @@ export default function SponsorSection() {
         gsap.to(cardLeft, {
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top center", // Mulai animasi saat section masuk tengah layar
+            start: "top bottom", // Mulai animasi saat section masuk tengah layar
             end: "bottom top",   // Selesai saat section lewat
             scrub: 1,            // Angka 1 bikin animasi lebih smooth (ada delay dikit)
             onUpdate: (self) => {
               const progress = self.progress;
               // STARTING OFFSET: Kita tambah offset agar tidak mulai tepat di titik 0,0 (biar agak renggang)
-              const startSpread = 50; 
+              const startSpread = 60; 
               
               if (cardLeft?.style) {
                 cardLeft.style.transform = `
@@ -75,20 +75,16 @@ export default function SponsorSection() {
   };
 
   return (
-    <section
+    <div
       ref={containerRef}
-      className="cta relative w-full h-screen overflow-hidden bg-black flex justify-center items-center"
-    >
-      {/* --- GRID BACKGROUND (Hiasan biar mirip referensi) --- */}
-      <div className=" opacity-20 pointer-events-none z-0" 
-           style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '100px 100px' }}>
-      </div>
-
+      className="cta relative w-full h-screen overflow-hidden bg-background flex justify-center items-center"
+>
       {/* --- CONTENT UTAMA (TEXT) --- */}
       {/* Z-Index 20 agar selalu di atas gambar */}
       <div className="cta-content relative z-20 flex flex-col items-center text-center pointer-events-none">
         {/* Text */}
-        <div className="max-w-md px-7 mb-8">
+        <div className="max-w-md px-8 mb-8">
+          <p className="text-white text-sm md:text-base leading-loose font-bold mb-4">Our Sponsor</p>
           <p className="text-white text-sm md:text-base leading-loose font-extralight">
             We extend our deepest gratitude to all partners who collaborated with IRMS to make ROCKS a reality. 
             Your support and dedication were the driving force behind this initiative. 
@@ -123,6 +119,6 @@ export default function SponsorSection() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
