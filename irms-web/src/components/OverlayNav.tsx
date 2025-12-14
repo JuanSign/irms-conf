@@ -146,7 +146,7 @@ export default function OverlayNav() {
         />
 
         <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-            {["HOME", "SPEAKERS", "SCHEDULE", "NEWS"].map((item, idx) => (
+            {["HOME", "REGISTER", "SCHEDULE", "NEWS"].map((item, idx) => (
                 <div key={item} className="group relative overflow-hidden p-2">
                     
                     <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-600 transition-all duration-300 group-hover:left-[-20px] group-hover:text-[#AD0D0E] group-hover:opacity-0 md:-left-8">
