@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+// 1. Import useLayoutEffect di sini
+import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+// Register Plugin
 gsap.registerPlugin(ScrollTrigger);
 
 type DivRef = HTMLDivElement | null;
@@ -17,67 +19,74 @@ const neonColor = "#AD0D0E";
 export default function HeroSection() {
   const rootRef = useRef<DivRef>(null);
   const blockRefs = useRef<DivRef[]>([]);
-  const menuRefs = useRef<DivRef[]>([]);
-  const boxRef = useRef<DivRef>(null);
+  // Menu refs dihapus jika tidak dipakai, atau biarkan jika ada rencana pakai
   const circleOneRef = useRef<DivRef>(null);
   const circleShowRef = useRef<DivRef>(null);
-  const logoRef = useRef<DivRef>(null);
-  const showreelRef = useRef<DivRef>(null);
 
   const setBlockRef = (index: number) => (el: DivRef) => {
     blockRefs.current[index] = el;
   };
 
-  const setMenuRef = (index: number) => (el: DivRef) => {
-    menuRefs.current[index] = el;
-  };
+  // 2. Gunakan useLayoutEffect (Jalan sebelum browser painting)
+  useLayoutEffect(() => {
+    // Safety check: Jika elemen utama belum ada, batalkan
+    if (!rootRef.current) return;
 
-  useEffect(() => {
     const mm = gsap.matchMedia();
-    const ctx = gsap.context(() => {
-      const blocks = blockRefs.current.filter(
-        (el): el is HTMLDivElement => Boolean(el)
-      );
 
-      gsap.set(blocks, { 
-        textShadow: `0 0 0px ${neonColor}00`
-      });
+    // 3. Masukkan scope (rootRef) sebagai parameter kedua
+    mm.add(
+      {
+        isMobile: "(max-width: 640px)",
+        isDesktop: "(min-width: 641px)",
+      },
+      (context) => {
+        // Ambil kondisi dari context
+        const { isMobile } = context.conditions as { isMobile: boolean };
 
-      const animateLetters = (offsets: Array<{ x: number; y: number; scale: number }>) => {
-        offsets.forEach((offset, idx) => {
-          if (blocks[idx]) {
-            gsap.to(blocks[idx], {
+        // Filter refs yang valid
+        const blocks = blockRefs.current.filter(
+          (el): el is HTMLDivElement => Boolean(el)
+        );
+
+        if (blocks.length === 0) return;
+
+        // --- SETUP AWAL ---
+        gsap.set(blocks, {
+          textShadow: `0 0 0px ${neonColor}00`,
+        });
+
+        // --- LOGIKA POSISI (Tentukan koordinat berdasarkan kondisi) ---
+        const offsets = isMobile
+          ? [
+              { x: -15, y: -120, scale: 1.5 }, // R
+              { x: 160, y: -140, scale: 1.7 }, // O
+              { x: -150, y: 80, scale: 1.05 }, // C
+              { x: -70, y: 170, scale: 1.25 }, // K
+              { x: 10, y: 130, scale: 1.1 },   // S
+            ]
+          : [
+              { x: -120, y: -200, scale: 2 },
+              { x: -240, y: 200, scale: 1.2 },
+              { x: 290, y: -290, scale: 1.1 },
+              { x: 230, y: 240, scale: 0.8 },
+              { x: 190, y: 0, scale: 0.8 },
+            ];
+
+        // --- ANIMASI INTRO (SCATTER) ---
+        blocks.forEach((block, idx) => {
+          if (offsets[idx]) {
+            gsap.to(block, {
               duration: 2,
-              x: offset.x,
-              y: offset.y,
-              scale: offset.scale,
+              x: offsets[idx].x,
+              y: offsets[idx].y,
+              scale: offsets[idx].scale,
               ease: "expo.inOut",
             });
           }
         });
-      };
 
-      mm.add("(max-width: 640px)", () => {
-        animateLetters([
-          { x: -15, y: -120, scale: 1.5 }, // R
-          { x: 160, y: -140, scale: 1.7 }, // O
-          { x: -150, y: 80, scale: 1.05 }, // C
-          { x: -70, y: 170, scale: 1.25 }, // K
-          { x: 10, y: 130, scale: 1.1 }, // S
-        ]);
-      });
-
-      mm.add("(min-width: 641px)", () => {
-        animateLetters([
-          { x: -120, y: -200, scale: 2 },
-          { x: -240, y: 200, scale: 1.2 },
-          { x: 290, y: -290, scale: 1.1 },
-          { x: 230, y: 240, scale: 0.8 },
-          { x: 190, y: 0, scale: 0.8 },
-        ]);
-      });
-
-      if (blocks.length) {
+        // Animasi Glow
         gsap.to(blocks, {
           duration: 1.2,
           color: "#ffffff",
@@ -85,64 +94,83 @@ export default function HeroSection() {
           ease: "expo.out",
           delay: 0.4,
         });
-      }
 
-      if (circleShowRef.current) {
-        gsap.to(circleShowRef.current, { 
-          duration: 2, 
-          scale: 1, 
-          opacity: 1, 
-          ease: "expo.inOut", 
-          delay: 0.2 
-        });
-      }
-      
-      const circles = [circleOneRef.current].filter((el) => Boolean(el));
-      if (circles.length) {
-        gsap.to(circles, { 
-          duration: 2.4, 
-          scale: 1, 
-          opacity: 1,
-          ease: "expo.inOut", 
-          stagger: 0.05 
-        });
-      }
-
-      const exitTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top top",
-          end: "60% top", 
-          scrub: 0.5,    
+        // Animasi Logo Tengah
+        if (circleShowRef.current) {
+          gsap.to(circleShowRef.current, {
+            duration: 2,
+            scale: 1,
+            opacity: 1,
+            ease: "expo.inOut",
+            delay: 0.2,
+          });
         }
-      });
 
-      exitTimeline.to(blocks, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        ease: "power2.inOut", 
-      }, 0);
+        // Animasi Lingkaran Luar
+        if (circleOneRef.current) {
+          gsap.to(circleOneRef.current, {
+            duration: 2.4,
+            scale: 1,
+            opacity: 1,
+            ease: "expo.inOut",
+          });
+        }
 
-      exitTimeline.to(blocks, {
-        color: "#ffffff", 
-        textShadow: `0 0 0px ${neonColor}00, 0 0 0px ${neonColor}00, 0 0 0px ${neonColor}00`,
-        ease: "power2.inOut" 
-      }, 0);
+        // --- SCROLL TRIGGER (EXIT / ASSEMBLY) ---
+        // Animasi saat user scroll ke bawah: huruf menyatu kembali
+        const exitTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: rootRef.current, // Mengacu ke section container
+            start: "top top",
+            end: "60% top",
+            scrub: 0.5,
+          },
+        });
 
-      if (circleShowRef.current) {
-        exitTimeline.to(circleShowRef.current, { scale: 0, opacity: 0, ease: "power2.inOut" }, 0);
-      }
-      if (circleOneRef.current) {
-        exitTimeline.to(circleOneRef.current, { scale: 0, opacity: 0, ease: "power2.inOut" }, 0);
-      }
+        // Tarik semua huruf ke posisi 0 (tengah)
+        exitTimeline.to(
+          blocks,
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+            ease: "power2.inOut",
+          },
+          0
+        );
 
-    }, rootRef);
+        // Matikan glow saat menyatu
+        exitTimeline.to(
+          blocks,
+          {
+            color: "#ffffff",
+            textShadow: `0 0 0px ${neonColor}00, 0 0 0px ${neonColor}00, 0 0 0px ${neonColor}00`,
+            ease: "power2.inOut",
+          },
+          0
+        );
 
-    return () => {
-      ctx.revert();
-      mm.revert();
-    };
+        // Sembunyikan lingkaran logo & background circle
+        if (circleShowRef.current) {
+          exitTimeline.to(
+            circleShowRef.current,
+            { scale: 0, opacity: 0, ease: "power2.inOut" },
+            0
+          );
+        }
+        if (circleOneRef.current) {
+          exitTimeline.to(
+            circleOneRef.current,
+            { scale: 0, opacity: 0, ease: "power2.inOut" },
+            0
+          );
+        }
+      },
+      rootRef // Scope ref (PENTING untuk cleanup otomatis)
+    );
+
+    // Cleanup function
+    return () => mm.revert();
   }, []);
 
   return (
@@ -185,7 +213,7 @@ export default function HeroSection() {
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 text-[64px] font-black leading-none sm:gap-4 sm:text-[110px] md:text-[140px]">
             {letters.map((char, index) => (
               <div
