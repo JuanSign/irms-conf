@@ -8,18 +8,10 @@ export default function SubmissionPage() {
   return (
     <>
       <OverlayNav />
-      
-      {/* CONTAINER UTAMA: 
-         - Mobile: flex-col, min-h-screen
-         - Desktop (lg): flex-row, h-screen, overflow-hidden
-      */}
+
       <div className="flex flex-col lg:flex-row min-h-screen lg:h-screen w-full bg-[#050505] text-zinc-200">
-        
-        {/* === BAGIAN KIRI: KONTEN UTAMA === */}
         <div className="w-full lg:w-[65%] h-auto lg:h-full lg:overflow-y-auto px-6 pt-32 pb-20 lg:py-24 sm:px-12 md:px-24 custom-scrollbar scroll-smooth">
           <div className="max-w-4xl mx-auto space-y-12 md:space-y-16">
-            
-            {/* 1. Header & Call for Abstract */}
             <section className="animate-fade-in-up">
               <div className="border-l-4 border-red-700 pl-4 md:pl-6 mb-8">
                 <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-white">
@@ -53,7 +45,6 @@ export default function SubmissionPage() {
                 </div>
               </div>
 
-               {/* Action Buttons */}
                <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <button className="flex justify-center items-center gap-3 bg-red-800 hover:bg-red-700 text-white px-8 py-4 font-bold uppercase tracking-widest transition-all clip-path-slant text-sm md:text-base">
                   Submit Abstract <ArrowRight size={20} />
@@ -66,7 +57,6 @@ export default function SubmissionPage() {
 
             <div className="w-full h-px bg-zinc-800" />
 
-            {/* 2. Important Dates */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <Calendar className="text-red-600 w-6 h-6 md:w-7 md:h-7" />
@@ -99,7 +89,6 @@ export default function SubmissionPage() {
 
             <div className="w-full h-px bg-zinc-800" />
 
-            {/* 3. Topics */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <Layers className="text-blue-600 w-6 h-6 md:w-7 md:h-7" />
@@ -155,7 +144,6 @@ export default function SubmissionPage() {
           </div>
         </div>
 
-        {/* === BAGIAN KANAN: SIDEBAR / FOOTER (Responsive) === */}
         <div className="relative flex flex-col w-full lg:w-[35%] h-auto lg:h-full justify-between bg-zinc-900 border-l border-zinc-800 overflow-hidden shrink-0">
           
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-red-900/30 via-[#0a0a0a] to-[#050505] z-0"></div>

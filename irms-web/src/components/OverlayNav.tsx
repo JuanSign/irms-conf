@@ -41,42 +41,31 @@ export default function OverlayNav() {
     container.appendChild(fragment);
   };
 
-  // 1. HARD LOCK (Gunakan useLayoutEffect agar jalan SEBELUM paint)
   useLayoutEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
 
-    // Pastikan grid ada
     createGrid(container);
 
-    // Cek Session Storage
-    // Kita pakai try-catch biar aman di server-side rendering pas build
     let isNavigating = false;
     try {
         isNavigating = sessionStorage.getItem("is-navigating") === "true";
     } catch (e) {}
 
     if (isNavigating) {
-      // FORCE INSTANT COVER (Tanpa Animasi)
-      // Ini akan menutup layar sebelum user melihat halaman baru yang belum siap
       const squares = container.children;
-      
-      // Paksa CSS langsung apply
+  
       container.style.display = "flex";
       container.style.pointerEvents = "all";
       gsap.set(squares, { opacity: 1, scale: 1 });
 
-      // Hapus tanda, dan mulai timer buka tirai
       sessionStorage.removeItem("is-navigating");
-      
-      // Delay sedikit lebih lama (800ms) untuk memastikan layout halaman belakang stabil
+
       setTimeout(() => {
         animateReveal();
       }, 800);
     }
   }, []); 
-
-  // --- FUNGSI ANIMASI ---
 
   const animateCover = (onCompleteCallback?: () => void) => {
     if (!containerRef.current) return;
@@ -112,7 +101,7 @@ export default function OverlayNav() {
         gsap.to(squares, {
             opacity: 0,
             scale: 0.5,
-            duration: 0.6, // Agak dipelanin biar smooth
+            duration: 0.6, 
             ease: "power2.inOut",
             stagger: { amount: 0.3, from: "random", grid: "auto" },
             onComplete: () => {
@@ -123,7 +112,6 @@ export default function OverlayNav() {
     }, containerRef);
   };
 
-  // --- LOGIC NAVIGASI ---
   const handleNavigation = (href: string) => {
     if (href === pathname) {
         setIsOpen(false);
@@ -131,11 +119,8 @@ export default function OverlayNav() {
         return;
     }
     
-    // 1. Jalankan Cover
     animateCover(() => {
-        // 2. Pasang Flag
         sessionStorage.setItem("is-navigating", "true");
-        // 3. Pindah
         router.push(href);
     });
   };
@@ -161,14 +146,12 @@ export default function OverlayNav() {
         </div>
       </button>
 
-      {/* Grid Container */}
       <div 
         ref={containerRef} 
         className="fixed inset-0 z-[9999] flex flex-wrap content-start justify-start overflow-hidden pointer-events-none" 
         style={{ display: 'none' }}
       />
 
-      {/* Menu Container */}
       <div
         className={`fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden transition-opacity duration-0 ${
           isOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
