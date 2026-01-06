@@ -25,10 +25,9 @@ export default function SponsorSection() {
         const cardLeft = row.querySelector(".cta-card-left") as HTMLElement;
         const cardRight = row.querySelector(".cta-card-right") as HTMLElement;
 
-        // Config Animasi (Angka ini mengatur seberapa jauh gambar "terbang")
-        const leftXValues = [-500, -700, -300]; // Jarak terbang ke kiri
-        const rightXValues = [500, 700, 300];   // Jarak terbang ke kanan
-        const yValues = [-300, 100, 400];       // Jarak terbang vertikal (atas/bawah)
+        const leftXValues = [-500, -700, -300]; 
+        const rightXValues = [500, 700, 300];   
+        const yValues = [-300, 100, 400];       
         const leftRotationValues = [-15, -20, -10];
         const rightRotationValues = [15, 20, 10];
 
@@ -37,12 +36,11 @@ export default function SponsorSection() {
         gsap.to(cardLeft, {
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top bottom", // Mulai animasi saat section masuk tengah layar
-            end: "bottom top",   // Selesai saat section lewat
-            scrub: 1,            // Angka 1 bikin animasi lebih smooth (ada delay dikit)
+            start: "top bottom", 
+            end: "bottom top",   
+            scrub: 1,            
             onUpdate: (self) => {
               const progress = self.progress;
-              // STARTING OFFSET: Kita tambah offset agar tidak mulai tepat di titik 0,0 (biar agak renggang)
               const startSpread = 60; 
               
               if (cardLeft?.style) {
@@ -77,15 +75,18 @@ export default function SponsorSection() {
   return (
     <div
       ref={containerRef}
-      className="cta relative w-full h-screen overflow-hidden bg-background flex justify-center items-center"
->
+      // CHANGE: bg-background -> bg-white
+      className="cta relative w-full h-screen overflow-hidden bg-white flex justify-center items-center"
+    >
       {/* --- CONTENT UTAMA (TEXT) --- */}
-      {/* Z-Index 20 agar selalu di atas gambar */}
       <div className="cta-content relative z-20 flex flex-col items-center text-center pointer-events-none">
-        {/* Text */}
         <div className="max-w-md px-8 mb-8">
-          <p className="text-white text-sm md:text-base leading-loose font-bold mb-4">Our Sponsor</p>
-          <p className="text-white text-sm md:text-base leading-loose font-extralight">
+          {/* CHANGE: text-white -> text-[#AD0D0E] (Red Accent) */}
+          <p className="text-[#AD0D0E] text-sm md:text-base leading-loose font-bold mb-4 tracking-wider uppercase">
+            Our Sponsor
+          </p>
+          {/* CHANGE: text-white -> text-gray-600 */}
+          <p className="text-gray-700 text-sm md:text-base leading-loose font-normal">
             We extend our deepest gratitude to all partners who collaborated with IRMS to make ROCKS a reality. 
             Your support and dedication were the driving force behind this initiative. 
             Together, we have built something monumental.
@@ -94,25 +95,29 @@ export default function SponsorSection() {
       </div>
 
       {/* --- IMAGE LAYERS (CARDS) --- */}
-      {/* Container ini dibuat ABSOLUTE INSET-0 agar menumpuk pas di tengah layar */}
       <div className="absolute inset-0 z-10 flex flex-col justify-center items-center pointer-events-none">
         {rowImages.map((images, i) => (
           <div key={i} className="cta-row absolute flex justify-center items-center w-full h-full">
             
             {/* Card Left */}
-            {/* Translate default CSS dihapus, biarkan GSAP yang geser */}
-            <div className="cta-card cta-card-left absolute w-full h-40 md:w-[320px] md:h-[220px] rounded-xl overflow-hidden shadow-2xl shadow-orange-500/10 border border-white/10 filter brightness-75 will-change-transform">
-              <div className="w-full h-full relative bg-[#1a1a1a]" style={cardFrameStyle}>
-                <img src={images.left} alt="Left" className="w-full h-full object-cover opacity-80" />
-                <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent"></div>
+            {/* CHANGE: 
+                - bg-[#1a1a1a] -> bg-white
+                - border-white/10 -> border-gray-200
+                - shadow-orange... -> shadow-xl (clean shadow)
+                - Removed brightness-75
+            */}
+            <div className="cta-card cta-card-left absolute w-full h-40 md:w-[320px] md:h-[220px] rounded-xl overflow-hidden shadow-xl border border-gray-200 will-change-transform">
+              <div className="w-full h-full relative bg-white" style={cardFrameStyle}>
+                {/* Removed Opacity & Dark Overlay */}
+                <img src={images.left} alt="Left" className="w-full h-full object-cover" />
               </div>
             </div>
 
             {/* Card Right */}
-            <div className="cta-card cta-card-right absolute w-full h-40 md:w-[320px] md:h-[220px] rounded-xl overflow-hidden shadow-2xl shadow-orange-500/10 border border-white/10 filter brightness-75 will-change-transform">
-              <div className="w-full h-full relative bg-[#1a1a1a]" style={cardFrameStyle}>
-                <img src={images.right} alt="Right" className="w-full h-full object-cover opacity-80" />
-                <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent"></div>
+            <div className="cta-card cta-card-right absolute w-full h-40 md:w-[320px] md:h-[220px] rounded-xl overflow-hidden shadow-xl border border-gray-200 will-change-transform">
+              <div className="w-full h-full relative bg-white" style={cardFrameStyle}>
+                {/* Removed Opacity & Dark Overlay */}
+                <img src={images.right} alt="Right" className="w-full h-full object-cover" />
               </div>
             </div>
 

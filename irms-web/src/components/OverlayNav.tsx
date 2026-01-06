@@ -5,10 +5,10 @@ import { gsap } from "gsap";
 import { useRouter, usePathname } from "next/navigation";
 
 const theme = {
-  red: "#8e0c0cff",
-  blue: "#0055ff",
-  dark: "#050505",
-  white: "#ffffff",
+  brandBlue: "#04233A",
+  cyanBlue: "#00d2ff",
+  bg: "#ffffff",
+  text: "#0a0a0a",
 };
 
 export default function OverlayNav() {
@@ -17,7 +17,6 @@ export default function OverlayNav() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Helper: Buat Grid
   const createGrid = (container: HTMLDivElement) => {
     if (container.childElementCount > 0) return;
 
@@ -33,9 +32,11 @@ export default function OverlayNav() {
       const square = document.createElement("div");
       square.style.width = `${100 / numCols}%`;
       square.style.height = `${100 / numRows}%`;
-      square.style.backgroundColor = theme.red;
+      
+      square.style.backgroundColor = theme.brandBlue; 
+      
       square.style.opacity = "0"; 
-      square.style.border = "0.5px solid rgba(0,0,0,0.05)";
+      square.style.border = "0.5px solid rgba(255,255,255,0.1)"; 
       fragment.appendChild(square);
     }
     container.appendChild(fragment);
@@ -137,12 +138,26 @@ export default function OverlayNav() {
     <>
       <button
         onClick={toggleMenu}
-        className="fixed right-8 top-8 z-[2000] flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-md transition-all duration-300 hover:border-[#AD0D0E] hover:bg-black/80 hover:shadow-[0_0_20px_rgba(173,13,14,0.4)] active:scale-95"
+        className="fixed right-8 top-8 z-[2000] flex h-14 w-14 items-center justify-center rounded-full border border-gray-200 bg-white/80 shadow-md backdrop-blur-md transition-all duration-300 hover:border-[#0055ff] hover:bg-white hover:shadow-xl active:scale-95"
       >
         <div className="flex flex-col gap-1.5">
-          <span className={`block h-[2px] w-6 bg-white transition-all duration-300 ${isOpen ? "rotate-45 translate-y-2 bg-[#AD0D0E]" : ""}`} style={{ boxShadow: isOpen ? `0 0 10px ${theme.red}` : "none" }} />
-          <span className={`block h-[2px] w-4 bg-white transition-all duration-300 self-end ${isOpen ? "opacity-0" : ""}`} />
-          <span className={`block h-[2px] w-6 bg-white transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-2 bg-[#AD0D0E]" : ""}`} style={{ boxShadow: isOpen ? `0 0 10px ${theme.red}` : "none" }} />
+          <span 
+            className={`block h-[2px] w-6 bg-gray-900 transition-all duration-300 ${
+                isOpen ? "rotate-45 translate-y-2 bg-[#0055ff]" : ""
+            }`} 
+          />
+          
+          <span 
+            className={`block h-[2px] w-4 bg-gray-900 transition-all duration-300 self-end ${
+                isOpen ? "opacity-0" : ""
+            }`} 
+          />
+          
+          <span 
+            className={`block h-[2px] w-6 bg-gray-900 transition-all duration-300 ${
+                isOpen ? "-rotate-45 -translate-y-2 bg-[#0055ff]" : ""
+            }`} 
+          />
         </div>
       </button>
 
@@ -156,10 +171,11 @@ export default function OverlayNav() {
         className={`fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden transition-opacity duration-0 ${
           isOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
         }`}
-        style={{ backgroundColor: theme.dark }}
+        style={{ backgroundColor: theme.bg }} 
       >
-        <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-[#0055ff]/10 blur-[150px]" />
-        <div className="absolute left-0 bottom-0 h-[500px] w-[500px] rounded-full bg-[#AD0D0E]/10 blur-[150px]" />
+        <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-[#0055ff]/5 blur-[120px]" />
+        
+        <div className="absolute left-0 bottom-0 h-[500px] w-[500px] rounded-full bg-[#00d2ff]/5 blur-[120px]" />
         
         <div className="relative z-10 flex flex-col items-center gap-4 text-center">
           {["HOME", "PROGRAMS", "SUBMISSION"].map((item, idx) => {
@@ -172,8 +188,20 @@ export default function OverlayNav() {
                     e.preventDefault();
                     handleNavigation(href);
                   }}
-                  className="relative block font-black uppercase italic tracking-tighter text-white transition-all duration-300 hover:tracking-widest"
-                  style={{ fontSize: "clamp(3rem, 6vw, 6rem)", lineHeight: 0.9 }}
+                  className="relative block font-black uppercase italic tracking-tighter text-gray-900 transition-all duration-300 hover:text-transparent hover:tracking-widest"
+                  style={{ 
+                    fontSize: "clamp(3rem, 6vw, 6rem)", 
+                    lineHeight: 0.9,
+                    WebkitTextStroke: "0px", 
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.webkitTextStroke = `2px ${theme.brandBlue}`;
+                    e.currentTarget.style.color = "transparent";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.webkitTextStroke = "0px";
+                    e.currentTarget.style.color = theme.text;
+                  }}
                 >
                   {item}
                 </a>

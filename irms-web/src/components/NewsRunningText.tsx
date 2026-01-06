@@ -29,7 +29,14 @@ const newsRow3 = [
   "Circular Economy: Repurposing Mine Tailings into Construction Materials",
 ];
 
-const neonRed = "#AD0D0E";
+// Definisi Tema (Sesuai Request)
+const theme = {
+  darkMaroon: "#590004", // Background strip tengah / Shadow
+  vintageRed: "#C71F2D", // Highlight utama / Separator
+  cream: "#FCEECB",      // Text highlight / Stroke / Badge Text
+  deepNavy: "#04233A",   // Background Utama
+  steelBlue: "#6A96B7",  // Text normal / Pattern
+};
 
 export default function NewsRunningText() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,31 +68,54 @@ export default function NewsRunningText() {
   }, []);
 
   const Separator = () => (
-    <span className="mx-6 text-xl md:text-2xl text-[#AD0D0E] select-none">•</span>
+    // Separator menggunakan Vintage Red agar kontras dengan Navy
+    <span className="mx-6 text-xl md:text-2xl select-none" style={{ color: theme.vintageRed }}>•</span>
   );
 
   return (
     <section 
       ref={containerRef} 
-      className="relative flex w-full flex-col justify-center overflow-hidden bg-[#050505] pt-20 pb-40"
-      style={{ borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}
+      className="relative flex w-full flex-col justify-center overflow-hidden pt-24 pb-44"
+      style={{ 
+        // BACKGROUND: Deep Navy Solid dengan gradasi radial ke arah hitam di pinggir (Vignette alami)
+        background: `radial-gradient(circle at center, ${theme.deepNavy} 0%, #02121f 100%)`,
+        borderTop: `1px solid ${theme.steelBlue}15`, 
+        borderBottom: `1px solid ${theme.steelBlue}15` 
+      }}
     >
+      {/* UBAH: Pattern dots jadi Steel Blue dengan opacity rendah */}
       <div className="absolute inset-0 opacity-20" 
-           style={{ backgroundImage: "radial-gradient(#333 1px, transparent 1px)", backgroundSize: "30px 30px" }} 
+           style={{ backgroundImage: `radial-gradient(${theme.steelBlue} 1px, transparent 1px)`, backgroundSize: "30px 30px" }} 
       />
-      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-[#050505] to-transparent" />
-      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-[#050505] to-transparent" />
-      <div className="container mx-auto mb-20 px-6 text-center">
-        <span className="inline-block rounded-full border border-white/10 bg-white/5 px-8 py-3 text-xl font-bold tracking-[0.2em] text-gray-200 backdrop-blur-sm">
-          LATEST NEWS
+      
+      <div className="container mx-auto mb-16 px-6 text-center relative z-20">
+        <span 
+          className="inline-block px-6 py-2 text-xs md:text-sm font-bold tracking-[0.3em] uppercase backdrop-blur-md rounded-full transition-all duration-500 hover:tracking-[0.4em]"
+          style={{ 
+            backgroundColor: `${theme.deepNavy}80`, // Navy transparan
+            color: theme.vintageRed,                // Aksen Merah Vintage
+            border: `5px solid ${theme.vintageRed}40`, 
+            boxShadow: `0 0 35px ${theme.vintageRed}10` 
+          }}
+        >
+          Latest Intelligence
         </span>
       </div>
 
+      {/* ROW 1 */}
       <div className="relative mb-6 flex w-full -rotate-1 transform opacity-80 transition-opacity hover:opacity-100">
         <div ref={row1Ref} className="flex whitespace-nowrap">
           {[...newsRow1, ...newsRow1, ...newsRow1].map((item, i) => (
-            <div key={i} className="flex items-center text-sm md:text-xl font-medium text-gray-400">
-              <span className="uppercase tracking-wide transition-colors hover:text-white">
+            <div 
+                key={i} 
+                className="flex items-center text-sm md:text-xl font-medium transition-colors duration-300"
+                style={{ color: theme.steelBlue }}
+            >
+              <span 
+                className="uppercase tracking-wide transition-colors hover:cursor-default"
+                onMouseEnter={(e) => e.currentTarget.style.color = theme.cream}
+                onMouseLeave={(e) => e.currentTarget.style.color = "inherit"}
+              >
                 {item}
               </span>
               <Separator />
@@ -94,40 +124,64 @@ export default function NewsRunningText() {
         </div>
       </div>
 
-      <div className="relative mb-6 flex w-full rotate-1 transform bg-[#AD0D0E]/5 py-4 backdrop-blur-sm">
+      {/* ROW 2 (BIG TEXT - HERO) */}
+      <div 
+        className="relative mb-6 flex w-full rotate-1 transform py-4 backdrop-blur-sm"
+        style={{ 
+            backgroundColor: `${theme.darkMaroon}40`, // Dark Maroon transparan
+            borderTop: `1px solid ${theme.vintageRed}20`,
+            borderBottom: `1px solid ${theme.vintageRed}20`
+        }}
+      >
         <div ref={row2Ref} className="flex whitespace-nowrap">
           {[...newsRow2, ...newsRow2, ...newsRow2].map((item, i) => (
-            <div key={i} className="flex items-center text-2xl sm:text-3xl md:text-4xl font-black uppercase italic tracking-tighter text-white/90">
+            <div key={i} className="flex items-center text-2xl sm:text-3xl md:text-4xl font-black uppercase italic tracking-tighter">
               <span 
-                className="transition-colors hover:text-[#AD0D0E]"
+                className="transition-all duration-300 cursor-default"
                 style={{ 
-                   WebkitTextStroke: "1px rgba(255,255,255,0.3)", 
+                   // UBAH: Stroke warna Cream (elegan), Fill transparan
+                   WebkitTextStroke: `1px ${theme.cream}66`, // 66 = opacity 40%
                    color: "transparent" 
                 }}
                 onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "#AD0D0E"; 
+                    e.currentTarget.style.color = theme.vintageRed; // Isi jadi Merah Klasik
                     e.currentTarget.style.webkitTextStroke = "0px";
-                    e.currentTarget.style.textShadow = "0 0 20px #AD0D0E";
+                    e.currentTarget.style.textShadow = `0 0 30px ${theme.vintageRed}80`; // Glow
                 }}
                 onMouseLeave={(e) => {
                     e.currentTarget.style.color = "transparent";
-                    e.currentTarget.style.webkitTextStroke = "1px rgba(255,255,255,0.3)";
+                    e.currentTarget.style.webkitTextStroke = `1px ${theme.cream}66`;
                     e.currentTarget.style.textShadow = "none";
                 }}
               >
                 {item}
               </span>
-              <span className="mx-8 text-xl sm:text-2xl md:text-3xl text-[#AD0D0E] opacity-50">///</span>
+              <span 
+                className="mx-8 text-xl sm:text-2xl md:text-3xl opacity-50"
+                style={{ color: theme.vintageRed }}
+              >
+                ///
+              </span>
             </div>
           ))}
         </div>
       </div>
 
+      {/* ROW 3 */}
       <div className="relative flex w-full -rotate-1 transform opacity-60 transition-opacity hover:opacity-100">
         <div ref={row3Ref} className="flex whitespace-nowrap">
           {[...newsRow3, ...newsRow3, ...newsRow3].map((item, i) => (
-            <div key={i} className="flex items-center text-sm md:text-lg font-medium text-gray-500">
-              <span className="uppercase tracking-wide transition-colors hover:text-white">
+            // UBAH: Sama seperti Row 1, Steel Blue -> Cream
+            <div 
+                key={i} 
+                className="flex items-center text-sm md:text-lg font-medium transition-colors duration-300"
+                style={{ color: theme.steelBlue }}
+            >
+              <span 
+                className="uppercase tracking-wide transition-colors hover:cursor-default"
+                onMouseEnter={(e) => e.currentTarget.style.color = theme.cream}
+                onMouseLeave={(e) => e.currentTarget.style.color = "inherit"}
+              >
                 {item}
               </span>
               <Separator />

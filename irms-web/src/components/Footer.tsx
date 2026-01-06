@@ -7,7 +7,7 @@ export default function Footer() {
   };
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col p-8 md:p-16 bg-[rgba(56,1,1,0.58)] rounded-t-[2.5rem] md:rounded-t-[3rem] text-white">
+    <div className="relative w-full min-h-screen flex flex-col p-8 md:p-16 bg-[#04233A] rounded-t-[2.5rem] md:rounded-t-[3rem] text-white">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 w-full h-full content-start">
         
 
@@ -63,7 +63,7 @@ export default function Footer() {
             </ul>
         </div>
 
-k
+
         <div className="lg:col-span-4 flex flex-col gap-6 pt-2">
             <h3 className="text-white/50 font-bold uppercase tracking-widest text-sm">
                 Contact Details

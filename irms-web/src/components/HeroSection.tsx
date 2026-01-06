@@ -19,7 +19,6 @@ const neonColor = "#AD0D0E";
 export default function HeroSection() {
   const rootRef = useRef<DivRef>(null);
   const blockRefs = useRef<DivRef[]>([]);
-  // Menu refs dihapus jika tidak dipakai, atau biarkan jika ada rencana pakai
   const circleOneRef = useRef<DivRef>(null);
   const circleShowRef = useRef<DivRef>(null);
 
@@ -27,14 +26,11 @@ export default function HeroSection() {
     blockRefs.current[index] = el;
   };
 
-  // 2. Gunakan useLayoutEffect (Jalan sebelum browser painting)
   useLayoutEffect(() => {
-    // Safety check: Jika elemen utama belum ada, batalkan
     if (!rootRef.current) return;
 
     const mm = gsap.matchMedia();
 
-    // 3. Masukkan scope (rootRef) sebagai parameter kedua
     mm.add(
       {
         isMobile: "(max-width: 640px)",

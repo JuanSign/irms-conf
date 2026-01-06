@@ -6,6 +6,8 @@ const GRID_BLOCK_SIZE = 50;
 const GRID_HIGHLIGHT_DURATION = 400;
 const NEON_COLOR = "#0055ff"; 
 
+const DEFAULT_BORDER_COLOR = "rgba(0, 0, 0, 0.05)"; 
+
 export default function InteractiveGridBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -51,7 +53,9 @@ export default function InteractiveGridBackground() {
       block.style.height = `${GRID_BLOCK_SIZE}px`;
       block.style.left = `${x}px`;
       block.style.top = `${y}px`;
-      block.style.border = "1px solid rgba(255, 255, 255, 0.03)"; 
+      
+      block.style.border = `1px solid ${DEFAULT_BORDER_COLOR}`; 
+      
       block.style.transition = "background-color 0.2s, border-color 0.2s, box-shadow 0.2s"; 
       block.style.boxSizing = "border-box";
       
@@ -76,7 +80,7 @@ export default function InteractiveGridBackground() {
         let closestBlock = null;
         let minDist = Infinity;
 
-        const radius = GRID_BLOCK_SIZE * 3; 
+        const radius = GRID_BLOCK_SIZE * 1.5; 
 
         for (const block of gridBlocksRef.current) {
             const dx = mouseX - block.x;
@@ -132,7 +136,7 @@ export default function InteractiveGridBackground() {
         gridBlocksRef.current.forEach(block => {
             if (block.highlightEndTime > 0 && now > block.highlightEndTime) {
                 block.highlightEndTime = 0;
-                block.element.style.borderColor = "rgba(255, 255, 255, 0.03)";
+                block.element.style.borderColor = DEFAULT_BORDER_COLOR;
                 block.element.style.backgroundColor = "transparent";
                 block.element.style.boxShadow = "none";
                 block.element.style.zIndex = "0";
@@ -151,11 +155,6 @@ export default function InteractiveGridBackground() {
         mouseRef.current.y = e.clientY - rect.top;
 
         addHighlights();
-    };
-
-    const handleMouseLeave = () => {
-        mouseRef.current.x = undefined;
-        mouseRef.current.y = undefined;
     };
 
     const handleResize = () => {
@@ -178,7 +177,7 @@ export default function InteractiveGridBackground() {
   return (
     <div 
       ref={containerRef}
-      className="absolute inset-0 -z-10 h-full w-full overflow-hidden bg-black"
+      className="absolute inset-0 -z-10 h-full w-full overflow-hidden bg-white"
     />
   );
 }

@@ -34,8 +34,13 @@ const events = [
   },
 ];
 
-const neonRed = "#AD0D0E";
-const neonBlue = "#0055ff";
+const theme = {
+  darkMaroon: "#590004", 
+  vintageRed: "#C71F2D", 
+  cream: "#FCEECB",      
+  deepNavy: "#04233A",   
+  steelBlue: "#6A96B7",  
+};
 
 export default function ImportantDates() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,9 +63,9 @@ export default function ImportantDates() {
 
       if (titleTextRef.current) {
         gsap.to(titleTextRef.current, {
-          color: neonBlue,
-          textShadow: `0 0 20px ${neonBlue}66`,
-          duration: 1,
+          textShadow: `0 0 25px ${theme.vintageRed}66`, 
+          color: theme.vintageRed,
+          duration: 1.5,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
@@ -109,36 +114,54 @@ export default function ImportantDates() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full overflow-hidden pt-20 pb-40 text-white"
+      className="relative w-full overflow-hidden pt-20 pb-40"
+      style={{ color: theme.cream }} 
     >
       <InteractiveGridBackground />
       
-      <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-red-900/10 blur-[120px]" />
-      <div className="pointer-events-none absolute left-0 bottom-0 h-96 w-96 rounded-full bg-red-900/10 blur-[120px]" />
+      <div 
+        className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full blur-[120px] opacity-40" 
+        style={{ backgroundColor: theme.vintageRed }}
+      />
+      <div 
+        className="pointer-events-none absolute left-0 bottom-0 h-96 w-96 rounded-full blur-[120px] opacity-60" 
+        style={{ backgroundColor: theme.darkMaroon }}
+      />
 
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="mb-20 text-center">
           <h2 className="text-4xl font-bold uppercase tracking-wider md:text-5xl">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+            <span 
+              className="bg-clip-text text-transparent"
+              style={{ 
+                backgroundImage: `linear-gradient(to right, ${theme.deepNavy}, ${theme.steelBlue})` 
+              }}
+            >
               Important
             </span>{" "}
             <span
               ref={titleTextRef}
               style={{
-                color: neonRed,
-                textShadow: `0 0 20px ${neonRed}66`
+                color: theme.vintageRed,
+                textShadow: `0 0 20px ${theme.vintageRed}40`
               }}
             >
               Dates
             </span>
           </h2>
-          <p className="mt-4 text-gray-400">Key milestones leading up to the IRMS Conference 2026.</p>
+          <p 
+            className="mt-4 font-medium"
+            style={{ color: theme.deepNavy   }}
+          >
+            Key milestones leading up to the IRMS Conference 2026.
+          </p>
         </div>
 
         <div className="relative mx-auto max-w-6xl">
 
           <div
-            className="absolute left-6 top-0 h-full w-1 -translate-x-1/2 rounded-full bg-gray-800 md:left-1/2"
+            className="absolute left-6 top-0 h-full w-1 -translate-x-1/2 rounded-full md:left-1/2"
+            style={{ backgroundColor: `${theme.steelBlue}30` }} 
             aria-hidden="true"
           />
 
@@ -147,10 +170,11 @@ export default function ImportantDates() {
           >
             <div
               ref={lineProgressRef}
-              className="w-full rounded-full bg-gradient-to-b from-[#AD0D0E] to-[#5e0000]"
+              className="w-full rounded-full"
               style={{
                 height: "0%",
-                boxShadow: `0 0 15px ${neonRed}`
+                background: `linear-gradient(to bottom, ${theme.vintageRed}, ${theme.darkMaroon})`,
+                boxShadow: `0 0 15px ${theme.vintageRed}66`
               }}
             />
           </div>
@@ -170,9 +194,16 @@ export default function ImportantDates() {
                   <div className="absolute left-6 z-10 flex -translate-x-1/2 items-center justify-center md:left-1/2">
                     <div
                       ref={(el) => addToRefs(el, dotsRef) as any}
-                      className="h-5 w-5 rounded-full border-[3px] border-black bg-white"
+                      className="h-5 w-5 rounded-full shadow-md flex items-center justify-center"
+                      style={{ 
+                        border: `3px solid ${theme.cream}`, 
+                        backgroundColor: theme.cream 
+                      }}
                     >
-                      <div className="h-full w-full rounded-full bg-[#AD0D0E]"></div>
+                      <div 
+                        className="h-full w-full rounded-full" 
+                        style={{ backgroundColor: theme.vintageRed }}
+                      ></div>
                     </div>
                   </div>
 
@@ -180,23 +211,47 @@ export default function ImportantDates() {
                     ref={(el) => addToRefs(el, cardsRef) as any}
                     className={`w-full pl-16 md:w-5/12 md:pl-0 ${isEven ? 'md:text-right' : 'md:text-left'}`}
                   >
-                    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a] p-6 transition-all hover:border-[#AD0D0E]/50 hover:bg-[#111]">
+                    <div 
+                      className="group relative overflow-hidden rounded-xl border p-6 transition-all duration-300 shadow-2xl"
+                      style={{ 
+                        backgroundColor: theme.deepNavy, 
+                        borderColor: `${theme.steelBlue}20`, 
+                      }}
+                    >
+                      
+                      <div className="absolute inset-0 rounded-xl border border-transparent transition-colors duration-300 group-hover:border-[#C71F2D] pointer-events-none" />
 
-                      <div className="absolute -inset-1 z-0 rounded-xl bg-gradient-to-r from-[#AD0D0E] to-red-900 opacity-0 blur transition duration-500 group-hover:opacity-20" />
+                      <div 
+                        className="absolute -inset-1 z-0 rounded-xl opacity-0 blur transition duration-500 group-hover:opacity-30" 
+                        style={{ 
+                          background: `linear-gradient(to right, ${theme.vintageRed}, ${theme.darkMaroon})` 
+                        }}
+                      />
 
                       <div className="relative z-10">
                         <span
-                          className="mb-3 inline-block rounded border border-[#AD0D0E]/30 bg-[#AD0D0E]/10 px-3 py-1 text-sm font-bold tracking-wide text-white backdrop-blur-sm"
-                          style={{ boxShadow: `0 0 10px ${neonRed}15` }}
+                          className="mb-3 inline-block rounded px-3 py-1 text-sm font-bold tracking-wide backdrop-blur-sm border"
+                          style={{ 
+                            backgroundColor: `${theme.darkMaroon}E6`, 
+                            color: theme.cream,                        
+                            borderColor: `${theme.vintageRed}66`,      
+                            boxShadow: `0 0 10px ${theme.darkMaroon}80`
+                          }}
                         >
                           {event.date}
                         </span>
 
-                        <h3 className="mb-2 text-xl font-bold text-white group-hover:text-red-100 md:text-2xl">
+                        <h3 
+                          className="mb-2 text-xl font-bold transition-colors md:text-2xl"
+                          style={{ color: theme.cream }}
+                        >
                           {event.title}
                         </h3>
 
-                        <p className="text-sm leading-relaxed text-gray-400 group-hover:text-gray-300">
+                        <p 
+                          className="text-sm leading-relaxed"
+                          style={{ color: theme.steelBlue }}
+                        >
                           {event.description}
                         </p>
                       </div>
