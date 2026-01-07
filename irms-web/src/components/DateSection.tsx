@@ -10,27 +10,27 @@ gsap.registerPlugin(ScrollTrigger);
 const events = [
   {
     id: 1,
-    date: "December 19, 2025",
+    date: "December 22, 2025",
+    title: "Open Registration",
+    description: "Official opening of the registration period. Participants and authors can begin registering for the conference.",
+  },
+  {
+    id: 2,
+    date: "February 23, 2026",
     title: "Abstract Submission Deadline",
     description: "The final deadline for research abstract submissions. Ensure the summary comprehensively covers the objectives, methodology, and preliminary results.",
   },
   {
-    id: 2,
-    date: "January 31, 2026",
+    id: 3,
+    date: "March 15, 2026",
     title: "Notification of Abstract Acceptance",
     description: "Announcement of abstract selection results. Successful authors will be invited to submit their full manuscripts.",
   },
   {
-    id: 3,
-    date: "April 30, 2026",
+    id: 4,
+    date: "June 1, 2026",
     title: "Full Paper Submission Deadline",
     description: "The deadline for full paper submissions. Manuscripts must adhere strictly to the IRMS 2026 template and guidelines.",
-  },
-  {
-    id: 4,
-    date: "June 30, 2026",
-    title: "Notification of Paper Acceptance",
-    description: "Final notification of paper acceptance for presentation at the main conference.",
   },
 ];
 

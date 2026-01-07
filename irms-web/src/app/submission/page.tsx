@@ -12,6 +12,37 @@ import { Calendar, FileText, Award, Layers, ArrowRight } from "lucide-react";
 // 5. Steel Blue: #6A96B7
 
 export default function SubmissionPage() {
+  const events = [
+  {
+    id: 1,
+    date: "Dec 22, 2025",
+    label: "Notification", // Sesuaikan dengan label di desain (Notification/Deadline)
+    title: "Open Registration",
+    desc: "Official opening of the registration period.",
+  },
+  {
+    id: 2,
+    date: "Feb 23, 2026",
+    label: "Deadline",
+    title: "Abstract Submission",
+    desc: "Final deadline for research abstract submissions.",
+  },
+  {
+    id: 3,
+    date: "Mar 15, 2026",
+    label: "Notification",
+    title: "Abstract Acceptance",
+    desc: "Announcement of abstract selection results.",
+  },
+  {
+    id: 4,
+    date: "Jun 1, 2026",
+    label: "Deadline",
+    title: "Full Paper Submission",
+    desc: "Deadline for full paper submissions.",
+  },
+];
+
   return (
     <>
       <OverlayNav />
@@ -24,7 +55,7 @@ export default function SubmissionPage() {
               <div className="border-l-4 border-[#C71F2D] pl-4 md:pl-6 mb-8">
                 <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-[#04233A]">
                   Call for <span className="text-[#C71F2D]">Abstract</span>
-                </h1>]
+                </h1>
                 <p className="mt-2 text-sm md:text-lg text-[#6A96B7] font-bold tracking-widest uppercase">
                   Submission has been started!
                 </p>
@@ -32,26 +63,26 @@ export default function SubmissionPage() {
 
               <div className="prose max-w-none text-justify text-[#04233A]/80 text-sm md:text-base leading-relaxed">
                 <p className="mb-4">
-                  Prospective authors are kindly asked to submit an abstract related to one of the proposed symposium topics
-                  to participate in the symposium. The abstracts should be written in English and should clearly explain the
-                  contents of the studies discussed. Specifically, it is strongly recommended that the abstracts states:
+                  Prospective authors are invited to submit an abstract aligned with one of the symposium topics for consideration. Abstracts must be written in English and provide a clear explanation of the research content. It is highly recommended that each abstract explicitly includes:
                 </p>
                 <ul className="list-disc pl-5 space-y-2 mb-6 text-[#04233A] font-medium marker:text-[#C71F2D]">
-                  <li>Objective of the study</li>
-                  <li>Results obtained in the study and their significance</li>
-                  <li>Advancements beyond previous research or novelties</li>
-                  {/* Note Color: Dark Maroon */}
-                  <li><span className="text-[#590004] font-bold">Note:</span> Previously published results will not be accepted.</li>
-                  <li>The length of the abstracts should be around <strong>300 words</strong>.</li>
+                  <li>The study's objective</li>
+                  <li>The results and their significance</li>
+                  <li>Advancements or novel contributions relative to prior work</li>
+                  <li><span className="text-[#590004] font-bold">Note:</span> Previously published findings are not eligible for submission.</li>
                 </ul>
-                
-                <div className="bg-[#FCEECB]/30 border border-[#6A96B7]/30 p-4 md:p-6 rounded-none border-l-2 border-l-[#04233A]">
-                  <h4 className="text-[#04233A] font-bold uppercase tracking-wider mb-2 text-sm">Review Process</h4>
-                  <p className="text-xs md:text-sm text-[#04233A]/80">
-                    Submitted abstracts will be reviewed by two independent experts specializing in the relevant fields.
-                    Author(s) information do not need to be included in the PDF body (blind review).
-                  </p>
-                </div>
+                <p className="mb-4">
+                  Abstracts should be approximately 500 words in length and must contain:
+                </p>
+                <ul className="list-disc pl-5 space-y-2 mb-6 text-[#04233A] font-medium marker:text-[#C71F2D]">
+                  <li>The paper title</li>
+                  <li>Indication of the chosen symposium topic</li>
+                  <li>4–5 keywords</li>
+                  <li>(Author information is not required at this stage.)</li>
+                </ul>
+                <p>
+                  Submissions must be prepared as a PDF file and uploaded via the online submission system, which will become active in December 2025. No specific formatting template is provided.
+                </p>
               </div>
 
                <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -66,39 +97,51 @@ export default function SubmissionPage() {
 
             <div className="w-full h-px bg-[#04233A]/10" />
 
-            <section>
-              <div className="flex items-center gap-3 mb-8">
-                {/* Icon: Vintage Red */}
-                <Calendar className="text-[#C71F2D] w-6 h-6 md:w-7 md:h-7" />
-                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#04233A]">Important Dates</h2>
-              </div>
+<section className="w-full">
+      <div className="flex items-center gap-3 mb-8">
+        <Calendar className="text-[#C71F2D] w-6 h-6 md:w-7 md:h-7" />
+        <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#04233A]">
+          Important Dates
+        </h2>
+      </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="group relative bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#C71F2D] transition-all duration-300">
-                    <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest">Deadline</span>
-                    <h3 className="text-2xl font-bold text-[#04233A] mt-1">Dec 19, 2025</h3>
-                    <p className="text-[#04233A]/60 mt-2 text-sm group-hover:text-[#C71F2D] transition-colors">Abstract Submission Deadline</p>
-                 </div>
-                 
-                 <div className="group relative bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#04233A] transition-all duration-300">
-                    <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest">Notification</span>
-                    <h3 className="text-2xl font-bold text-[#04233A] mt-1">Jan 31, 2026</h3>
-                    <p className="text-[#04233A]/60 mt-2 text-sm group-hover:text-[#04233A] transition-colors">Notification of Abstract Acceptance</p>
-                 </div>
-                 
-                 <div className="group relative bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#C71F2D] transition-all duration-300">
-                    <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest">Deadline</span>
-                    <h3 className="text-2xl font-bold text-[#04233A] mt-1">Apr 30, 2026</h3>
-                    <p className="text-[#04233A]/60 mt-2 text-sm group-hover:text-[#C71F2D] transition-colors">Full Paper Submission Deadline</p>
-                 </div>
-                 
-                 <div className="group relative bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#04233A] transition-all duration-300">
-                    <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest">Notification</span>
-                    <h3 className="text-2xl font-bold text-[#04233A] mt-1">Jun 30, 2026</h3>
-                    <p className="text-[#04233A]/60 mt-2 text-sm group-hover:text-[#04233A] transition-colors">Notification of Paper Acceptance</p>
-                 </div>
+      {/* Ganti Flex dengan Grid agar lebar kartu PASTI sama rata */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {events.map((item, index) => (
+          <div key={item.id} className="relative group w-full">
+            
+            {/* KARTU */}
+            <div className="bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#C71F2D] transition-all duration-300 h-full flex flex-col relative z-10">
+              <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest mb-1">
+                {item.label}
+              </span>
+              <h3 className="text-xl md:text-2xl font-bold text-[#04233A] mb-2">
+                {item.date}
+              </h3>
+              {/* min-h-[3rem] menjaga agar judul 1 baris tetap punya tinggi sama dengan judul 2 baris */}
+              <p className="text-[#04233A]/80 text-sm font-medium leading-tight min-h-[2.5rem] flex items-center group-hover:text-[#C71F2D] transition-colors">
+                {item.title}
+              </p>
+            </div>
+
+            {/* PANAH (Absolute Position) */}
+            {/* Logika: Munculkan panah jika bukan item terakhir */}
+            {index !== events.length - 1 && (
+              <div className="absolute z-0 flex items-center justify-center 
+                              /* Posisi Mobile: Di bawah tengah */
+                              left-1/2 -translate-x-1/2 -bottom-6
+                              /* Posisi Desktop: Di kanan tengah */
+                              lg:left-auto lg:-right-9 lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto">
+                <ArrowRight 
+                  className="w-5 h-5 text-[#C71F2D] 
+                             transform rotate-90 lg:rotate-0" 
+                />
               </div>
-            </section>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
 
             <div className="w-full h-px bg-[#04233A]/10" />
 
