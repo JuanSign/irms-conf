@@ -97,51 +97,47 @@ export default function SubmissionPage() {
 
             <div className="w-full h-px bg-[#04233A]/10" />
 
-<section className="w-full">
-      <div className="flex items-center gap-3 mb-8">
-        <Calendar className="text-[#C71F2D] w-6 h-6 md:w-7 md:h-7" />
-        <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#04233A]">
-          Important Dates
-        </h2>
-      </div>
+            <section className="w-full">
+              <div className="flex items-center gap-3 mb-8">
+                <Calendar className="text-[#C71F2D] w-6 h-6 md:w-7 md:h-7" />
+                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#04233A]">
+                Important Dates
+                </h2>
+              </div>
 
-      {/* Ganti Flex dengan Grid agar lebar kartu PASTI sama rata */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {events.map((item, index) => (
-          <div key={item.id} className="relative group w-full">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {events.map((item, index) => (
+                  <div key={item.id} className="relative group w-full">
             
-            {/* KARTU */}
-            <div className="bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#C71F2D] transition-all duration-300 h-full flex flex-col relative z-10">
-              <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest mb-1">
-                {item.label}
-              </span>
-              <h3 className="text-xl md:text-2xl font-bold text-[#04233A] mb-2">
-                {item.date}
-              </h3>
-              {/* min-h-[3rem] menjaga agar judul 1 baris tetap punya tinggi sama dengan judul 2 baris */}
-              <p className="text-[#04233A]/80 text-sm font-medium leading-tight min-h-[2.5rem] flex items-center group-hover:text-[#C71F2D] transition-colors">
-                {item.title}
-              </p>
-            </div>
+                   <div className="bg-white p-6 border border-[#6A96B7]/30 shadow-sm hover:shadow-md hover:border-[#C71F2D] transition-all duration-300 h-full flex flex-col relative z-10">
+                      <span className="text-xs font-bold text-[#6A96B7] uppercase tracking-widest mb-1">
+                        {item.label}
+                      </span>
+                      <h3 className="text-xl md:text-2xl font-bold text-[#04233A] mb-2">
+                        {item.date}
+                      </h3>
+                      <p className="text-[#04233A]/80 text-sm font-medium leading-tight min-h-[2.5rem] flex items-center group-hover:text-[#C71F2D] transition-colors">
+                        {item.title}
+                      </p>
+                    </div>
 
-            {/* PANAH (Absolute Position) */}
-            {/* Logika: Munculkan panah jika bukan item terakhir */}
-            {index !== events.length - 1 && (
-              <div className="absolute z-0 flex items-center justify-center 
+                    {index !== events.length - 1 && (
+                      <div className="absolute z-0 flex items-center justify-center 
                               /* Posisi Mobile: Di bawah tengah */
                               left-1/2 -translate-x-1/2 -bottom-6
                               /* Posisi Desktop: Di kanan tengah */
                               lg:left-auto lg:-right-9 lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto">
-                <ArrowRight 
-                  className="w-5 h-5 text-[#C71F2D] 
-                             transform rotate-90 lg:rotate-0" 
-                />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+                      <ArrowRight 
+                        className="
+                              w-5 h-5 text-[#C71F2D] 
+                              transform rotate-90 lg:rotate-0" 
+                        />
+                      </div>
+                    )}
+                   </div>
+                  ))}
+                </div>
+            </section>
 
             <div className="w-full h-px bg-[#04233A]/10" />
 
