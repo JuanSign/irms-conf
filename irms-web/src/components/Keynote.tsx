@@ -43,7 +43,7 @@ const KeynoteGSAP = () => {
       desc: "We develop drawings and specifications across structure, services, and joinery. Materials and samples are reviewed in natural light while budget and timeline stay in view."
     },
     {
-      img: "syafrijal.png",
+      img: "/syafrijal.png",
       title: "Estimation of Joint Size",
       speaker: "Prof. Syafrizal",
       institute: "Bandung Institute of Technology",
