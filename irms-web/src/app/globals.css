@@ -24,3 +24,27 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom Scrollbar Styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #FAF9F6;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #6A96B7;
+  border-radius: 0px;
+  border: 1px solid #FAF9F6;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #04233A;
+}
+
+/* Clip Path Utility */
+.clip-path-slant {
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -51,11 +52,11 @@ const KeynoteGSAP = () => {
   ];
 
   // --- 3. LOGIC CHECK MOBILE ---
-  const checkMobile = () => {
-    setIsMobile(window.innerWidth <= 1000);
-  };
-
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1000);
+    };
+    
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -133,9 +134,9 @@ const KeynoteGSAP = () => {
   }, [isMobile]);
 
   return (
-    // CONTAINER UTAMA (Style Keynote)
+    // CONTAINER UTAMA (Style Keynote - Light Theme)
     <div 
-      className="relative w-full min-h-screen flex flex-col lg:flex-row bg-black text-[#8d785b]"
+      className="relative w-full min-h-screen flex flex-col lg:flex-row bg-white text-gray-800"
       ref={containerRef}
     >
       
@@ -152,11 +153,11 @@ const KeynoteGSAP = () => {
             
             {/* Label Kecil */}
             <div>
-              <p className="font-medium">Keynote Speakers</p>
+              <p className="font-medium text-[#6A96B7]">Keynote Speakers</p>
             </div>
 
             {/* Judul Besar */}
-            <h3 className="text-[2rem] lg:text-[2.5rem] leading-[1.1] font-medium tracking-tight">
+            <h3 className="text-[2rem] lg:text-[2.5rem] leading-[1.1] font-medium tracking-tight text-[#04233A]">
               Insights from global experts shaping the future of rock mechanics and engineering.
             </h3>
 
@@ -170,8 +171,8 @@ const KeynoteGSAP = () => {
                     className={`gsap-step group relative p-5 h-16 flex items-center justify-center border rounded-2xl transition-all duration-500 ease-out overflow-hidden select-none
                       ${
                         isActive
-                          ? "w-40 bg-[#8d785b] text-black"
-                          : "w-16 border-[rgba(102,95,86,0.65)] border-4"
+                          ? "w-40 bg-[#C71F2D] text-white"
+                          : "w-16 border-[#6A96B7]/40 border-4 text-[#04233A]"
                       }`}
                   >
                     {/* Teks "Step" */}
@@ -207,29 +208,30 @@ const KeynoteGSAP = () => {
           <div 
             key={i} 
             // Class 'gsap-card' ditambahkan untuk target ScrollTrigger
-            className="gsap-card flex flex-col gap-6  p-4 rounded-2xl shadow-sm"
+            className="gsap-card flex flex-col gap-6 p-4 rounded-2xl shadow-sm bg-white border border-gray-200 hover:border-[#C71F2D] transition-colors"
           >
             {/* Gambar */}
-            <div className="relative overflow-hidden aspect-square rounded-xl bg-gray-800">
-              <img
+            <div className="relative overflow-hidden aspect-square rounded-xl bg-gray-200">
+              <Image
                 src={item.img}
                 alt={item.title}
-                className="absolute top-0 left-0 object-cover w-full h-full opacity-80 hover:opacity-100 transition-opacity duration-500"
+                fill
+                className="object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
               />
-              <div className="absolute z-10 bottom-4 right-4 p-4 bg-[rgba(20,19,19,0.65)] backdrop-blur-[15px] rounded-xl max-[1000px]:hidden">
-                <h3 className="text-xl font-bold">{item.speaker}</h3>
-                <p className="text-[#fee7e7]">{item.institute}</p>
+              <div className="absolute z-10 bottom-4 right-4 p-4 bg-white/90 backdrop-blur-[15px] rounded-xl max-[1000px]:hidden shadow-lg">
+                <h3 className="text-xl font-bold text-[#04233A]">{item.speaker}</h3>
+                <p className="text-[#6A96B7]">{item.institute}</p>
                 </div>
             </div>
 
             {/* Teks Deskripsi (Style Keynote) */}
             <div className="p-2">
               <div className="mb-5">
-                <h3 className="text-[1.75rem] leading-none tracking-tight font-medium">
+                <h3 className="text-[1.75rem] leading-none tracking-tight font-medium text-[#04233A]">
                   {item.title}
                 </h3>
               </div>
-              <p className="text-[1rem] leading-[1.6] opacity-90">
+              <p className="text-[1rem] leading-[1.6] text-gray-600">
                 {item.desc}
               </p>
             </div>

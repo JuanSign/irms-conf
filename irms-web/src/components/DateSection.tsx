@@ -193,7 +193,7 @@ export default function ImportantDates() {
 
                   <div className="absolute left-6 z-10 flex -translate-x-1/2 items-center justify-center md:left-1/2">
                     <div
-                      ref={(el) => addToRefs(el, dotsRef) as any}
+                      ref={(el) => addToRefs(el, dotsRef)}
                       className="h-5 w-5 rounded-full shadow-md flex items-center justify-center"
                       style={{ 
                         border: `3px solid ${theme.cream}`, 
@@ -208,7 +208,7 @@ export default function ImportantDates() {
                   </div>
 
                   <div
-                    ref={(el) => addToRefs(el, cardsRef) as any}
+                    ref={(el) => addToRefs(el, cardsRef)}
                     className={`w-full pl-16 md:w-5/12 md:pl-0 ${isEven ? 'md:text-right' : 'md:text-left'}`}
                   >
                     <div 

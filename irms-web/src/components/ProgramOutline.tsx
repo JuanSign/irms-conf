@@ -33,34 +33,34 @@ export default function ProgramOutline() {
   ];
 
   return (
-    <section className="w-full min-h-screen flex flex-col items-center bg-black text-[#8d785b] py-20 px-4 md:px-10">
+    <section className="w-full min-h-screen flex flex-col items-center bg-white text-gray-800 py-20 px-4 md:px-10">
 
-      <div className='text-4xl md:text-6xl font-bold mb-12 tracking-tight text-center'>
+      <div className='text-4xl md:text-6xl font-bold mb-12 tracking-tight text-center text-[#04233A]'>
         Program Outline
       </div>
 
       <div className='w-full max-w-7xl overflow-x-auto shadow-lg rounded-lg'>
-        <table className='w-full border-collapse bg-white/10 text-left text-sm md:text-base text-white'>
+        <table className='w-full border-collapse bg-white text-left text-sm md:text-base text-gray-800'>
 
-          <thead className='bg-[#8d785b8b] text-white uppercase tracking-wider'>
+          <thead className='bg-[#C71F2D] text-white uppercase tracking-wider'>
             <tr>
-              <th className='p-5 border-r-2 border-[rgba(255,255,255,0.5)]'>Date</th>
-              <th className='p-5 border-r-2 border-[rgba(255,255,255,0.5)]'>Registration</th>
-              <th className='p-5 border-r-2 border-[rgba(255,255,255,0.5)]'>Scientific Program</th>
-              <th className='p-5 border-r-2 border-[rgba(255,255,255,0.5)]'>Exhibition</th>
+              <th className='p-5 border-r-2 border-white/30'>Date</th>
+              <th className='p-5 border-r-2 border-white/30'>Registration</th>
+              <th className='p-5 border-r-2 border-white/30'>Scientific Program</th>
+              <th className='p-5 border-r-2 border-white/30'>Exhibition</th>
               <th className='p-5'>Social Events</th>
             </tr>
           </thead>
 
-          <tbody className='divide-y-4 divide-gray-200/35'>
+          <tbody className='divide-y-2 divide-gray-200'>
             {scheduleData.map((item, index) => (
-              <tr key={index} className="hover:bg-red-700/40 transition-colors">
+              <tr key={index} className="hover:bg-[#FCEECB]/30 transition-colors">
 
-                <td className='p-4 border-r-2 border-[rgba(255,255,255,0.5)] font-bold bg-transparent text-white align-top w-1/6'>
+                <td className='p-4 border-r-2 border-gray-200 font-bold bg-transparent text-[#04233A] align-top w-1/6'>
                   {item.date}
                 </td>
 
-                <td className='p-4 border-r-2 border-[rgba(255,255,255,0.5)]  align-top w-1/6'>
+                <td className='p-4 border-r-2 border-gray-200 align-top w-1/6'>
                   {item.reg && (
                     <ul className="list-disc list-inside">
                         <li>{item.reg}</li>
@@ -68,7 +68,7 @@ export default function ProgramOutline() {
                   )}
                 </td>
 
-                <td className='p-4 border-r-2 border-[rgba(255,255,255,0.5)] align-top w-2/6'>
+                <td className='p-4 border-r-2 border-gray-200 align-top w-2/6'>
                   <ul className='list-disc list-inside space-y-1'>
                     {item.program.map((prog, i) => (
                       <li key={i}>{prog}</li>
@@ -76,7 +76,7 @@ export default function ProgramOutline() {
                   </ul>
                 </td>
 
-                <td className='p-4 border-r-2 border-[rgba(255,255,255,0.5)] align-top w-1/6'>
+                <td className='p-4 border-r-2 border-gray-200 align-top w-1/6'>
                    {item.exhibit && (
                     <ul className="list-disc list-inside">
                         <li>{item.exhibit}</li>
@@ -84,7 +84,7 @@ export default function ProgramOutline() {
                   )}
                 </td>
 
-                <td className='p-4 align-top w-1/6 font-bold text-[#8d785b]'>
+                <td className='p-4 align-top w-1/6 font-bold text-[#C71F2D]'>
                    {item.social && (
                     <ul className="list-disc list-inside">
                         <li>{item.social}</li>

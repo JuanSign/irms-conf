@@ -156,11 +156,11 @@ export default function NewsRunningText() {
               >
                 {item}
               </span>
-              <span 
+              <span
                 className="mx-8 text-xl sm:text-2xl md:text-3xl opacity-50"
                 style={{ color: theme.vintageRed }}
               >
-                ///
+                {'///'}
               </span>
             </div>
           ))}
