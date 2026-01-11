@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 const rowImages = [
   { left: "/KAjima.jpg", right: "/Hazama.jpg" },
   { left: "/KumagaiGumi.png", right: "/Shimizu.png" },
-  { left: "/Toda.png", right: "/KAjima.jpg" },
+  { left: "/Toda.png", right: "/Shimizu.png" },
 ];
 
 export default function SponsorSection() {

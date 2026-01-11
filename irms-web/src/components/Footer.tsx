@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import React from "react";
 
 export default function Footer() {
@@ -55,11 +56,11 @@ export default function Footer() {
                 Menu
             </h3>
             <ul className="flex flex-col gap-4 text-xl font-medium">
-                <li><a href="/" className="hover:text-white/70 transition-colors">Home</a></li>
-                <li><a href="/about" className="hover:text-white/70 transition-colors">About IRMS</a></li>
-                <li><a href="/submission" className="hover:text-white/70 transition-colors">Submission</a></li>
-                <li><a href="/schedule" className="hover:text-white/70 transition-colors">Schedule</a></li>
-                <li><a href="/sponsors" className="hover:text-white/70 transition-colors">Sponsors</a></li>
+                <li><Link href="/" className="hover:text-white/70 transition-colors">Home</Link></li>
+                <li><Link href="/about" className="hover:text-white/70 transition-colors">About IRMS</Link></li>
+                <li><Link href="/submission" className="hover:text-white/70 transition-colors">Submission</Link></li>
+                <li><Link href="/schedule" className="hover:text-white/70 transition-colors">Schedule</Link></li>
+                <li><Link href="/sponsors" className="hover:text-white/70 transition-colors">Sponsors</Link></li>
             </ul>
         </div>
 
