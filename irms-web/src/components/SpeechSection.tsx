@@ -75,13 +75,13 @@ export default function SpeechSection() {
             {/* Row 1 */}
             <div className="relative -left-[5vw] flex w-full gap-4 items-end max-[1000px]:left-0">
             <div className="relative aspect-5/4 flex-[0.75] rounded-xl overflow-hidden">
-                <img src="/palbot.jpg" alt="" className="w-full h-full object-cover" />
+                <img src="/RidhoKresna1.png" alt="" className="w-full h-full object-cover" />
             </div>
             <div className="relative aspect-5/4 flex-1 rounded-xl overflow-hidden">
-                <img src="/palbot.jpg" alt="" className="w-full h-full object-cover" />
+                <img src="/RidhoKresna1.png" alt="" className="w-full h-full object-cover" />
                 <div className="absolute z-10 bottom-4 left-4 p-4 bg-[rgba(20,19,19,0.25)] backdrop-blur-[15px] text-[#fdb1b1] rounded-xl max-[1000px]:hidden">
-                <h3 className="text-xl font-bold">Jhonny Sins</h3>
-                <p className="text-[#fee7e7]">IRMS Chairman</p>
+                <h3 className="text-xl font-bold">Ridho Kresna Wattimena</h3>
+                <p className="text-[#fee7e7]">President IRMS</p>
                 </div>
             </div>
             </div>
@@ -89,10 +89,10 @@ export default function SpeechSection() {
             {/* Row 2 */}
             <div className="relative -left-[5vw] flex w-full gap-4 items-start max-[1000px]:left-0">
             <div className="relative aspect-5/4 flex-1 rounded-xl overflow-hidden">
-                <img src="/palbot.jpg" alt="" className="w-full h-full object-cover" />
+                <img src="/RidhoKresna1.png" alt="" className="w-full h-full object-cover" />
             </div>
             <div className="relative aspect-5/4 flex-[0.75] rounded-xl overflow-hidden">
-                <img src="/palbot.jpg" alt="" className="w-full h-full object-cover" />
+                <img src="/RidhoKresna1.png" alt="" className="w-full h-full object-cover" />
             </div>
             </div>
         </div>
@@ -103,44 +103,43 @@ export default function SpeechSection() {
             <div className="relative z-10 flex flex-col gap-4">
             
             {/* Tambah class "welcome-header" */}
-            <h3 className="welcome-header text-4xl md:text-4xl font-bold text-justify leading-snug">
-                Welcome to IRMS Conference!
+            <h3 className="text-red-800 text-4xl md:text-4xl font-bold text-justify leading-snug">
+                Dear Valued Potential Sponsors,
             </h3>
 
             {/* Wrapper class "welcome-text" dan ganti h4 jadi p */}
             <div className="welcome-text flex flex-col gap-4">
-                <p className='text-white text-sm text-justify leading-snug'>
-                On behalf of the organizers, I would like to extend a warm welcome to the 14th Asian Rock Mechanics Symposium (ARMS14), which will be held in November 2026. This conference is a valuable 
-                opportunity to share the latest research findings and technological innovations in the field of rock mechanics in the Asian region, and to deepen exchanges among researchers and engineers. This is the third 
-                time Japan has hosted ARMS, following ARMS3 in Kyoto and ARMS8 in Sapporo. This time, ARMS14 has been selected as an official international symposium of the International Society for Rock Mechanics and Rock Engineering 
-                (ISRM).
+                <p className='text-red-800 text-sm text-justify leading-snug'>
+                My name is Ridho Kresna Wattimena, and it is my pleasure to serve as the President of the Indonesian Rock Mechanics Society (IRMS). 
+                On behalf of IRMS and the organising committee, I invite your organisation to become valued partners for our upcoming
+                Indonesian Rock Mechanics Society Conference 2026 (IRMS Conference 2026).
                 </p>
 
-                <p className='text-white text-sm text-justify leading-snug'>
-                The theme of the conference is “Rock Mechanics for the Next Generation - Innovations, Sustainability, and Resilience -.” This theme reflects our commitment to pursuing innovation, enhancing sustainability, and 
-                building resilience to address the next generation of challenges in rock engineering. This symposium will provide a platform to share the latest research findings and technologies, fostering new perspectives and collaborations. 
-                Additionally, we encourage the participation of young researchers through presentations and poster sessions, incorporating new viewpoints and ideas. We hope this will help the next generation of leaders grow and pave the way for the future of rock engineering.
+                <p className='text-red-800 text-sm text-justify leading-snug'>
+                For over 18 years, the IRMS has provided significant contributions to the advancement of the field of rock mechanics and rock 
+                engineering through organising various activities to increase the knowledge of its members and the wider community and active 
+                participation in international scientific conferences. Our conference is our most significant event, bringing together over 200 high-level professionals, 
+                decision-makers, and industry leaders from across the South East Asia.
                 </p>
 
-                <p className='text-white text-sm text-justify leading-snug'>
-                Fukuoka, the host city, is known as an “international city” with strong ties to Asia, offering an attractive environment where history and modernity harmonize. During the symposium, 
-                in addition to academic discussions, you will have the opportunity to experience the nature and culture of Fukuoka, gaining further inspiration.
+                <p className='text-red-800 text-sm text-justify leading-snug'>
+                The IRMS Conference 2026 is a continuation of our National Workshop and Symposium on Geomechanics (WSNG). 
+                The previous WSNG series (Yogyakarta 2012, Bandung 2013, Jakarta 2015, Padang 2017, and Makassar 2019) have 
+                been premier scientific events with international networks and professional forums for the Indonesian rock 
+                mechanics community to exchange ideas, research findings, and practical experiences.
                 </p>
 
-                <p className='text-white text-sm text-justify leading-snug'>
-                Finally, we hope that ARMS14 will be a significant opportunity to shape the future of the rock engineering field. We sincerely expect this international conference to be a 
-                starting point for next-generation research and technological innovation, contributing to new solutions for regional and international challenges.
-                </p>
-
-                <p className='text-white text-sm text-justify leading-snug'>
+                <p className='text-red-800 text-sm text-justify leading-snug'>
                 We look forward to meeting you in Fukuoka and sharing meaningful discussions and exchanges.
                 </p>
             </div>
 
             {/* Tambah class "signature" */}
-            <div className='signature text-white text-sm text-end mt-4'>
-                <p className='font-black'>Panitia IRMS</p>
-                <p>Jhonny Sins S.Pnis</p>
+            <div className='signature text-red-800 text-sm text-start mt-4'>
+                <p>Kindly Regards,</p>
+                <p className='font-black'>Ridho Kresna Wattimena</p>
+                <p>President,</p>
+                <p>Indonesian Rock Mechanics Society (IRMS)</p>
             </div>
 
             </div>
