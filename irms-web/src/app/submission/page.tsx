@@ -66,7 +66,7 @@ export default function SubmissionPage() {
                   Prospective authors are invited to submit an abstract aligned with one of the symposium topics for consideration. Abstracts must be written in English and provide a clear explanation of the research content. It is highly recommended that each abstract explicitly includes:
                 </p>
                 <ul className="list-disc pl-5 space-y-2 mb-6 text-[#04233A] font-medium marker:text-[#C71F2D]">
-                  <li>The study's objective</li>
+                  <li>The study&apos;s objective</li>
                   <li>The results and their significance</li>
                   <li>Advancements or novel contributions relative to prior work</li>
                   <li><span className="text-[#590004] font-bold">Note:</span> Previously published findings are not eligible for submission.</li>
@@ -121,23 +121,20 @@ export default function SubmissionPage() {
                       </p>
                     </div>
 
-                    {index !== events.length - 1 && (
-                      <div className="absolute z-0 flex items-center justify-center 
-                              /* Posisi Mobile: Di bawah tengah */
-                              left-1/2 -translate-x-1/2 -bottom-6
-                              /* Posisi Desktop: Di kanan tengah */
-                              lg:left-auto lg:-right-9 lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto">
-                      <ArrowRight 
-                        className="
-                              w-5 h-5 text-[#C71F2D] 
-                              transform rotate-90 lg:rotate-0" 
-                        />
-                      </div>
-                    )}
-                   </div>
-                  ))}
-                </div>
-            </section>
+            {/* PANAH (Absolute Position) */}
+            {/* Logika: Munculkan panah jika bukan item terakhir */}
+            {/* Posisi Mobile: Di bawah tengah | Posisi Desktop: Di kanan tengah */}
+            {index !== events.length - 1 && (
+              <div className="absolute z-0 flex items-center justify-center left-1/2 -translate-x-1/2 -bottom-6 lg:left-auto lg:-right-9 lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto">
+                <ArrowRight 
+                  className="w-5 h-5 text-[#C71F2D] transform rotate-90 lg:rotate-0" 
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
 
             <div className="w-full h-px bg-[#04233A]/10" />
 
@@ -219,7 +216,7 @@ export default function SubmissionPage() {
                 IRMS Conference 2026
               </p>
               <p className="text-[#6A96B7] text-sm leading-relaxed max-w-sm border-l-2 border-[#6A96B7] pl-4 italic">
-                "Rock Engineering for a Sustainable Future"
+                &ldquo;Rock Engineering for a Sustainable Future&rdquo;
                 <br />Innovations, Sustainability, and Resilience.
               </p>
               
@@ -252,26 +249,6 @@ export default function SubmissionPage() {
         </div>
 
       </div>
-
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #FAF9F6; 
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #6A96B7; /* Steel Blue Thumb */
-          border-radius: 0px;
-          border: 1px solid #FAF9F6;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #04233A; /* Deep Navy Hover */
-        }
-        .clip-path-slant {
-            clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
-        }
-      `}</style>
     </>
   );
 }

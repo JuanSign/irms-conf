@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect, useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -9,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 const rowImages = [
   { left: "/KAjima.jpg", right: "/Hazama.jpg" },
   { left: "/KumagaiGumi.png", right: "/Shimizu.png" },
-  { left: "/Toda.png", right: "/KAjima.jpg" },
+  { left: "/Toda.png", right: "/Shimizu.png" },
 ];
 
 export default function SponsorSection() {
@@ -109,7 +110,7 @@ export default function SponsorSection() {
             <div className="cta-card cta-card-left absolute w-full h-40 md:w-[320px] md:h-[220px] rounded-xl overflow-hidden shadow-xl border border-gray-200 will-change-transform">
               <div className="w-full h-full relative bg-white" style={cardFrameStyle}>
                 {/* Removed Opacity & Dark Overlay */}
-                <img src={images.left} alt="Left" className="w-full h-full object-cover" />
+                <Image src={images.left} alt="Left" fill className="object-cover" />
               </div>
             </div>
 
@@ -117,7 +118,7 @@ export default function SponsorSection() {
             <div className="cta-card cta-card-right absolute w-full h-40 md:w-[320px] md:h-[220px] rounded-xl overflow-hidden shadow-xl border border-gray-200 will-change-transform">
               <div className="w-full h-full relative bg-white" style={cardFrameStyle}>
                 {/* Removed Opacity & Dark Overlay */}
-                <img src={images.right} alt="Right" className="w-full h-full object-cover" />
+                <Image src={images.right} alt="Right" fill className="object-cover" />
               </div>
             </div>
 

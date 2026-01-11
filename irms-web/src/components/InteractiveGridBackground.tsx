@@ -8,10 +8,19 @@ const NEON_COLOR = "#0055ff";
 
 const DEFAULT_BORDER_COLOR = "rgba(0, 0, 0, 0.05)"; 
 
+interface GridBlock {
+  element: HTMLDivElement;
+  x: number;
+  y: number;
+  gridX: number;
+  gridY: number;
+  highlightEndTime: number;
+}
+
 export default function InteractiveGridBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const gridBlocksRef = useRef<any[]>([]);
+  const gridBlocksRef = useRef<GridBlock[]>([]);
   const rafIdRef = useRef<number | null>(null);
   const mouseRef = useRef<{ x: number | undefined; y: number | undefined }>({
     x: undefined,
@@ -101,7 +110,7 @@ export default function InteractiveGridBackground() {
 
         const clusterSize = Math.floor(Math.random() * 1) + 1; 
         let currentBlock = closestBlock;
-        let processed = [closestBlock];
+        const processed = [closestBlock];
 
         for (let i = 0; i < clusterSize; i++) {
             const neighbors = gridBlocksRef.current.filter(b => {
@@ -122,7 +131,7 @@ export default function InteractiveGridBackground() {
         }
     };
 
-    const highlightBlock = (block: any, endTime: number) => {
+    const highlightBlock = (block: GridBlock, endTime: number) => {
         block.highlightEndTime = endTime;
         block.element.style.borderColor = `${NEON_COLOR}`; 
         block.element.style.backgroundColor = `${NEON_COLOR}1A`; 

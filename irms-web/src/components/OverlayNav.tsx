@@ -42,32 +42,6 @@ export default function OverlayNav() {
     container.appendChild(fragment);
   };
 
-  useLayoutEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
-
-    createGrid(container);
-
-    let isNavigating = false;
-    try {
-        isNavigating = sessionStorage.getItem("is-navigating") === "true";
-    } catch (e) {}
-
-    if (isNavigating) {
-      const squares = container.children;
-  
-      container.style.display = "flex";
-      container.style.pointerEvents = "all";
-      gsap.set(squares, { opacity: 1, scale: 1 });
-
-      sessionStorage.removeItem("is-navigating");
-
-      setTimeout(() => {
-        animateReveal();
-      }, 800);
-    }
-  }, []); 
-
   const animateCover = (onCompleteCallback?: () => void) => {
     if (!containerRef.current) return;
     const container = containerRef.current;
@@ -112,6 +86,34 @@ export default function OverlayNav() {
         });
     }, containerRef);
   };
+
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+
+    createGrid(container);
+
+    let isNavigating = false;
+    try {
+        isNavigating = sessionStorage.getItem("is-navigating") === "true";
+    } catch {
+        // sessionStorage not available
+    }
+
+    if (isNavigating) {
+      const squares = container.children;
+  
+      container.style.display = "flex";
+      container.style.pointerEvents = "all";
+      gsap.set(squares, { opacity: 1, scale: 1 });
+
+      sessionStorage.removeItem("is-navigating");
+
+      setTimeout(() => {
+        animateReveal();
+      }, 800);
+    }
+  }, []);
 
   const handleNavigation = (href: string) => {
     if (href === pathname) {
@@ -178,8 +180,8 @@ export default function OverlayNav() {
         <div className="absolute left-0 bottom-0 h-[500px] w-[500px] rounded-full bg-[#00d2ff]/5 blur-[120px]" />
         
         <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-          {["HOME", "PROGRAMS", "SUBMISSION"].map((item, idx) => {
-            const href = item === "SUBMISSION" ? "/submission" : item === "HOME" ? "/" : "#";
+          {["HOME", "SCHEDULE", "SUBMISSION"].map((item) => {
+            const href = item === "SUBMISSION" ? "/submission" : item === "HOME" ? "/" : item === "SCHEDULE" ? "/schedule" : "#";
             return (
               <div key={item} className="group relative overflow-hidden p-2">
                 <a

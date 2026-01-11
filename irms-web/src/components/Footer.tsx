@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 
 export default function Footer() {
@@ -24,16 +26,16 @@ export default function Footer() {
 
           <div className="flex gap-4 items-center mt-4">
             <a href="#" className="hover:opacity-80 transition-opacity">
-                <img src="/IG.svg" alt="Instagram" className="w-10 h-10 object-cover" />
+                <Image src="/IG.svg" alt="Instagram" width={40} height={40} className="object-cover" />
             </a>
             <a href="#" className="hover:opacity-80 transition-opacity">
-                <img src="/linkedin.svg" alt="LinkedIn" className="w-10 h-10 object-cover" />
+                <Image src="/linkedin.svg" alt="LinkedIn" width={40} height={40} className="object-cover" />
             </a>
             <a href="#" className="hover:opacity-80 transition-opacity">
-                <img src="/fb.svg" alt="Facebook" className="w-10 h-10 object-cover" />
+                <Image src="/fb.svg" alt="Facebook" width={40} height={40} className="object-cover" />
             </a>
             <a href="#" className="hover:opacity-80 transition-opacity">
-                <img src="/twitter.svg" alt="Twitter" className="w-11 h-11 object-cover" />
+                <Image src="/twitter.svg" alt="Twitter" width={44} height={44} className="object-cover" />
             </a>
           </div>
 
@@ -55,11 +57,11 @@ export default function Footer() {
                 Menu
             </h3>
             <ul className="flex flex-col gap-4 text-xl font-medium">
-                <li><a href="/" className="hover:text-white/70 transition-colors">Home</a></li>
-                <li><a href="/about" className="hover:text-white/70 transition-colors">About IRMS</a></li>
-                <li><a href="/submission" className="hover:text-white/70 transition-colors">Submission</a></li>
-                <li><a href="/schedule" className="hover:text-white/70 transition-colors">Schedule</a></li>
-                <li><a href="/sponsors" className="hover:text-white/70 transition-colors">Sponsors</a></li>
+                <li><Link href="/" className="hover:text-white/70 transition-colors">Home</Link></li>
+                <li><Link href="/about" className="hover:text-white/70 transition-colors">About IRMS</Link></li>
+                <li><Link href="/submission" className="hover:text-white/70 transition-colors">Submission</Link></li>
+                <li><Link href="/schedule" className="hover:text-white/70 transition-colors">Schedule</Link></li>
+                <li><Link href="/sponsors" className="hover:text-white/70 transition-colors">Sponsors</Link></li>
             </ul>
         </div>
 
