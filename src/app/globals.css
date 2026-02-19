@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-irms-blue: #003366;
+  --color-irms-red: #D32F2F;
+  --color-irms-light: #F8FAFC;
+  --color-irms-dark: #0f172a;
+
+  /* UI Defaults */
+  --color-background: #ffffff;
+  --color-foreground: #1e293b;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #1e293b;
+}
+
+/* Smooth Scrolling for Anchor Links */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "overline" 0, "smcp" 0, "onum" 0, "pnum" 0, "lnum" 0, "tnum" 0;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #003366;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #002244;
+}
