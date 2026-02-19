@@ -1,29 +1,3 @@
-import { DefaultSession } from "next-auth";
-import { JWT } from "next-auth/jwt";
-
-// Extend the built-in session and user types
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      affiliation?: string | null;
-    } & DefaultSession["user"];
-  }
-
-  interface User {
-    id?: string;
-    affiliation?: string | null;
-  }
-}
-
-// Extend the built-in JWT type for Auth.js v5
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-    affiliation?: string | null;
-  }
-}
-
 // Type for the Search Results & Co-Authors
 export interface AuthorSearchResult {
   id: string;
@@ -41,4 +15,9 @@ export interface AbstractSubmission {
   path: string;
   status: string;
   createdAt: Date;
+  comments?: {
+    id: string;
+    content: string;
+    createdAt: Date;
+  }[];
 }

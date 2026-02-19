@@ -89,33 +89,35 @@ export async function getUserAbstracts() {
   if (!session?.user?.id) return { error: "Unauthorized" };
 
   try {
-    // Fetch abstracts where the user is the primary writer
-    const primaryAbstracts = await db.query.abstracts.findMany({
-      where: eq(abstracts.writerId, session.user.id),
+    const data = await db.query.abstracts.findMany({
+      where: (abstracts, { exists, and }) => or(
+        eq(abstracts.writerId, session.user.id),
+        exists(
+          db.select()
+            .from(abstractCoauthors)
+            .where(
+              and(
+                eq(abstractCoauthors.abstractId, abstracts.id),
+                eq(abstractCoauthors.userId, session.user.id)
+              )
+            )
+        )
+      ),
+      with: {
+        // Include comments so the SubmissionCard can render feedback
+        comments: {
+          orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+        },
+        author: {
+          columns: {
+            name: true,
+          }
+        }
+      },
       orderBy: [desc(abstracts.createdAt)],
     });
 
-    // Fetch abstracts where the user is a co-author via the junction table
-    const coAuthoredData = await db.select({
-      abstract: abstracts
-    })
-    .from(abstracts)
-    .innerJoin(abstractCoauthors, eq(abstracts.id, abstractCoauthors.abstractId))
-    .where(eq(abstractCoauthors.userId, session.user.id));
-
-    const coAuthoredAbstracts = coAuthoredData.map(row => row.abstract);
-
-    // Combine and deduplicate
-    const allAbstractsMap = new Map();
-    primaryAbstracts.forEach(a => allAbstractsMap.set(a.id, a));
-    coAuthoredAbstracts.forEach(a => allAbstractsMap.set(a.id, a));
-
-    // Sort by newest first
-    const finalAbstracts = Array.from(allAbstractsMap.values()).sort((a, b) =>
-      b.createdAt.getTime() - a.createdAt.getTime()
-    );
-
-    return { success: true, data: finalAbstracts };
+    return { success: true, data };
   } catch (error) {
     console.error("Fetch error:", error);
     return { error: "Failed to load submissions" };
