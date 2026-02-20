@@ -1,20 +1,26 @@
+// @/app/portal/page.tsx (or wherever your PortalPage is)
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import toast, { Toaster } from 'react-hot-toast';
-import { Plus, LogOut, Settings, Loader2, FileText } from 'lucide-react';
+import { Plus, LogOut, Loader2, FileText } from 'lucide-react';
 import { getUserAbstracts } from '@/actions/submissions';
 import { AbstractSubmission } from '@/types/submission';
 
 import Sidebar from '@/components/portal/Sidebar';
 import SubmissionCard from '@/components/portal/SubmissionCard';
-import SubmissionModal from '@/components/portal/SubmissionModal';
+import CreateAbstractModal from '@/components/portal/CreateAbstractModal';
+import EditAbstractModal from '@/components/portal/EditAbstractModal';
 
 export default function PortalPage() {
   const { data: session } = useSession();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Distinct states for the two modals
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingSubmission, setEditingSubmission] = useState<AbstractSubmission | null>(null);
+
   const [mySubmissions, setMySubmissions] = useState<AbstractSubmission[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
@@ -32,6 +38,11 @@ export default function PortalPage() {
   useEffect(() => {
     loadSubmissions();
   }, []);
+
+  const openEditModal = (sub: AbstractSubmission) => {
+    setEditingSubmission(sub);
+    setIsEditOpen(true);
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -56,8 +67,6 @@ export default function PortalPage() {
 
         {/* Main Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-          {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Quick Actions Header */}
@@ -66,7 +75,7 @@ export default function PortalPage() {
                 <h3 className="font-extrabold text-lg text-gray-900">New Submission</h3>
                 <p className="text-sm text-gray-500 mt-0.5">Ready to submit another abstract?</p>
               </div>
-              <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-irms-blue text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-800 transition shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              <button onClick={() => setIsCreateOpen(true)} className="flex items-center gap-2 bg-irms-blue text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-800 transition shadow-md hover:shadow-lg hover:-translate-y-0.5">
                 <Plus size={18} /> Submit Abstract
               </button>
             </div>
@@ -94,23 +103,38 @@ export default function PortalPage() {
                   <p className="text-gray-500 text-sm max-w-sm mx-auto">You haven't submitted any abstracts yet. Click the button above to start your first submission.</p>
                 </div>
               ) : (
-                mySubmissions.map((sub) => <SubmissionCard key={sub.id} sub={sub} />)
+                mySubmissions.map((sub) => (
+                  <SubmissionCard
+                    key={sub.id}
+                    sub={sub}
+                    onEdit={() => openEditModal(sub)}
+                  />
+                ))
               )}
             </div>
           </div>
 
-          {/* Sidebar */}
           <Sidebar session={session} />
-
         </div>
       </div>
 
-      {/* Modal Rendered Here */}
-      <SubmissionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+      {/* Separate Modals Keep Logic Clean */}
+      <CreateAbstractModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
         onSuccess={loadSubmissions}
       />
+
+      <EditAbstractModal
+        isOpen={isEditOpen}
+        onClose={() => {
+          setIsEditOpen(false);
+          setEditingSubmission(null);
+        }}
+        onSuccess={loadSubmissions}
+        initialData={editingSubmission}
+      />
+
     </main>
   );
 }

@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { users, abstracts, abstractCoauthors } from '@/db/schema';
 import { ilike, or, eq, desc } from 'drizzle-orm';
 import { auth } from '@/auth';
+import { TopicType } from '@/types/submission';
 
 // Action to search for users by name or email
 export async function searchAuthors(query: string) {
@@ -32,54 +33,6 @@ export async function searchAuthors(query: string) {
   } catch (error) {
     console.error('Search error:', error);
     return [];
-  }
-}
-
-// Action to submit the abstract
-export async function submitAbstract(formData: FormData) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { error: "Unauthorized. Please log in." };
-  }
-
-  const title = formData.get('title') as string;
-  const topic = formData.get('topic') as any;
-  const fileUrl = formData.get('fileUrl') as string;
-  const coAuthorIdsStr = formData.get('coAuthors') as string;
-
-  // Basic server-side validation
-  if (!title || !topic || !fileUrl) {
-    return { error: "Missing required fields." };
-  }
-
-  try {
-    // Insert the Abstract into the Neon DB
-    const [newAbstract] = await db.insert(abstracts).values({
-      writerId: session.user.id,
-      title,
-      topic,
-      path: fileUrl,
-    }).returning({ id: abstracts.id });
-
-    // Insert Co-authors into the junction table (if any)
-    if (coAuthorIdsStr) {
-      const coAuthorIds: string[] = JSON.parse(coAuthorIdsStr);
-
-      if (Array.isArray(coAuthorIds) && coAuthorIds.length > 0) {
-        // Map the IDs to match our schema structure
-        const coAuthorData = coAuthorIds.map(id => ({
-          abstractId: newAbstract.id,
-          userId: id,
-        }));
-
-        await db.insert(abstractCoauthors).values(coAuthorData);
-      }
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error('Database insert error:', error);
-    return { error: "Failed to save submission to the database." };
   }
 }
 
@@ -121,5 +74,76 @@ export async function getUserAbstracts() {
   } catch (error) {
     console.error("Fetch error:", error);
     return { error: "Failed to load submissions" };
+  }
+}
+
+// Action to submit the abstract
+export async function submitAbstract(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized." };
+
+  const id = formData.get('id') as string;
+  const title = formData.get('title') as string;
+  const topic = formData.get('topic') as TopicType;
+  const fileUrl = formData.get('fileUrl') as string;
+  const coAuthorIdsStr = formData.get('coAuthors') as string;
+
+  if (!id || !title || !topic || !fileUrl) return { error: "Missing fields." };
+
+  try {
+    await db.insert(abstracts).values({
+      id,
+      writerId: session.user.id,
+      title,
+      topic,
+      path: fileUrl,
+    });
+
+    if (coAuthorIdsStr) {
+      const coAuthorIds: string[] = JSON.parse(coAuthorIdsStr);
+      if (coAuthorIds.length > 0) {
+        const coAuthorData = coAuthorIds.map(userId => ({ abstractId: id, userId }));
+        await db.insert(abstractCoauthors).values(coAuthorData);
+      }
+    }
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to save submission." };
+  }
+}
+
+// Action to update existing abstract
+export async function updateAbstract(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized." };
+
+  const id = formData.get('id') as string;
+  const title = formData.get('title') as string;
+  const topic = formData.get('topic') as TopicType;
+  const fileUrl = formData.get('fileUrl') as string;
+  const coAuthorIdsStr = formData.get('coAuthors') as string;
+
+  try {
+    const existing = await db.query.abstracts.findFirst({ where: eq(abstracts.id, id) });
+    if (!existing || existing.writerId !== session.user.id) return { error: "Unauthorized." };
+
+    await db.update(abstracts)
+      .set({ title, topic, path: fileUrl, status: 'Under Review' })
+      .where(eq(abstracts.id, id));
+
+    await db.delete(abstractCoauthors).where(eq(abstractCoauthors.abstractId, id));
+
+    if (coAuthorIdsStr) {
+      const coAuthorIds: string[] = JSON.parse(coAuthorIdsStr);
+      if (coAuthorIds.length > 0) {
+        const coAuthorData = coAuthorIds.map(userId => ({ abstractId: id, userId }));
+        await db.insert(abstractCoauthors).values(coAuthorData);
+      }
+    }
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to update." };
   }
 }

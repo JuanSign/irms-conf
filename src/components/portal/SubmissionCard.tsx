@@ -1,43 +1,37 @@
 "use client";
 
 import { useState } from 'react';
-import { Clock, MoreVertical, FileText, Download, Loader2, CheckCircle2, XCircle, MessageSquare } from 'lucide-react';
+import { Clock, MoreVertical, FileText, Download, Loader2, CheckCircle2, XCircle, MessageSquare, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AbstractSubmission } from '@/types/submission';
 
 interface SubmissionCardProps {
   sub: AbstractSubmission;
+  onEdit: () => void;
 }
 
-export default function SubmissionCard({ sub }: SubmissionCardProps) {
+export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const formattedDate = new Date(sub.createdAt).toLocaleDateString('en-GB', {
     day: '2-digit', month: 'short', year: 'numeric'
   });
 
-  // Helper to define status styles
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'Accepted':
-        return {
-          bg: 'bg-green-50 text-green-700 border-green-200',
-          icon: <CheckCircle2 size={12} />
-        };
+        return { bg: 'bg-green-50 text-green-700 border-green-200', icon: <CheckCircle2 size={12} /> };
       case 'Rejected':
-        return {
-          bg: 'bg-red-50 text-red-700 border-red-200',
-          icon: <XCircle size={12} />
-        };
+        return { bg: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={12} /> };
       default: // Under Review
-        return {
-          bg: 'bg-amber-50 text-amber-700 border-amber-200',
-          icon: <Clock size={12} />
-        };
+        return { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={12} /> };
     }
   };
 
   const statusStyle = getStatusStyles(sub.status);
+
+  // Rule: Can only edit if not Accepted
+  const canEdit = sub.status !== 'Accepted';
 
   const handleDownload = async () => {
     try {
@@ -78,12 +72,19 @@ export default function SubmissionCard({ sub }: SubmissionCardProps) {
               Topic: <span className="text-gray-700">{sub.topic}</span>
             </p>
           </div>
-          <button className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-lg transition-colors">
-            <MoreVertical size={20} />
-          </button>
+
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <button
+                onClick={onEdit}
+                className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors font-medium text-sm"
+              >
+                <Pencil size={16} /> Edit
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* --- COMMENTS SECTION --- */}
         {sub.comments && sub.comments.length > 0 && (
           <div className="mt-6 pt-4 border-t border-dashed border-gray-200">
             <h5 className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
@@ -92,9 +93,7 @@ export default function SubmissionCard({ sub }: SubmissionCardProps) {
             <div className="space-y-3">
               {sub.comments.map((comment) => (
                 <div key={comment.id} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {comment.content}
-                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{comment.content}</p>
                   <p className="text-[10px] text-gray-400 mt-2 font-medium">
                     Received on {new Date(comment.createdAt).toLocaleDateString()}
                   </p>
