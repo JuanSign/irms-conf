@@ -20,6 +20,7 @@ export interface AbstractSubmission {
   path: string;
   status: string;
   createdAt: Date;
+  updatedAt: Date;
   author?: {
     name: string;
   };
@@ -27,6 +28,18 @@ export interface AbstractSubmission {
     id: string;
     content: string;
     createdAt: Date;
+    admin?: {
+      name: string;
+    };
+  }[];
+  reviews?: {
+    id: string;
+    filePath: string;
+    fileName: string | null;
+    createdAt: Date;
+    admin?: {
+      name: string;
+    };
   }[];
   coauthors?: {
     user: AuthorSearchResult;

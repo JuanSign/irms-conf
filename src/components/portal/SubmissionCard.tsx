@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Clock, MoreVertical, FileText, Download, Loader2, CheckCircle2, XCircle, MessageSquare, Pencil } from 'lucide-react';
+import { Clock, FileText, Download, Loader2, CheckCircle2, XCircle, MessageSquare, Pencil, ChevronDown, Calendar, FileDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AbstractSubmission } from '@/types/submission';
 
@@ -11,112 +11,176 @@ interface SubmissionCardProps {
 }
 
 export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const formattedDate = new Date(sub.createdAt).toLocaleDateString('en-GB', {
     day: '2-digit', month: 'short', year: 'numeric'
   });
 
+  const updatedDate = sub.updatedAt ? new Date(sub.updatedAt).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  }) : null;
+
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'Accepted':
-        return { bg: 'bg-green-50 text-green-700 border-green-200', icon: <CheckCircle2 size={12} /> };
+        return { bg: 'bg-green-50 text-green-700 border-green-200', icon: <CheckCircle2 size={14} /> };
       case 'Rejected':
-        return { bg: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={12} /> };
-      default: // Under Review
-        return { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={12} /> };
+        return { bg: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={14} /> };
+      case 'Revision Required':
+        return { bg: 'bg-orange-50 text-orange-700 border-orange-200', icon: <Pencil size={14} /> };
+      default:
+        return { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={14} /> };
     }
   };
 
   const statusStyle = getStatusStyles(sub.status);
-
-  // Rule: Can only edit if not Accepted
   const canEdit = sub.status !== 'Accepted';
 
-  const handleDownload = async () => {
+  const handleDownload = async (path: string, fallbackName: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     try {
       setIsDownloading(true);
-      const response = await fetch(sub.path);
+      const response = await fetch(path);
       if (!response.ok) throw new Error("Network response was not ok");
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `${sub.title}.pdf`;
+      link.download = fallbackName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       toast.error("Failed to download file.");
-      window.open(sub.path, '_blank');
+      window.open(path, '_blank');
     } finally {
       setIsDownloading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden mb-6 group">
-      <div className="p-6">
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-3">
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusStyle.bg}`}>
-                {statusStyle.icon} {sub.status}
-              </span>
-            </div>
-            <h4 className="text-lg font-bold text-gray-900 mb-1.5 leading-tight transition-colors">
-              {sub.title}
-            </h4>
-            <p className="text-sm text-gray-500 font-medium">
-              Topic: <span className="text-gray-700">{sub.topic}</span>
-            </p>
-          </div>
+    <div className={`bg-white rounded-xl border transition-all duration-200 overflow-hidden ${isExpanded ? 'border-blue-300 ring-2 ring-blue-50 shadow-md' : 'border-gray-200 shadow-sm hover:border-blue-200 hover:shadow-md'}`}>
 
-          <div className="flex items-center gap-2">
-            {canEdit && (
-              <button
-                onClick={onEdit}
-                className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors font-medium text-sm"
-              >
-                <Pencil size={16} /> Edit
-              </button>
-            )}
+      <div
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="p-5 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group bg-white"
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-2">
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${statusStyle.bg}`}>
+              {statusStyle.icon} {sub.status}
+            </span>
+            <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
+              <Calendar size={12} /> {formattedDate}
+            </span>
           </div>
+          <h4 className="text-base sm:text-lg font-bold text-gray-900 leading-tight truncate group-hover:text-blue-600 transition-colors">
+            {sub.title}
+          </h4>
+          <p className="text-sm text-gray-500 font-medium mt-1 truncate">
+            {sub.topic}
+          </p>
         </div>
 
-        {sub.comments && sub.comments.length > 0 && (
-          <div className="mt-6 pt-4 border-t border-dashed border-gray-200">
-            <h5 className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-              <MessageSquare size={14} /> Reviewer Feedback
-            </h5>
-            <div className="space-y-3">
-              {sub.comments.map((comment) => (
-                <div key={comment.id} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                  <p className="text-sm text-gray-700 leading-relaxed">{comment.content}</p>
-                  <p className="text-[10px] text-gray-400 mt-2 font-medium">
-                    Received on {new Date(comment.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
-            </div>
+        <div className="flex items-center self-end sm:self-center">
+          <div className={`p-2 rounded-full bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all duration-300 ${isExpanded ? 'rotate-180 bg-blue-50 text-blue-600' : ''}`}>
+            <ChevronDown size={20} />
           </div>
-        )}
+        </div>
       </div>
 
-      <div className="bg-slate-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between text-sm">
-        <div className="text-gray-500 font-medium flex items-center gap-1.5">
-          <FileText size={14} /> Submitted on {formattedDate}
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 transition-all disabled:opacity-50"
-          >
-            {isDownloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-            {isDownloading ? 'Downloading...' : 'PDF'}
-          </button>
+      <div className={`grid transition-all duration-300 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className="overflow-hidden">
+          <div className="p-5 pt-0 bg-slate-50/50 border-t border-gray-100">
+
+            <div className="flex flex-wrap items-center justify-between gap-3 py-4">
+              <div className="text-xs text-gray-500">
+                 {updatedDate && <span>Last updated: {updatedDate}</span>}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={(e) => handleDownload(sub.path, `${sub.title}.pdf`, e)}
+                  disabled={isDownloading}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 transition-all disabled:opacity-50"
+                >
+                  {isDownloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                  Your Document
+                </button>
+
+                {canEdit && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-bold rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <Pencil size={16} /> Edit Details
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {sub.comments && sub.comments.length > 0 && (
+              <div className="mt-2 mb-4">
+                <h5 className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                  <MessageSquare size={14} /> Reviewer Comments
+                </h5>
+                <div className="space-y-3">
+                  {sub.comments.map((comment) => (
+                    <div key={comment.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
+                      <div className="absolute top-0 left-0 w-1 h-full bg-amber-400 rounded-l-xl" />
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{comment.content}</p>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+                        <p className="text-[11px] text-gray-500 font-medium">
+                          By <span className="font-bold text-gray-700">{comment.admin?.name || 'Reviewer'}</span>
+                        </p>
+                        <p className="text-[11px] text-gray-400 font-medium">
+                          {new Date(comment.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {sub.reviews && sub.reviews.length > 0 && (
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <h5 className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                  <FileDown size={14} /> Review Documents
+                </h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {sub.reviews.map((review) => (
+                    <div key={review.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group/file">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="p-2 bg-red-50 text-red-600 rounded-lg shrink-0 group-hover/file:bg-red-100 transition-colors">
+                          <FileText size={16} />
+                        </div>
+                        <div className="truncate">
+                          <p className="text-sm font-semibold text-gray-800 truncate">
+                            {review.fileName || 'Review_Document.pdf'}
+                          </p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">
+                            Uploaded by <span className="font-semibold">{review.admin?.name || 'Admin'}</span> • {new Date(review.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={(e) => handleDownload(review.filePath, review.fileName || 'review.pdf', e)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors shrink-0"
+                        title="Download Review File"
+                      >
+                        <Download size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
       </div>
     </div>

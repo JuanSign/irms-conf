@@ -17,6 +17,10 @@ export default async function AdminDashboardPage() {
         with: { admin: { columns: { username: true } } },
         orderBy: (comments, { desc }) => [desc(comments.createdAt)],
       },
+      reviews: {
+        with: { admin: { columns: { username: true } } },
+        orderBy: (reviews, { desc }) => [desc(reviews.createdAt)],
+      },
       coauthors: { with: { user: { columns: { name: true } } } },
     },
     orderBy: (abstracts, { desc }) => [desc(abstracts.createdAt)],
@@ -31,7 +35,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] pt-24 pb-20">
       <div className="container mx-auto px-6 max-w-7xl">
-        
+
         {/* Header Section */}
         <header className="mb-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -62,7 +66,7 @@ export default async function AdminDashboardPage() {
 
         {/* Main Content Area */}
         <div className="relative">
-          <AdminDashboardClient initialData={allAbstracts} />
+          <AdminDashboardClient initialData={allAbstracts as any} />
         </div>
       </div>
     </div>

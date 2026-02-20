@@ -57,14 +57,26 @@ export async function getUserAbstracts() {
         )
       ),
       with: {
-        // Include comments so the SubmissionCard can render feedback
+        // 1. Fetch comments AND the admin who wrote them
         comments: {
           orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+          with: {
+            admin: {
+              columns: { name: true }
+            }
+          }
+        },
+        // 2. Fetch review files AND the admin who uploaded them
+        reviews: {
+          orderBy: (reviews, { desc }) => [desc(reviews.createdAt)],
+          with: {
+            admin: {
+              columns: { name: true }
+            }
+          }
         },
         author: {
-          columns: {
-            name: true,
-          }
+          columns: { name: true }
         }
       },
       orderBy: [desc(abstracts.createdAt)],
@@ -129,7 +141,13 @@ export async function updateAbstract(formData: FormData) {
     if (!existing || existing.writerId !== session.user.id) return { error: "Unauthorized." };
 
     await db.update(abstracts)
-      .set({ title, topic, path: fileUrl, status: 'Under Review' })
+      .set({
+        title,
+        topic,
+        path: fileUrl,
+        status: 'Under Review',
+        updatedAt: new Date() // <-- ADD THIS to track last edit time
+      })
       .where(eq(abstracts.id, id));
 
     await db.delete(abstractCoauthors).where(eq(abstractCoauthors.abstractId, id));
