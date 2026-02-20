@@ -1,23 +1,43 @@
-import { pgTable, uuid, varchar, text, timestamp, pgEnum, primaryKey, integer } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, pgEnum, primaryKey, integer, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
+// -----------------------------------------------------------------------------
+// ENUMS
+// -----------------------------------------------------------------------------
+export const topicEnum = pgEnum('topic', [
+  'Fundamental Rock Mechanics',
+  'Rock Engineering Analysis & Numerical Modeling',
+  'Rock Mechanics Applications'
+]);
+
+export const statusEnum = pgEnum('status', [
+  'Submitted',
+  'Under Review',
+  'Revision Required',
+  'Accepted',
+  'Rejected'
+]);
+
+// -----------------------------------------------------------------------------
+// TABLES
+// -----------------------------------------------------------------------------
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   affiliation: varchar("affiliation", { length: 255 }),
   passwordHash: text("password_hash").notNull(),
+  emailVerifiedAt: timestamp("email_verified_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
-
-export const topicEnum = pgEnum('topic', [
-  'Fundamental Rock Mechanics',
-  'Rock Engineering Analysis & Numerical Modeling',
-  'Rock Mechanics Applications'
-]);
+export const emailVerificationTokens = pgTable("email_verification_tokens", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 export const abstracts = pgTable("abstracts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -25,8 +45,9 @@ export const abstracts = pgTable("abstracts", {
   title: text("title").notNull(),
   topic: topicEnum("topic").notNull(),
   path: text("path").notNull(),
-  status: varchar("status", { length: 50 }).default("Under Review").notNull(),
+  status: statusEnum("status").default("Under Review").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const abstractCoauthors = pgTable("abstract_coauthors", {
@@ -36,19 +57,14 @@ export const abstractCoauthors = pgTable("abstract_coauthors", {
   primaryKey({ columns: [t.abstractId, t.userId] })
 ]);
 
-export type Abstract = typeof abstracts.$inferSelect;
-export type NewAbstract = typeof abstracts.$inferInsert;
-
 export const admins = pgTable("admins", {
   id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
   username: varchar("username", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   type: integer("type").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export type Admin = typeof admins.$inferSelect;
-export type NewAdmin = typeof admins.$inferInsert;
 
 export const abstractComments = pgTable("abstract_comments", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -58,16 +74,32 @@ export const abstractComments = pgTable("abstract_comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type AbstractComment = typeof abstractComments.$inferSelect;
-export type NewAbstractComment = typeof abstractComments.$inferInsert;
+export const abstractReviews = pgTable("abstract_reviews", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  abstractId: uuid("abstract_id").references(() => abstracts.id, { onDelete: 'cascade' }).notNull(),
+  adminId: uuid("admin_id").references(() => admins.id).notNull(),
+  filePath: text("file_path").notNull(),
+  fileName: varchar("file_name", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
-// Users Relations
+
+// -----------------------------------------------------------------------------
+// RELATIONS
+// -----------------------------------------------------------------------------
 export const usersRelations = relations(users, ({ many }) => ({
   abstracts: many(abstracts),
   coauthoredAbstracts: many(abstractCoauthors),
+  verificationTokens: many(emailVerificationTokens),
 }));
 
-// Abstracts Relations
+export const emailVerificationTokensRelations = relations(emailVerificationTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [emailVerificationTokens.userId],
+    references: [users.id],
+  }),
+}));
+
 export const abstractsRelations = relations(abstracts, ({ one, many }) => ({
   author: one(users, {
     fields: [abstracts.writerId],
@@ -75,9 +107,9 @@ export const abstractsRelations = relations(abstracts, ({ one, many }) => ({
   }),
   coauthors: many(abstractCoauthors),
   comments: many(abstractComments),
+  reviews: many(abstractReviews),
 }));
 
-// Abstract Coauthors Relations (Join Table)
 export const abstractCoauthorsRelations = relations(abstractCoauthors, ({ one }) => ({
   abstract: one(abstracts, {
     fields: [abstractCoauthors.abstractId],
@@ -89,9 +121,9 @@ export const abstractCoauthorsRelations = relations(abstractCoauthors, ({ one })
   }),
 }));
 
-// Admin & Comments Relations
 export const adminsRelations = relations(admins, ({ many }) => ({
   comments: many(abstractComments),
+  reviews: many(abstractReviews),
 }));
 
 export const abstractCommentsRelations = relations(abstractComments, ({ one }) => ({
@@ -104,3 +136,28 @@ export const abstractCommentsRelations = relations(abstractComments, ({ one }) =
     references: [admins.id],
   }),
 }));
+
+export const abstractReviewsRelations = relations(abstractReviews, ({ one }) => ({
+  abstract: one(abstracts, {
+    fields: [abstractReviews.abstractId],
+    references: [abstracts.id],
+  }),
+  admin: one(admins, {
+    fields: [abstractReviews.adminId],
+    references: [admins.id],
+  }),
+}));
+
+// -----------------------------------------------------------------------------
+// TYPES
+// -----------------------------------------------------------------------------
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Abstract = typeof abstracts.$inferSelect;
+export type NewAbstract = typeof abstracts.$inferInsert;
+export type Admin = typeof admins.$inferSelect;
+export type NewAdmin = typeof admins.$inferInsert;
+export type AbstractComment = typeof abstractComments.$inferSelect;
+export type NewAbstractComment = typeof abstractComments.$inferInsert;
+export type AbstractReview = typeof abstractReviews.$inferSelect;
+export type NewAbstractReview = typeof abstractReviews.$inferInsert;
