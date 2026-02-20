@@ -37,12 +37,14 @@ export async function registerUser(formData: FormData) {
 export async function loginUser(formData: FormData) {
   try {
     const credentials = Object.fromEntries(formData.entries());
-    const result = await signIn('credentials', {
+
+    await signIn('user-login', {
       ...credentials,
       redirect: false,
     });
-    if (result?.error) return { error: 'Invalid email or password.' };
+
     return { success: true };
+
   } catch (error: unknown) {
     if (error instanceof AuthError) {
       switch (error.type) {
