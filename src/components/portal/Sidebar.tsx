@@ -1,53 +1,102 @@
-import { User, Clock } from 'lucide-react';
+import { User, Clock, Plus, LogOut, LayoutDashboard, FileDown } from 'lucide-react'; // <-- Added FileDown
 import { Session } from 'next-auth';
+import { signOut } from 'next-auth/react';
 
 interface SidebarProps {
   session: Session | null;
+  onNewSubmission: () => void;
 }
 
-export default function Sidebar({ session }: SidebarProps) {
+export default function Sidebar({ session, onNewSubmission }: SidebarProps) {
+  const getShortName = (fullName?: string | null) => {
+    if (!fullName) return "Author";
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0];
+    return `${parts[0]} ${parts[parts.length - 1]}`;
+  };
+
+  const displayName = getShortName(session?.user?.name);
+
   return (
-    <div className="lg:col-span-1 space-y-6">
-      {/* Profile Summary */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-gray-500">
-            <User size={24} />
+    <aside className="bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
+
+      {/* Dashboard Header & Identity */}
+      <div className="p-6 border-b border-gray-100 shrink-0">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2.5 bg-blue-50 rounded-xl border border-blue-100">
+            <LayoutDashboard className="text-blue-600" size={24} />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">Dashboard</h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-400 border border-gray-200 shrink-0 shadow-sm">
+            <User size={20} />
           </div>
           <div className="overflow-hidden">
-            <div className="font-bold text-gray-900 truncate">{session?.user?.name || "Loading..."}</div>
-            <div className="text-xs text-gray-500 truncate">
-              {session?.user?.affiliation || "No Affiliation"}
+            <div className="text-xs text-gray-500">Welcome back,</div>
+            <div className="font-bold text-gray-900 truncate" title={session?.user?.name || ""}>
+              {displayName}
             </div>
           </div>
         </div>
-        <div className="space-y-3 pt-4 border-t border-gray-100">
-          <div className="flex justify-between text-sm items-center">
-            <span className="text-gray-500">Email</span>
-            <span className="font-medium text-gray-900 truncate max-w-37.5 ml-4">{session?.user?.email || "..."}</span>
+      </div>
+
+      {/* Primary Action & Download Link */}
+      <div className="p-6 border-b border-gray-100 shrink-0">
+        <button
+          onClick={onNewSubmission}
+          className="w-full flex justify-center items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+        >
+          <Plus size={20} /> Submit New Abstract
+        </button>
+
+        <a
+          href="/abstract-template.docx"
+          download="IRMS_Abstract_Template.docx"
+          className="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group"
+        >
+          <FileDown size={16} className="text-gray-400 group-hover:text-blue-600 group-hover:-translate-y-0.5 transition-all" />
+          Download Template
+        </a>
+      </div>
+
+      {/* Upcoming Deadlines */}
+      <div className="p-6 flex-1">
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Clock size={16} className="text-red-500" /> Next Deadlines
+        </h3>
+        <div className="space-y-5 relative">
+          <div className="absolute left-1.25 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+
+          <div className="relative pl-6">
+            <div className="absolute left-0 top-1.5 w-3 h-3 bg-red-500 rounded-full ring-4 ring-white"></div>
+            <div className="text-sm font-bold text-gray-900">23 Feb 2026</div>
+            <div className="text-xs text-gray-500 mt-0.5">Abstract Submission Closes</div>
+          </div>
+
+          <div className="relative pl-6">
+            <div className="absolute left-0 top-1.5 w-3 h-3 bg-gray-300 rounded-full ring-4 ring-white"></div>
+            <div className="text-sm font-medium text-gray-600">15 Mar 2026</div>
+            <div className="text-xs text-gray-400 mt-0.5">Acceptance Notification</div>
           </div>
         </div>
       </div>
 
-      {/* Upcoming Deadlines */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Clock size={18} className="text-irms-red" /> Next Deadlines
-        </h3>
-        <div className="space-y-4 relative">
-          <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-gray-100"></div>
-          <div className="relative pl-8">
-            <div className="absolute left-1 top-1.5 w-3.5 h-3.5 bg-irms-red rounded-full border-2 border-white ring-1 ring-red-100"></div>
-            <div className="text-sm font-bold text-gray-900">23 Feb 2026</div>
-            <div className="text-xs text-gray-500">Abstract Submission Closes</div>
-          </div>
-          <div className="relative pl-8">
-            <div className="absolute left-1 top-1.5 w-3.5 h-3.5 bg-gray-300 rounded-full border-2 border-white"></div>
-            <div className="text-sm font-medium text-gray-500">15 Mar 2026</div>
-            <div className="text-xs text-gray-400">Acceptance Notification</div>
-          </div>
+      {/* Footer / Sign Out */}
+      <div className="p-6 border-t border-gray-100 bg-slate-50 mt-auto shrink-0">
+        <div className="mb-4 text-xs text-gray-500 truncate text-center">
+          {session?.user?.email}
         </div>
+        <button
+          onClick={() => signOut({ callbackUrl: '/submission/register' })}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl text-sm font-semibold hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all shadow-sm"
+        >
+          <LogOut size={16} /> Sign Out
+        </button>
       </div>
-    </div>
+    </aside>
   );
 }

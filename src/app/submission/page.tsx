@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   CheckCircle2,
@@ -22,7 +21,7 @@ export default function SubmissionPage() {
             Abstract Submission
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Please download the official guidelines and templates below before submitting your abstract.
+            Please download the official template below before submitting your abstract.
           </p>
         </div>
       </div>
@@ -37,7 +36,7 @@ export default function SubmissionPage() {
           <div className="flex-1">
             <h3 className="font-bold text-green-900 text-lg">Submission System is OPEN</h3>
             <p className="text-green-800 text-sm mt-1">
-              The portal is currently accepting abstracts. Please ensure you follow the document formats below.
+              The portal is currently accepting abstracts. Please ensure you follow the document format below.
             </p>
           </div>
           <div className="bg-white px-4 py-2 rounded-lg border border-green-200 text-green-800 font-bold text-sm shadow-sm whitespace-nowrap">
@@ -54,36 +53,17 @@ export default function SubmissionPage() {
                 <div className="w-10 h-10 bg-blue-50 text-irms-blue rounded-lg flex items-center justify-center">
                   <FileDown size={20} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Download Resources</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Download Resource</h2>
               </div>
 
               <p className="text-gray-600 mb-8 leading-relaxed">
-                To ensure a smooth review process, please prepare your abstract using the official templates provided below.
+                To ensure a smooth review process, please prepare your abstract using the official template provided below.
               </p>
 
               <div className="space-y-4">
                 <a
-                  href="#"
-                  className="group flex items-center p-4 border border-gray-200 rounded-lg hover:border-irms-blue hover:bg-blue-50/50 transition-all duration-200"
-                >
-                  <div className="bg-red-100 text-red-600 p-3 rounded-md mr-4 shrink-0">
-                    <FileText size={24} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 group-hover:text-irms-blue transition-colors">
-                      Submission Guidelines
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      PDF • 1.2 MB • Detailed rules and formatting requirements
-                    </p>
-                  </div>
-                  <div className="text-gray-400 group-hover:text-irms-blue">
-                    <FileDown size={20} />
-                  </div>
-                </a>
-
-                <a
-                  href="#"
+                  href="/IRMS 2026_Abstract_Template.docx"
+                  download="IRMS_Abstract_Template.docx"
                   className="group flex items-center p-4 border border-gray-200 rounded-lg hover:border-irms-blue hover:bg-blue-50/50 transition-all duration-200"
                 >
                   <div className="bg-blue-100 text-blue-600 p-3 rounded-md mr-4 shrink-0">
@@ -94,7 +74,7 @@ export default function SubmissionPage() {
                       Abstract Template
                     </h4>
                     <p className="text-sm text-gray-500">
-                      DOCX • 500 KB • Microsoft Word Format
+                      DOCX • Microsoft Word Format
                     </p>
                   </div>
                   <div className="text-gray-400 group-hover:text-irms-blue">

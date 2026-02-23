@@ -5,12 +5,12 @@ import { Clock, FileText, Download, Loader2, CheckCircle2, XCircle, MessageSquar
 import toast from 'react-hot-toast';
 import { AbstractSubmission } from '@/types/submission';
 
-interface SubmissionCardProps {
+interface SubmissionRowProps {
   sub: AbstractSubmission;
   onEdit: () => void;
 }
 
-export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
+export default function SubmissionRow({ sub, onEdit }: SubmissionRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -24,19 +24,19 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
 
   const getStatusStyles = (status: string) => {
     switch (status) {
-      case 'Accepted':
-        return { bg: 'bg-green-50 text-green-700 border-green-200', icon: <CheckCircle2 size={14} /> };
-      case 'Rejected':
-        return { bg: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={14} /> };
-      case 'Revision Required':
-        return { bg: 'bg-orange-50 text-orange-700 border-orange-200', icon: <Pencil size={14} /> };
-      default:
-        return { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={14} /> };
+      case 'Accepted': return { bg: 'bg-green-50 text-green-700 border-green-200', icon: <CheckCircle2 size={14} /> };
+      case 'Rejected': return { bg: 'bg-red-50 text-red-700 border-red-200', icon: <XCircle size={14} /> };
+      case 'Revision Required': return { bg: 'bg-orange-50 text-orange-700 border-orange-200', icon: <Pencil size={14} /> };
+      default: return { bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={14} /> };
     }
   };
 
   const statusStyle = getStatusStyles(sub.status);
   const canEdit = sub.status !== 'Accepted';
+
+  const commentCount = sub.comments?.length || 0;
+  const reviewCount = sub.reviews?.length || 0;
+  const hasFeedback = commentCount > 0 || reviewCount > 0;
 
   const handleDownload = async (path: string, fallbackName: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -62,40 +62,78 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
   };
 
   return (
-    <div className={`bg-white rounded-xl border transition-all duration-200 overflow-hidden ${isExpanded ? 'border-blue-300 ring-2 ring-blue-50 shadow-md' : 'border-gray-200 shadow-sm hover:border-blue-200 hover:shadow-md'}`}>
+    <div className={`transition-all duration-200 ${isExpanded ? 'bg-blue-50/20' : 'hover:bg-slate-50'}`}>
 
+      {/* Table Row (Visible Header) */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="p-5 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group bg-white"
+        className="px-6 py-4 cursor-pointer flex flex-col lg:grid lg:grid-cols-12 lg:items-center gap-4 group"
       >
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-2">
+        {/* Title, Topic & Badges */}
+        <div className="col-span-5 min-w-0">
+          <div className="flex items-center gap-3 lg:hidden mb-2">
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${statusStyle.bg}`}>
               {statusStyle.icon} {sub.status}
             </span>
-            <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
-              <Calendar size={12} /> {formattedDate}
-            </span>
           </div>
-          <h4 className="text-base sm:text-lg font-bold text-gray-900 leading-tight truncate group-hover:text-blue-600 transition-colors">
+          <h4 className="text-sm font-bold text-gray-900 leading-tight truncate group-hover:text-blue-600 transition-colors">
             {sub.title}
           </h4>
-          <p className="text-sm text-gray-500 font-medium mt-1 truncate">
-            {sub.topic}
-          </p>
+
+          <div className="flex items-center gap-3 mt-1.5">
+            <p className="text-xs text-gray-500 font-medium truncate max-w-37.5 sm:max-w-50">
+              {sub.topic}
+            </p>
+
+            {hasFeedback && (
+              <div className="flex items-center gap-2 border-l border-gray-200 pl-3">
+                {commentCount > 0 && (
+                  <span
+                    className="flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-md shadow-sm"
+                    title={`${commentCount} Comments`}
+                  >
+                    <MessageSquare size={12} /> {commentCount}
+                  </span>
+                )}
+                {reviewCount > 0 && (
+                  <span
+                    className="flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded-md shadow-sm"
+                    title={`${reviewCount} Review Files`}
+                  >
+                    <FileDown size={12} /> {reviewCount}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center self-end sm:self-center">
-          <div className={`p-2 rounded-full bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all duration-300 ${isExpanded ? 'rotate-180 bg-blue-50 text-blue-600' : ''}`}>
+        {/* Status (Desktop) */}
+        <div className="col-span-3 hidden lg:block">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${statusStyle.bg}`}>
+            {statusStyle.icon} {sub.status}
+          </span>
+        </div>
+
+        {/* Date */}
+        <div className="col-span-3 text-sm text-gray-600 flex items-center gap-1.5">
+          <Calendar size={14} className="text-gray-400" /> {formattedDate}
+        </div>
+
+        {/* Expand Action */}
+        <div className="col-span-1 flex justify-end">
+          <div className={`p-1.5 rounded-full text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-blue-100 text-blue-600' : ''}`}>
             <ChevronDown size={20} />
           </div>
         </div>
       </div>
 
+      {/* Expanded Content Area */}
       <div className={`grid transition-all duration-300 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <div className="p-5 pt-0 bg-slate-50/50 border-t border-gray-100">
+          <div className="px-6 pb-6 pt-2 border-t border-blue-100/50">
 
+            {/* Top Bar of Expanded View: Actions & Metadata */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-4">
               <div className="text-xs text-gray-500">
                  {updatedDate && <span>Last updated: {updatedDate}</span>}
@@ -105,7 +143,7 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
                 <button
                   onClick={(e) => handleDownload(sub.path, `${sub.title}.pdf`, e)}
                   disabled={isDownloading}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm disabled:opacity-50"
                 >
                   {isDownloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                   Your Document
@@ -114,7 +152,7 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
                 {canEdit && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-bold rounded-lg hover:bg-blue-100 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 text-sm font-bold rounded-lg hover:bg-blue-100 transition-colors shadow-sm"
                   >
                     <Pencil size={16} /> Edit Details
                   </button>
@@ -122,6 +160,7 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
               </div>
             </div>
 
+            {/* Reviewer Comments */}
             {sub.comments && sub.comments.length > 0 && (
               <div className="mt-2 mb-4">
                 <h5 className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
@@ -146,6 +185,7 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
               </div>
             )}
 
+            {/* Review Documents */}
             {sub.reviews && sub.reviews.length > 0 && (
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <h5 className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
@@ -153,7 +193,7 @@ export default function SubmissionCard({ sub, onEdit }: SubmissionCardProps) {
                 </h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {sub.reviews.map((review) => (
-                    <div key={review.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group/file">
+                    <div key={review.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group/file shadow-sm">
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div className="p-2 bg-red-50 text-red-600 rounded-lg shrink-0 group-hover/file:bg-red-100 transition-colors">
                           <FileText size={16} />
