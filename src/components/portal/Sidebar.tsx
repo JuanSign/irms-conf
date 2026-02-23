@@ -73,7 +73,7 @@ export default function Sidebar({ session, onNewSubmission }: SidebarProps) {
 
           <div className="relative pl-6">
             <div className="absolute left-0 top-1.5 w-3 h-3 bg-red-500 rounded-full ring-4 ring-white"></div>
-            <div className="text-sm font-bold text-gray-900">23 Feb 2026</div>
+            <div className="text-sm font-bold text-gray-900">1 March 2026</div>
             <div className="text-xs text-gray-500 mt-0.5">Abstract Submission Closes</div>
           </div>
 

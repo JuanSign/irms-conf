@@ -40,7 +40,7 @@ export default function SubmissionPage() {
             </p>
           </div>
           <div className="bg-white px-4 py-2 rounded-lg border border-green-200 text-green-800 font-bold text-sm shadow-sm whitespace-nowrap">
-            Deadline: 23 Feb 2026
+            Deadline: 1 March 2026
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export default function SubmissionPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-500">Deadline</span>
-                  <span className="font-bold text-gray-900">23 Feb 2026</span>
+                  <span className="font-bold text-gray-900">1 March 2026</span>
                 </div>
               </div>
             </div>

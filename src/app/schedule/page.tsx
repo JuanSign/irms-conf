@@ -6,20 +6,12 @@ import { MapPin, Calendar, Clock, CheckCircle2, AlertCircle } from 'lucide-react
 const detailedEvents = [
   {
     id: 1,
-    date: "23 February 2026",
+    date: "1 March 2026",
     title: "Abstract Submission Deadline",
     status: "active",
     description: "Authors are invited to submit a short abstract (max 300 words) outlining the scope and results of their research. Abstracts must be written in English.",
     location: "Submission Portal",
     highlight: true
-  },
-  {
-    id: 2,
-    date: "1 March 2026",
-    title: "Extended Abstract Submission",
-    status: "upcoming",
-    description: "Final deadline for late-breaking abstracts. No further extensions will be granted after this date to ensure the review process stays on track.",
-    location: "Submission Portal"
   },
   {
     id: 3,

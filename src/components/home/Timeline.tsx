@@ -1,7 +1,7 @@
 import { Calendar, CheckCircle2, Clock } from 'lucide-react';
 
 const events = [
-  { id: 1, date: "23 Feb 2026", title: "Abstract Submission Deadline", status: "active" },
+  { id: 1, date: "1 March 2026", title: "Abstract Submission Deadline", status: "active" },
   { id: 2, date: "15 Mar 2026", title: "Abstract Acceptance Notification", status: "upcoming" },
   { id: 3, date: "1 Jun 2026", title: "Full Paper Submission", status: "upcoming" },
   { id: 4, date: "16 Jun 2026", title: "Full Paper Acceptance Notification", status: "upcoming" },
