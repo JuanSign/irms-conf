@@ -6,7 +6,7 @@ import { MapPin, Calendar, Clock, CheckCircle2, AlertCircle } from 'lucide-react
 const detailedEvents = [
   {
     id: 1,
-    date: "1 March 2026",
+    date: "22 Mar 2026",
     title: "Abstract Submission Deadline",
     status: "active",
     description: "Authors are invited to submit a short abstract (max 300 words) outlining the scope and results of their research. Abstracts must be written in English.",
@@ -14,32 +14,24 @@ const detailedEvents = [
     highlight: true
   },
   {
-    id: 3,
-    date: "15 March 2026",
+    id: 2,
+    date: "5 Apr 2026",
     title: "Notification of Acceptance",
     status: "upcoming",
     description: "Authors will be notified via email regarding the acceptance of their abstracts. Successful authors will receive guidelines for Full Paper submission.",
     location: "Email Notification"
   },
   {
-    id: 4,
-    date: "1 June 2026",
+    id: 3,
+    date: "14 June 2026",
     title: "Full Paper Submission",
     status: "upcoming",
     description: "Submission of the camera-ready full paper. Papers will undergo a final technical review before being included in the conference proceedings.",
     location: "Submission Portal"
   },
   {
-    id: 5,
-    date: "14 July 2026",
-    title: "Pre-Conference Workshop",
-    status: "upcoming",
-    description: "A full-day hands-on workshop focusing on 'Advanced Numerical Modeling in Rock Mechanics'. Separate registration is required.",
-    location: "éL Hotel Bandung"
-  },
-  {
-    id: 6,
-    date: "15-16 July 2026",
+    id: 4,
+    date: "14-16 July 2026",
     title: "IRMS Conference 2026 (Main Event)",
     status: "upcoming",
     description: "Two days of keynote speeches, technical sessions, and networking events. Includes Gala Dinner on the night of July 15th.",

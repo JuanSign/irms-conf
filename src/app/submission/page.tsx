@@ -40,7 +40,7 @@ export default function SubmissionPage() {
             </p>
           </div>
           <div className="bg-white px-4 py-2 rounded-lg border border-green-200 text-green-800 font-bold text-sm shadow-sm whitespace-nowrap">
-            Deadline: 1 March 2026
+            Deadline: 22 March 2026
           </div>
         </div>
 
