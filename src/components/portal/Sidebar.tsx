@@ -54,7 +54,7 @@ export default function Sidebar({ session, onNewSubmission }: SidebarProps) {
         </button>
 
         <a
-          href="/abstract-template.docx"
+          href="/IRMS 2026_Abstract_Template.docx"
           download="IRMS_Abstract_Template.docx"
           className="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group"
         >
@@ -73,13 +73,13 @@ export default function Sidebar({ session, onNewSubmission }: SidebarProps) {
 
           <div className="relative pl-6">
             <div className="absolute left-0 top-1.5 w-3 h-3 bg-red-500 rounded-full ring-4 ring-white"></div>
-            <div className="text-sm font-bold text-gray-900">1 March 2026</div>
+            <div className="text-sm font-bold text-gray-900">22 Mar 2026</div>
             <div className="text-xs text-gray-500 mt-0.5">Abstract Submission Closes</div>
           </div>
 
           <div className="relative pl-6">
             <div className="absolute left-0 top-1.5 w-3 h-3 bg-gray-300 rounded-full ring-4 ring-white"></div>
-            <div className="text-sm font-medium text-gray-600">15 Mar 2026</div>
+            <div className="text-sm font-medium text-gray-600">5 Apr 2026</div>
             <div className="text-xs text-gray-400 mt-0.5">Acceptance Notification</div>
           </div>
         </div>
