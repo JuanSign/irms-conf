@@ -6,7 +6,7 @@ import { MapPin, Calendar, Clock, CheckCircle2, AlertCircle } from 'lucide-react
 const detailedEvents = [
   {
     id: 1,
-    date: "22 Mar 2026",
+    date: "30 Apr 2026",
     title: "Abstract Submission Deadline",
     status: "active",
     description: "Authors are invited to submit a short abstract (max 300 words) outlining the scope and results of their research. Abstracts must be written in English.",
@@ -15,7 +15,7 @@ const detailedEvents = [
   },
   {
     id: 2,
-    date: "5 Apr 2026",
+    date: "8 May 2026",
     title: "Notification of Acceptance",
     status: "upcoming",
     description: "Authors will be notified via email regarding the acceptance of their abstracts. Successful authors will receive guidelines for Full Paper submission.",
@@ -23,7 +23,7 @@ const detailedEvents = [
   },
   {
     id: 3,
-    date: "14 June 2026",
+    date: "30 June 2026",
     title: "Full Paper Submission",
     status: "upcoming",
     description: "Submission of the camera-ready full paper. Papers will undergo a final technical review before being included in the conference proceedings.",
