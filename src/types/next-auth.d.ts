@@ -7,7 +7,7 @@ declare module "next-auth" {
       id: string;
       role: "user" | "admin";
       affiliation?: string | null;
-      adminType?: number | null;
+      adminRole?: "Super Admin" | "Reviewer" | null; // Changed from adminType
     } & DefaultSession["user"];
   }
 
@@ -15,7 +15,7 @@ declare module "next-auth" {
     id?: string;
     role?: "user" | "admin";
     affiliation?: string | null;
-    adminType?: number | null;
+    adminRole?: "Super Admin" | "Reviewer" | null; // Changed from adminType
   }
 }
 
@@ -25,6 +25,6 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: "user" | "admin";
     affiliation?: string | null;
-    adminType?: number | null;
+    adminRole?: "Super Admin" | "Reviewer" | null; // Changed from adminType
   }
 }

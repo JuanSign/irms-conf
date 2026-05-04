@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { db } from "@/db";
@@ -9,7 +9,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     // REGULAR USER PROVIDER
     Credentials({
-      id: "user-login", // Explicit ID
+      id: "user-login",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -31,14 +31,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: user.name,
           email: user.email,
           affiliation: user.affiliation,
-          role: "user",
+          role: "user", // Identifies them as a regular user
         };
       },
     }),
 
     // ADMIN PROVIDER
     Credentials({
-      id: "admin-login", // Explicit ID for the admin portal
+      id: "admin-login",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
@@ -58,8 +58,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           id: admin.id.toString(),
           name: admin.username,
-          role: "admin",
-          adminType: admin.type,
+          role: "admin", // Identifies them as an admin to NextAuth
+          adminRole: admin.role, // "Super Admin" or "Reviewer"
         };
       },
     }),
@@ -77,8 +77,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role;
         // User specific
         if (user.affiliation) token.affiliation = user.affiliation;
-        // Admin specific
-        if (user.adminType !== undefined) token.adminType = user.adminType;
+
+        // Admin specific: Changed from adminType to adminRole
+        if (user.adminRole) token.adminRole = user.adminRole;
       }
       return token;
     },
@@ -87,7 +88,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as "user" | "admin";
         session.user.affiliation = token.affiliation as string | undefined;
-        session.user.adminType = token.adminType as number | undefined;
+
+        // Admin specific: Map the token role to the session
+        session.user.adminRole = token.adminRole as "Super Admin" | "Reviewer" | undefined;
       }
       return session;
     }

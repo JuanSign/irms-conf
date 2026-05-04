@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+// Import getSession to fetch the user data after login
+import { signIn, getSession } from "next-auth/react"; 
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -17,7 +18,7 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      // Call signIn with the specific "admin-login" provider ID
+      // 1. Attempt to sign in
       const res = await signIn("admin-login", {
         username,
         password,
@@ -26,13 +27,28 @@ export default function AdminLoginPage() {
 
       if (res?.error) {
         setError("Invalid username or password");
-      } else {
-        router.push("/admin/dashboard");
-        router.refresh();
+        setIsLoading(false); // Stop loading so they can try again
+        return;
       }
+
+      // 2. If successful, fetch the session to see who just logged in
+      const session = await getSession();
+
+      // 3. Route based on their specific admin role
+      if (session?.user?.adminRole === "Super Admin") {
+        router.push("/admin/dashboard");
+      } else if (session?.user?.adminRole === "Reviewer") {
+        router.push("/admin/review");
+      } else {
+        // Fallback just in case
+        router.push("/admin");
+        setIsLoading(false);
+      }
+
+      router.refresh();
+      
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };

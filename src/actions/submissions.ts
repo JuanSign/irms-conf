@@ -89,18 +89,18 @@ export async function getUserAbstracts() {
   }
 }
 
-// Action to submit the abstract
 export async function submitAbstract(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Unauthorized." };
 
   const id = formData.get('id') as string;
   const title = formData.get('title') as string;
-  const topic = formData.get('topic') as TopicType;
+  const topic = formData.get('topic') as TopicType; // Note: Ensure TopicType matches your schema
   const fileUrl = formData.get('fileUrl') as string;
+  const fileName = formData.get('fileName') as string; // ✅ 1. Extract fileName
   const coAuthorIdsStr = formData.get('coAuthors') as string;
 
-  if (!id || !title || !topic || !fileUrl) return { error: "Missing fields." };
+  if (!id || !title || !topic || !fileUrl || !fileName) return { error: "Missing fields." };
 
   try {
     await db.insert(abstracts).values({
@@ -109,6 +109,7 @@ export async function submitAbstract(formData: FormData) {
       title,
       topic,
       path: fileUrl,
+      fileName,
     });
 
     if (coAuthorIdsStr) {
