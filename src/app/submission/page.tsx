@@ -3,25 +3,30 @@
 import Link from 'next/link';
 import {
   CheckCircle2,
-  UploadCloud,
   ArrowRight,
   FileDown,
-  FileText
+  FileText,
+  AlertCircle,
+  BellRing,
+  LayoutDashboard,
+  Mail,
+  MessageSquare
 } from 'lucide-react';
 
 export default function SubmissionPage() {
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      {/* Hero Section */}
       <div className="bg-white pt-32 pb-16 border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-irms-blue font-semibold text-sm tracking-wider uppercase mb-2 block">
-            Call for Papers
+          <span className="text-irms-red font-semibold text-sm tracking-wider uppercase mb-2 block">
+            Important Update
           </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6">
-            Abstract Submission
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
+            Submission Closed
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Please download the official template below before submitting your abstract.
+            The call for papers has officially ended. Thank you to all authors who submitted their research for consideration.
           </p>
         </div>
       </div>
@@ -29,88 +34,123 @@ export default function SubmissionPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
         {/* Status Banner */}
-        <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-12 flex flex-col md:flex-row items-start md:items-center gap-4 shadow-sm">
-          <div className="bg-green-100 p-3 rounded-full text-green-700 shrink-0">
-            <CheckCircle2 size={28} />
+        <div className="bg-slate-100 border border-slate-200 rounded-xl p-6 mb-12 flex flex-col md:flex-row items-start md:items-center gap-5 shadow-sm">
+          <div className="bg-slate-200 p-3 rounded-full text-slate-700 shrink-0">
+            <AlertCircle size={28} />
           </div>
           <div className="flex-1">
-            <h3 className="font-bold text-green-900 text-lg">Submission System is OPEN</h3>
-            <p className="text-green-800 text-sm mt-1">
-              The portal is currently accepting abstracts. Please ensure you follow the document format below.
+            <h3 className="font-bold text-slate-900 text-lg">New Submissions are Offline</h3>
+            <p className="text-slate-700 text-sm mt-1 leading-relaxed">
+              We are no longer accepting new abstracts. If you have urgent inquiries, missed the deadline due to technical issues, or need to withdraw a submission, please contact the administration.
             </p>
           </div>
-          <div className="bg-white px-4 py-2 rounded-lg border border-green-200 text-green-800 font-bold text-sm shadow-sm whitespace-nowrap">
-            Deadline: 30 Apr 2026
-          </div>
+          <a
+            href="mailto:irms2026.secretariat@gmail.com"
+            className="bg-white px-5 py-2.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-sm shadow-sm whitespace-nowrap flex items-center gap-2 transition-all"
+          >
+            <Mail size={16} className="text-slate-500" /> Email Admin
+          </a>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-          {/* Main Content: Downloads */}
-          <div className="lg:col-span-2 space-y-8">
-            <section className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 bg-blue-50 text-irms-blue rounded-lg flex items-center justify-center">
-                  <FileDown size={20} />
+          {/* Main Content: Heavy Focus on Updates & Portal */}
+          <div className="lg:col-span-2 space-y-6">
+            <section className="bg-linear-to-br from-white to-blue-50/40 p-8 md:p-10 rounded-2xl shadow-sm border border-blue-100 relative overflow-hidden">
+              {/* Decorative background blur */}
+              <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-blue-200 rounded-full opacity-30 blur-3xl pointer-events-none"></div>
+
+              <div className="flex items-center gap-4 mb-6 relative">
+                <div className="w-12 h-12 bg-irms-blue text-white rounded-xl flex items-center justify-center shadow-md shrink-0">
+                  <BellRing size={24} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Download Resource</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Track Your Submission</h2>
               </div>
 
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                To ensure a smooth review process, please prepare your abstract using the official template provided below.
-              </p>
+              <div className="space-y-6 relative">
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  All submitted abstracts are currently undergoing the peer-review process. To ensure you don't miss any critical information, please log in to the <strong>Author Portal</strong> regularly.
+                </p>
 
-              <div className="space-y-4">
-                <a
-                  href="/IRMS 2026_Abstract_Template.docx"
-                  download="IRMS_Abstract_Template.docx"
-                  className="group flex items-center p-4 border border-gray-200 rounded-lg hover:border-irms-blue hover:bg-blue-50/50 transition-all duration-200"
-                >
-                  <div className="bg-blue-100 text-blue-600 p-3 rounded-md mr-4 shrink-0">
-                    <FileText size={24} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 group-hover:text-irms-blue transition-colors">
-                      Abstract Template
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      DOCX • Microsoft Word Format
-                    </p>
-                  </div>
-                  <div className="text-gray-400 group-hover:text-irms-blue">
-                    <FileDown size={20} />
-                  </div>
-                </a>
+                <div className="bg-white/60 rounded-xl p-6 border border-white shadow-sm">
+                  <ul className="space-y-4 text-gray-700">
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 text-irms-blue p-1 rounded-md mt-0.5 shrink-0">
+                        <CheckCircle2 size={16} strokeWidth={3} />
+                      </div>
+                      <span className="leading-snug">Track the real-time <strong>review status</strong> of your abstract.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 text-irms-blue p-1 rounded-md mt-0.5 shrink-0">
+                        <CheckCircle2 size={16} strokeWidth={3} />
+                      </div>
+                      <span className="leading-snug">Receive instant <strong>notifications</strong> regarding acceptance, revisions, or formatting requests.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 text-irms-blue p-1 rounded-md mt-0.5 shrink-0">
+                        <CheckCircle2 size={16} strokeWidth={3} />
+                      </div>
+                      <span className="leading-snug">Access reviewer feedback and download official letters once decisions are finalized.</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
+            </section>
+
+            {/* Kept as a secondary reference block */}
+            <section className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                  <FileText size={18} className="text-gray-400"/>
+                  Abstract Template Reference
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">Need to review the formatting guidelines while waiting?</p>
+              </div>
+              <a
+                href="/IRMS 2026_Abstract_Template.docx"
+                download="IRMS_Abstract_Template.docx"
+                className="text-irms-blue hover:text-blue-900 font-medium text-sm flex items-center gap-2 bg-blue-50 px-4 py-2.5 rounded-lg transition-colors border border-blue-100 hover:border-blue-200 w-full sm:w-auto justify-center"
+              >
+                Download File <FileDown size={16}/>
+              </a>
             </section>
           </div>
 
           {/* Sidebar Action Card */}
           <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-irms-red sticky top-28">
-              <div className="flex items-center gap-2 text-irms-red mb-2">
-                <UploadCloud size={24} />
-                <h3 className="text-xl font-bold text-gray-900">Submit Abstract</h3>
+            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl shadow-slate-200/50 border-t-4 border-irms-blue sticky top-28">
+              <div className="flex items-center gap-3 text-irms-blue mb-3">
+                <LayoutDashboard size={26} />
+                <h3 className="text-xl font-bold text-gray-900">Author Portal</h3>
               </div>
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                Ready to submit?
+              <p className="text-gray-500 text-sm mb-8 leading-relaxed">
+                Access your personalized dashboard to view notifications and manage your submitted papers.
               </p>
 
               <Link
-                href="/submission/register"
-                className="w-full bg-irms-red text-white font-bold py-4 px-4 rounded-lg hover:bg-red-700 transition shadow-md hover:shadow-lg mb-4 flex items-center justify-center gap-2 group"
+                href="/submission/portal" // Update this path to match your actual dashboard route
+                className="w-full bg-irms-blue text-white font-bold py-4 px-4 rounded-xl hover:bg-blue-900 transition-all shadow-md hover:shadow-lg mb-6 flex items-center justify-center gap-2 group"
               >
-                Go to Portal
+                Go to Dashboard
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
 
-              <hr className="my-6 border-gray-100"/>
+              <hr className="my-6 border-slate-100"/>
 
-              <div className="space-y-4">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">Deadline</span>
-                  <span className="font-bold text-gray-900">30 Apr 2026</span>
-                </div>
+              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                <h4 className="font-semibold text-gray-900 text-sm mb-2 flex items-center gap-2">
+                  <MessageSquare size={16} className="text-irms-red" /> Need Assistance?
+                </h4>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">
+                  If you require technical support or have questions regarding your submission status, our team is here to help.
+                </p>
+                <a
+                  href="mailto:irms2026.secretariat@gmail.com"
+                  className="text-irms-red hover:text-red-800 font-bold text-sm flex items-center gap-1 group w-fit transition-colors"
+                >
+                  Contact Admin
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </a>
               </div>
             </div>
           </div>
