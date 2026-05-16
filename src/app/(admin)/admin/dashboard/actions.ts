@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/db";
-import { admins, abstractAssignments } from "@/db/schema";
+import { admins, abstractAssignments, abstracts } from "@/db/schema";
 import { hash } from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
 
 export async function createAdmin(formData: FormData) {
   const name = formData.get("name") as string;
@@ -51,5 +52,22 @@ export async function assignAbstract(adminId: string, abstractId: string) {
     return { success: true };
   } catch (error) {
     return { error: "Failed to assign abstract" };
+  }
+}
+
+export async function updateAbstractStatus(abstractId: string, newStatus: string) {
+  if (!abstractId || !newStatus) return { error: "Missing data" };
+
+  try {
+    // Cast to the enum types mapped in your schema
+    await db.update(abstracts)
+      .set({ status: newStatus as "Submitted" | "Under Review" | "Revision Required" | "Accepted" | "Rejected" })
+      .where(eq(abstracts.id, abstractId));
+
+    revalidatePath("/admin/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to update status" };
   }
 }

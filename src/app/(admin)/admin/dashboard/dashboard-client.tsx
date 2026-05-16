@@ -1,71 +1,83 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { createAdmin, assignAbstract } from "./actions";
+import React from "react";
+import { createAdmin, assignAbstract, updateAbstractStatus } from "./actions";
+import { 
+  Users, FileText, CheckCircle, Clock, LayoutDashboard, 
+  UserCog, AlertCircle, FileCheck, Search, BookOpen, PenTool, 
+  CheckCircle2, MoreHorizontal, ChevronDown, ChevronUp, 
+  Download, BarChart3, ArrowUpDown
+} from "lucide-react";
 
-type Abstract = { id: string; title: string; status: string };
-type User = { id: string; name: string; email: string; abstracts: Abstract[] };
-type Admin = { id: string; name: string; username: string; role: string; assignments: { abstract: Abstract }[] };
+// --- EXPORTED Types for strict Server-to-Client typing ---
+export type BaseAbstract = { id: string; title: string; status: string };
+
+export type User = { 
+  id: string; name: string; email: string; affiliation: string | null;
+  abstracts: BaseAbstract[]; 
+  coauthoredAbstracts: { abstract: BaseAbstract }[] 
+};
+
+export type Admin = { 
+  id: string; name: string; username: string; role: string; 
+  assignments: { isReviewed: boolean; abstract: BaseAbstract }[] 
+};
+
+export type AbstractDetail = BaseAbstract & {
+  path: string;
+  fileName: string;
+  author: { name: string; email: string };
+  assignments: { 
+    isReviewed: boolean; 
+    admin: { name: string };
+    scoreClarity: number | null;
+    scoreQuality: number | null;
+    scoreCompleteness: number | null;
+    scoreInteresting: number | null;
+  }[];
+};
+
+// --- Helper Functions ---
+function getInitials(name: string) {
+  return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+}
 
 // --- Reusable Searchable Select Component ---
-function SearchableSelect({
-  options,
-  placeholder,
-  label,
-  name
-}: {
-  options: { id: string, label: string }[],
-  placeholder: string,
-  label: string,
-  name: string
-}) {
+function SearchableSelect({ options, placeholder, label, name }: { options: { id: string, label: string }[], placeholder: string, label: string, name: string }) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<{ id: string, label: string } | null>(null);
 
   const filtered = useMemo(() => {
-    return query === ""
-      ? options
-      : options.filter(opt => opt.label.toLowerCase().includes(query.toLowerCase()));
+    return query === "" ? options : options.filter(opt => opt.label.toLowerCase().includes(query.toLowerCase()));
   }, [query, options]);
 
   return (
     <div className="relative flex-1">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
-      <input
-        type="hidden"
-        name={name}
-        value={selected?.id || ""}
-        required
-      />
-      <div className="relative mt-1">
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <input type="hidden" name={name} value={selected?.id || ""} required />
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 text-gray-400" />
+        </div>
         <input
           type="text"
-          className="block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors border bg-gray-50 focus:bg-white"
           placeholder={selected ? selected.label : placeholder}
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
+          onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
           onFocus={() => setIsOpen(true)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 200)} // Delay to allow click
+          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
         />
         {isOpen && (
-          <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+          <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-sm shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
             {filtered.length === 0 ? (
-              <li className="px-4 py-2 text-gray-500">No results found.</li>
+              <li className="px-4 py-3 text-gray-500 text-center">No results found.</li>
             ) : (
               filtered.map((opt) => (
-                <li
-                  key={opt.id}
-                  className="relative cursor-pointer select-none px-4 py-2 hover:bg-blue-600 hover:text-white"
-                  onClick={() => {
-                    setSelected(opt);
-                    setQuery("");
-                    setIsOpen(false);
-                  }}
-                >
+                <li key={opt.id} className="relative cursor-pointer select-none px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                  onClick={() => { setSelected(opt); setQuery(""); setIsOpen(false); }}>
                   {opt.label}
                 </li>
               ))
@@ -74,35 +86,55 @@ function SearchableSelect({
         )}
       </div>
       {selected && (
-        <button
-          type="button"
-          onClick={() => setSelected(null)}
-          className="mt-1 text-xs text-red-500 hover:underline"
-        >
-          Clear selection
-        </button>
+        <button type="button" onClick={() => setSelected(null)} className="mt-1.5 text-xs text-red-500 hover:text-red-700 transition-colors font-medium">Clear selection</button>
       )}
     </div>
   );
 }
 
-export default function DashboardClient({
-  users,
-  admins,
-  allAbstracts,
-}: {
-  users: User[];
-  admins: Admin[];
-  allAbstracts: Abstract[];
-}) {
-  const [activeTab, setActiveTab] = useState<"users" | "admins">("users");
+// --- Main Dashboard Component ---
+export default function DashboardClient({ users, admins, abstracts, stats }: { users: User[]; admins: Admin[]; abstracts: AbstractDetail[]; stats: any }) {
+  const [activeTab, setActiveTab] = useState<"overview" | "abstracts" | "users" | "admins">("abstracts");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // States for interactive UI
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [progressSort, setProgressSort] = useState<'asc' | 'desc' | null>(null);
+
+  const toggleRow = (id: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
+  // Sort logic for abstracts based on review progress
+  const sortedAbstracts = useMemo(() => {
+    if (!progressSort) return abstracts; // Return default chronological order
+    
+    return [...abstracts].sort((a, b) => {
+      const getScore = (ab: AbstractDetail) => {
+        const total = ab.assignments.length;
+        if (total === 0) return -1; // Unassigned is treated as the absolute lowest score (-1)
+        const completed = ab.assignments.filter(x => x.isReviewed).length;
+        return completed / total; // Returns percentage between 0 and 1
+      };
+      
+      const scoreA = getScore(a);
+      const scoreB = getScore(b);
+      
+      if (scoreA < scoreB) return progressSort === 'asc' ? -1 : 1;
+      if (scoreA > scoreB) return progressSort === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [abstracts, progressSort]);
 
   async function handleCreateAdmin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     const formData = new FormData(e.currentTarget);
     const res = await createAdmin(formData);
     if (res?.error) setError(res.error);
@@ -118,129 +150,424 @@ export default function DashboardClient({
     setLoading(false);
   }
 
+  async function handleStatusChange(abstractId: string, newStatus: string) {
+    await updateAbstractStatus(abstractId, newStatus);
+  }
+
+  const statusColors: Record<string, { bg: string, text: string, dot: string }> = {
+    'Submitted': { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' },
+    'Under Review': { bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500' },
+    'Revision Required': { bg: 'bg-yellow-100', text: 'text-yellow-700', dot: 'bg-yellow-500' },
+    'Accepted': { bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500' },
+    'Rejected': { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
+  };
+
   return (
     <div className="space-y-6">
-      {/* TABS */}
-      <div className="flex space-x-4 border-b pb-2">
-        <button onClick={() => setActiveTab("users")} className={`px-4 py-2 font-medium ${activeTab === "users" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"}`}>
-          Users & Abstracts
-        </button>
-        <button onClick={() => setActiveTab("admins")} className={`px-4 py-2 font-medium ${activeTab === "admins" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"}`}>
-          Admins & Assignments
-        </button>
+      {/* TABS NAVIGATION */}
+      <div className="flex space-x-1 border-b border-gray-200 overflow-x-auto pb-px scrollbar-hide">
+        {[
+          { id: "overview", label: "Overview", icon: LayoutDashboard },
+          { id: "abstracts", label: "Abstracts & Status", icon: BookOpen },
+          { id: "users", label: "Authors Directory", icon: Users },
+          { id: "admins", label: "Reviewers & Admins", icon: UserCog },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`flex items-center space-x-2 px-5 py-3 font-medium text-sm transition-all rounded-t-lg ${
+              activeTab === tab.id 
+                ? "border-b-2 border-blue-600 text-blue-700 bg-blue-50/50" 
+                : "text-gray-500 hover:text-gray-800 hover:bg-gray-50 border-b-2 border-transparent"
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
-      {activeTab === "users" && (
-        <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Author</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Submitted Abstracts</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <div className="font-medium text-gray-900">{user.name}</div>
-                    <div className="text-sm text-gray-500">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {user.abstracts.length === 0 ? <span className="text-sm text-gray-400">No abstracts</span> : (
-                      <ul className="list-disc pl-4 text-sm text-gray-700">
-                        {user.abstracts.map((ab) => (
-                          <li key={ab.id}>{ab.title} <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded ml-2">{ab.status}</span></li>
-                        ))}
-                      </ul>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* OVERVIEW TAB */}
+      {activeTab === "overview" && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+              <div className="p-3 bg-blue-50 rounded-xl text-blue-600"><FileText size={24} /></div>
+              <div><p className="text-sm text-gray-500 font-medium">Total Abstracts</p><h3 className="text-2xl font-bold text-gray-900">{stats.totalAbstracts}</h3></div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+              <div className="p-3 bg-green-50 rounded-xl text-green-600"><CheckCircle size={24} /></div>
+              <div><p className="text-sm text-gray-500 font-medium">Accepted</p><h3 className="text-2xl font-bold text-gray-900">{stats.statusBreakdown.accepted}</h3></div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+              <div className="p-3 bg-purple-50 rounded-xl text-purple-600"><Users size={24} /></div>
+              <div><p className="text-sm text-gray-500 font-medium">Total Users</p><h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3></div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+              <div className="p-3 bg-orange-50 rounded-xl text-orange-600"><FileCheck size={24} /></div>
+              <div><p className="text-sm text-gray-500 font-medium">Reviews Completed</p><h3 className="text-2xl font-bold text-gray-900">{stats.reviews.completed} / {stats.reviews.total}</h3></div>
+            </div>
+          </div>
         </div>
       )}
 
-      {activeTab === "admins" && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Admin</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Assigned Abstracts</th>
+      {/* ABSTRACTS & STATUS TAB */}
+      {activeTab === "abstracts" && (
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden animate-in fade-in duration-300">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50/80">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-12"></th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[45%]">Paper & Author</th>
+                  
+                  {/* Clickable Header for Sorting */}
+                  <th 
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer hover:bg-gray-200/50 transition-colors group select-none"
+                    onClick={() => setProgressSort(prev => prev === 'asc' ? 'desc' : prev === 'desc' ? null : 'asc')}
+                  >
+                    <div className="flex items-center space-x-1.5">
+                      <span>Review Progress</span>
+                      <div className="text-gray-400 group-hover:text-gray-700 transition-colors">
+                        {progressSort === 'asc' ? <ChevronUp size={14} /> : progressSort === 'desc' ? <ChevronDown size={14} /> : <ArrowUpDown size={14} opacity={0.5} />}
+                      </div>
+                    </div>
+                  </th>
+
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status & Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {/* Notice we map over sortedAbstracts now */}
+                {sortedAbstracts.map((ab) => {
+                  const completed = ab.assignments.filter(a => a.isReviewed).length;
+                  const total = ab.assignments.length;
+                  const progressPercent = total === 0 ? 0 : Math.round((completed / total) * 100);
+                  const colors = statusColors[ab.status] || statusColors['Submitted'];
+                  const isExpanded = expandedRows.has(ab.id);
+
+                  return (
+                    <React.Fragment key={ab.id}>
+                      <tr className={`hover:bg-gray-50/50 transition-colors group ${isExpanded ? 'bg-blue-50/20' : ''}`}>
+                        <td className="px-6 py-5 cursor-pointer" onClick={() => toggleRow(ab.id)}>
+                          <button className="text-gray-400 hover:text-blue-600 p-1 rounded-md hover:bg-blue-50 transition-colors">
+                            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </button>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="flex items-start space-x-3">
+                            <div className="mt-1 flex-shrink-0 text-gray-400 group-hover:text-blue-500 transition-colors">
+                              <FileText size={18} />
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900 leading-snug break-words mb-1">{ab.title}</div>
+                              <div className="text-sm text-gray-500 flex items-center">
+                                <span className="font-medium text-gray-700 mr-1">{ab.author.name}</span>
+                                <span className="text-gray-400">({ab.author.email})</span>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          {total === 0 ? (
+                            <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                              <MoreHorizontal size={14} />
+                              <span>Unassigned</span>
+                            </span>
+                          ) : (
+                            <div className="w-full max-w-[200px]">
+                              <div className="flex items-center justify-between text-xs mb-1.5">
+                                <span className={`font-medium ${completed === total ? 'text-green-600' : 'text-gray-600'}`}>
+                                  {completed} of {total} Reviewed
+                                </span>
+                                <span className="text-gray-400 font-medium">{progressPercent}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                <div className={`h-1.5 rounded-full transition-all duration-500 ${completed === total ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${progressPercent}%` }}></div>
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          <div className="relative inline-block w-full max-w-[220px]">
+                            <select 
+                              value={ab.status}
+                              onChange={(e) => handleStatusChange(ab.id, e.target.value)}
+                              className={`appearance-none w-full pl-8 pr-8 py-2 text-sm font-medium rounded-lg border-transparent shadow-sm focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer ${colors.bg} ${colors.text}`}
+                            >
+                              <option value="Submitted">Submitted</option>
+                              <option value="Under Review">Under Review</option>
+                              <option value="Revision Required">Revision Required</option>
+                              <option value="Accepted">Accepted</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className={`w-2 h-2 rounded-full ${colors.dot}`}></span></div>
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400"><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Expanded Details Row */}
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={4} className="bg-gray-50/80 px-8 py-6 border-b border-gray-200">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              
+                              {/* Left Column: File Info */}
+                              <div className="space-y-3">
+                                <h4 className="text-sm font-semibold text-gray-900 flex items-center"><BookOpen size={16} className="mr-2 text-blue-600" /> Submitted File</h4>
+                                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm flex items-center justify-between">
+                                  <div className="flex items-center space-x-3 overflow-hidden">
+                                    <div className="bg-red-100 text-red-600 p-2 rounded-md"><FileText size={20} /></div>
+                                    <span className="text-sm font-medium text-gray-700 truncate">{ab.fileName}</span>
+                                  </div>
+                                  <a 
+                                    href={ab.path} 
+                                    download={ab.fileName}
+                                    target="_blank" rel="noopener noreferrer"
+                                    className="flex items-center space-x-1.5 bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                                  >
+                                    <Download size={14} /> <span>Download</span>
+                                  </a>
+                                </div>
+                              </div>
+
+                              {/* Right Column: Review Scores */}
+                              <div className="space-y-3">
+                                <h4 className="text-sm font-semibold text-gray-900 flex items-center"><BarChart3 size={16} className="mr-2 text-purple-600" /> Review Results</h4>
+                                {ab.assignments.length === 0 ? (
+                                  <div className="text-sm text-gray-500 italic bg-white border border-gray-200 rounded-lg p-4">No reviewers assigned yet.</div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    {ab.assignments.map((asgn, idx) => (
+                                      <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                                        <div className="flex justify-between items-center mb-3">
+                                          <span className="text-sm font-semibold text-gray-900">{asgn.admin.name}</span>
+                                          {asgn.isReviewed ? (
+                                            <span className="inline-flex items-center text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200"><CheckCircle2 size={12} className="mr-1" /> Reviewed</span>
+                                          ) : (
+                                            <span className="inline-flex items-center text-xs font-medium text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200"><Clock size={12} className="mr-1" /> Pending</span>
+                                          )}
+                                        </div>
+                                        
+                                        {asgn.isReviewed && (
+                                          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                                            <div className="flex justify-between border-b border-gray-50 pb-1">
+                                              <span className="text-gray-500">Clarity:</span>
+                                              <span className="font-medium text-gray-900">{asgn.scoreClarity ?? '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-gray-50 pb-1">
+                                              <span className="text-gray-500">Quality:</span>
+                                              <span className="font-medium text-gray-900">{asgn.scoreQuality ?? '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-gray-50 pb-1">
+                                              <span className="text-gray-500">Completeness:</span>
+                                              <span className="font-medium text-gray-900">{asgn.scoreCompleteness ?? '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-gray-50 pb-1">
+                                              <span className="text-gray-500">Interesting:</span>
+                                              <span className="font-medium text-gray-900">{asgn.scoreInteresting ?? '-'}</span>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* USERS TAB */}
+      {activeTab === "users" && (
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden animate-in fade-in duration-300">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50/80">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[25%]">Author Profile</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[35%]">Lead Author Contributions</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[40%]">Co-Author Contributions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-5 align-top">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-bold shadow-inner">
+                          {getInitials(user.name)}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">{user.name}</div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
+                          {user.affiliation && (
+                            <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-600 break-words">
+                              {user.affiliation}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 align-top">
+                      {user.abstracts.length === 0 ? (
+                        <span className="text-sm text-gray-400 italic">No primary submissions</span>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {user.abstracts.map((ab) => {
+                            const colors = statusColors[ab.status] || statusColors['Submitted'];
+                            return (
+                              <div key={ab.id} className="flex items-start space-x-2 bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
+                                <PenTool className="w-3.5 h-3.5 text-blue-500 mt-1 flex-shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm text-gray-800 font-medium leading-relaxed break-words">{ab.title}</p>
+                                  <div className="flex items-center mt-2">
+                                    <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} mr-1.5`}></span>
+                                    <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">{ab.status}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-5 align-top">
+                      {user.coauthoredAbstracts.length === 0 ? (
+                        <span className="text-sm text-gray-400 italic">No co-authored papers</span>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {user.coauthoredAbstracts.map((ca) => {
+                            const colors = statusColors[ca.abstract.status] || statusColors['Submitted'];
+                            return (
+                              <div key={ca.abstract.id} className="flex items-start space-x-2 bg-gray-50 border border-gray-100 rounded-lg p-3">
+                                <Users className="w-3.5 h-3.5 text-gray-400 mt-1 flex-shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm text-gray-700 leading-relaxed break-words">{ca.abstract.title}</p>
+                                  <div className="flex items-center mt-2">
+                                    <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} mr-1.5 opacity-50`}></span>
+                                    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">{ca.abstract.status}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {admins.map((admin) => (
-                    <tr key={admin.id}>
-                      <td className="whitespace-nowrap px-6 py-4">
-                        <div className="font-medium text-gray-900">{admin.name}</div>
-                        <div className="text-sm text-gray-500">@{admin.username}</div>
-                        <span className="mt-1 inline-block rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800">{admin.role}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {admin.assignments.length === 0 ? <span className="text-sm text-gray-400">No assignments</span> : (
-                          <ul className="list-disc pl-4 text-sm text-gray-700">
-                            {admin.assignments.map((asgn) => <li key={asgn.abstract.id}>{asgn.abstract.title}</li>)}
-                          </ul>
-                        )}
-                      </td>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ADMINS TAB */}
+      {activeTab === "admins" && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 animate-in fade-in duration-300">
+          <div className="xl:col-span-2 space-y-6">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50/80">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Admin Profile</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Assignments & Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 bg-white">
+                    {admins.map((admin) => (
+                      <tr key={admin.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-5 align-top">
+                          <div className="flex items-center space-x-3">
+                            <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-purple-700 font-bold shadow-inner">
+                              {getInitials(admin.name)}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-gray-900">{admin.name}</div>
+                              <div className="text-sm text-gray-500">@{admin.username}</div>
+                              <span className="mt-1.5 inline-block rounded border border-purple-200 bg-purple-50 px-2 py-0.5 text-[11px] font-medium text-purple-700 uppercase tracking-wide">
+                                {admin.role}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          {admin.assignments.length === 0 ? <span className="text-sm text-gray-400 italic">No active assignments</span> : (
+                            <div className="space-y-2">
+                              {admin.assignments.map((asgn) => (
+                                <div key={asgn.abstract.id} className="flex flex-col text-sm border border-gray-100 bg-gray-50 rounded-lg p-3">
+                                  <span className="font-medium text-gray-800 line-clamp-1 mb-2">{asgn.abstract.title}</span>
+                                  <div className="flex items-center space-x-2">
+                                    {asgn.isReviewed ? (
+                                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md border border-green-200 flex items-center font-medium"><CheckCircle2 size={14} className="mr-1.5" /> Review Completed</span>
+                                    ) : (
+                                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md border border-yellow-200 flex items-center font-medium"><Clock size={14} className="mr-1.5" /> Pending Review</span>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div className="rounded-lg border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Assign Abstract to Reviewer</h3>
-              <form onSubmit={handleAssign} className="flex gap-4 items-end">
-                <SearchableSelect
-                  label="Select Admin"
-                  name="adminId"
-                  placeholder="Search by name..."
-                  options={admins.map(a => ({ id: a.id, label: `${a.name} (${a.role})` }))}
-                />
-                <SearchableSelect
-                  label="Select Abstract"
-                  name="abstractId"
-                  placeholder="Search by title..."
-                  options={allAbstracts.map(a => ({ id: a.id, label: a.title }))}
-                />
-                <button type="submit" disabled={loading} className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 h-9.5">
+            {/* Assignment Form */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center"><FileText className="mr-2 h-5 w-5 text-blue-500" /> Assign Paper to Reviewer</h3>
+              <form onSubmit={handleAssign} className="flex flex-col md:flex-row gap-5 items-start md:items-end">
+                <SearchableSelect label="Select Reviewer" name="adminId" placeholder="Search by name..." options={admins.map(a => ({ id: a.id, label: `${a.name} (${a.role})` }))} />
+                <SearchableSelect label="Select Abstract" name="abstractId" placeholder="Search by title..." options={abstracts.map(a => ({ id: a.id, label: a.title }))} />
+                <button type="submit" disabled={loading} className="w-full md:w-auto bg-blue-600 text-white px-8 py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium shadow-sm">
                   Assign
                 </button>
               </form>
             </div>
           </div>
 
-          <div className="rounded-lg border bg-white p-6 shadow-sm h-fit">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Admin</h3>
-            {error && <div className="mb-4 text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>}
+          {/* Create Admin Form */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm h-fit sticky top-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center"><UserCog className="mr-2 h-5 w-5 text-purple-500" /> Create Reviewer / Admin</h3>
+            {error && <div className="mb-5 text-sm text-red-700 bg-red-50 p-3 rounded-lg border border-red-200 flex items-start"><AlertCircle size={16} className="mt-0.5 mr-2 flex-shrink-0" /> {error}</div>}
             <form onSubmit={handleCreateAdmin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input type="text" name="name" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                <input type="text" name="name" required className="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white shadow-sm border p-2.5 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
-                <input type="text" name="username" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                <input type="text" name="username" required className="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white shadow-sm border p-2.5 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                <input type="password" name="password" required className="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white shadow-sm border p-2.5 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Role</label>
-                <select name="role" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+                <select name="role" required className="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white shadow-sm border p-2.5 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors">
                   <option value="Reviewer">Reviewer</option>
                   <option value="Super Admin">Super Admin</option>
                 </select>
               </div>
-              <button type="submit" disabled={loading} className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50">
-                {loading ? "Creating..." : "Create Admin"}
+              <button type="submit" disabled={loading} className="w-full bg-gray-900 text-white px-4 py-3 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors font-medium mt-6 shadow-sm">
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
           </div>
