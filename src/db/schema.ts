@@ -20,6 +20,19 @@ export const adminRoleEnum = pgEnum('admin_role', [
   'Reviewer'
 ]);
 
+export const registrationCategoryEnum = pgEnum('registration_category', [
+  'Industry/Practitioner',
+  'Academic',
+  'Student'
+]);
+
+export const paymentStatusEnum = pgEnum('payment_status', [
+  'Pending Payment',
+  'Verification Pending',
+  'Verified',
+  'Rejected'
+]);
+
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -98,10 +111,26 @@ export const abstractReviews = pgTable("abstract_reviews", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const eventRegistrations = pgTable("event_registrations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull().unique(),
+  category: registrationCategoryEnum("category").notNull(),
+  amount: integer("amount").notNull(),
+  paymentProofUrl: text("payment_proof_url"),
+  status: paymentStatusEnum("status").default("Pending Payment").notNull(),
+  invitationUrl: text("invitation_url"),
+  rejectionReason: text("rejection_reason"),
+  isIrmsMember: boolean("is_irms_member").default(false).notNull(),
+  irmsMemberId: varchar("irms_member_id", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+
+export const usersRelations = relations(users, ({ one, many }) => ({
   abstracts: many(abstracts),
   coauthoredAbstracts: many(abstractCoauthors),
   verificationTokens: many(emailVerificationTokens),
+  registration: one(eventRegistrations),
 }));
 
 export const emailVerificationTokensRelations = relations(emailVerificationTokens, ({ one }) => ({
@@ -172,6 +201,13 @@ export const abstractReviewsRelations = relations(abstractReviews, ({ one }) => 
   }),
 }));
 
+export const eventRegistrationsRelations = relations(eventRegistrations, ({ one }) => ({
+  user: one(users, {
+    fields: [eventRegistrations.userId],
+    references: [users.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Abstract = typeof abstracts.$inferSelect;
@@ -184,3 +220,5 @@ export type AbstractComment = typeof abstractComments.$inferSelect;
 export type NewAbstractComment = typeof abstractComments.$inferInsert;
 export type AbstractReview = typeof abstractReviews.$inferSelect;
 export type NewAbstractReview = typeof abstractReviews.$inferInsert;
+export type EventRegistration = typeof eventRegistrations.$inferSelect;
+export type NewEventRegistration = typeof eventRegistrations.$inferInsert;
