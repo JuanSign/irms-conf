@@ -54,6 +54,7 @@ export async function createRegistration(data: {
     return { success: false, error: "Failed to generate invoice. You might already have an active registration." };
   }
 }
+
 export async function cancelRegistration(registrationId: string) {
   try {
     const session = await auth();

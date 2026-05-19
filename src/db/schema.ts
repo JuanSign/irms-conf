@@ -122,6 +122,8 @@ export const eventRegistrations = pgTable("event_registrations", {
   rejectionReason: text("rejection_reason"),
   isIrmsMember: boolean("is_irms_member").default(false).notNull(),
   irmsMemberId: varchar("irms_member_id", { length: 255 }),
+  attendingWorkshop: boolean("attending_workshop").default(false).notNull(),
+  attendingRockersNight: boolean("attending_rockers_night").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });

@@ -1,19 +1,23 @@
+// components/layout/Navbar.tsx
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
-const Navbar = () => {
+// Accept the session prop
+const Navbar = ({ session }: { session: Session | null }) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Schedule', href: '/schedule' },
-    { name: 'Submission', href: '/submission' },
+    { name: 'Dashboard', href: '/dashboard' },
   ];
 
   return (
@@ -37,17 +41,45 @@ const Navbar = () => {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`text-sm font-semibold uppercase tracking-wider transition-colors duration-200 ${
-                  pathname === link.href ? 'text-irms-red' : 'text-slate-600 hover:text-irms-blue'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            <div className="flex items-center space-x-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`text-sm font-semibold uppercase tracking-wider transition-colors duration-200 ${
+                    pathname === link.href ? 'text-irms-red' : 'text-slate-600 hover:text-irms-blue'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+
+            {/* Auth Section Desktop */}
+            <div className="border-l border-slate-200 pl-6 flex items-center h-8">
+              {session?.user ? (
+                <div className="flex items-center gap-5">
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <User size={16} className="text-irms-blue" />
+                    <span className="max-w-[150px] truncate">{session.user.name}</span>
+                  </div>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/dashboard/register' })}
+                    className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-irms-red transition-colors"
+                    title="Sign Out"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/dashboard/register"
+                  className="text-sm font-semibold text-white bg-irms-blue px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile Toggle */}
@@ -73,6 +105,32 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+
+            {/* Auth Section Mobile */}
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              {session?.user ? (
+                <>
+                  <div className="px-3 mb-3 text-sm text-slate-500">
+                    Signed in as <span className="font-semibold text-slate-800">{session.user.name}</span>
+                  </div>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/dashboard/register' })}
+                    className="flex w-full items-center gap-2 px-3 py-3 rounded-md text-base font-semibold text-irms-red hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut size={20} />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/dashboard/register"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center w-full bg-irms-blue text-white px-4 py-3 rounded-md text-base font-semibold hover:bg-opacity-90 transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
