@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 
 export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isPortalRoute = req.nextUrl.pathname.startsWith("/submission/portal");
+  const isPortalRoute = req.nextUrl.pathname.startsWith("/dashboard/portal");
 
   if (isPortalRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/submission/register", req.nextUrl));
+    return NextResponse.redirect(new URL("/dashboard/register", req.nextUrl));
   }
 
   return NextResponse.next();
