@@ -33,6 +33,13 @@ export const paymentStatusEnum = pgEnum('payment_status', [
   'Rejected'
 ]);
 
+export const iopPaymentStatusEnum = pgEnum('iop_payment_status', [
+  'Pending Payment',
+  'Verification Pending',
+  'Verified',
+  'Rejected'
+]);
+
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -59,6 +66,15 @@ export const abstracts = pgTable("abstracts", {
   path: text("path").notNull(),
   fileName: varchar("file_name", { length: 255 }).notNull(),
   status: statusEnum("status").default("Submitted").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+
+export const iopPublications = pgTable("iop_publications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  abstractId: uuid("abstract_id").references(() => abstracts.id, { onDelete: 'cascade' }).notNull().unique(),
+  paymentProofUrl: text("payment_proof_url"),
+  status: iopPaymentStatusEnum("status").default("Pending Payment").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
@@ -151,6 +167,7 @@ export const abstractsRelations = relations(abstracts, ({ one, many }) => ({
   comments: many(abstractComments),
   reviews: many(abstractReviews),
   assignments: many(abstractAssignments),
+  iopPublication: one(iopPublications, { fields: [abstracts.id], references: [iopPublications.abstractId] })
 }));
 
 export const abstractCoauthorsRelations = relations(abstractCoauthors, ({ one }) => ({
@@ -224,3 +241,4 @@ export type AbstractReview = typeof abstractReviews.$inferSelect;
 export type NewAbstractReview = typeof abstractReviews.$inferInsert;
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type NewEventRegistration = typeof eventRegistrations.$inferInsert;
+export type IopPublication = typeof iopPublications.$inferSelect;
