@@ -27,7 +27,7 @@ const Navbar = ({ session }: { session: Session | null }) => {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative h-10 w-10">
               <Image
-                src="/logo/LOGO.png"
+                src="/logo/LOGO-SMALL.png"
                 alt="IRMS Logo"
                 fill
                 priority
@@ -61,7 +61,7 @@ const Navbar = ({ session }: { session: Session | null }) => {
                 <div className="flex items-center gap-5">
                   <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
                     <User size={16} className="text-irms-blue" />
-                    <span className="max-w-[150px] truncate">{session.user.name}</span>
+                    <span className="max-w-37.5 truncate">{session.user.name}</span>
                   </div>
                   <button
                     onClick={() => signOut({ callbackUrl: '/dashboard/register' })}
