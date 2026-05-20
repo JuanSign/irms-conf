@@ -10,6 +10,7 @@ import { EventRegistration, RegistrationCategory } from "@/types/event";
 import { createEventRegistration, confirmPaymentProof, cancelEventRegistration } from "./actions";
 import { getPaymentProofUploadUrl } from "@/actions/files";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 const PRICING = {
   'Industry/Practitioner': { member: 1100000, nonMember: 1500000, icon: <Building size={24}/> },
@@ -94,49 +95,64 @@ export default function EventWidget({ registration }: { registration: EventRegis
     if (e.dataTransfer.files && e.dataTransfer.files[0]) setPaymentFile(e.dataTransfer.files[0]);
   }, []);
 
-  if (!registration && !isRegistering) {
-    return <UnregisteredBanner onRegister={() => setIsRegistering(true)} />;
-  }
+  return (
+    <AnimatePresence mode="wait">
+      {!registration && !isRegistering && (
+        <UnregisteredBanner key="banner" onRegister={() => setIsRegistering(true)} />
+      )}
 
-  if (!registration && isRegistering) {
-    return (
-      <RegistrationForm
-        step={step} handleNext={handleNextStep} handleBack={handlePrevStep} handleRegister={handleRegister}
-        error={error} clearError={() => setError('')} loading={loading} currentFee={currentFee}
-        form={{ category, setCategory, isMember, setIsMember, memberEmail, setMemberEmail, attendingWorkshop, setAttendingWorkshop, attendingRockersNight, setAttendingRockersNight }}
-      />
-    );
-  }
+      {!registration && isRegistering && (
+        <RegistrationForm
+          key="form"
+          step={step} handleNext={handleNextStep} handleBack={handlePrevStep} handleRegister={handleRegister}
+          error={error} clearError={() => setError('')} loading={loading} currentFee={currentFee}
+          form={{ category, setCategory, isMember, setIsMember, memberEmail, setMemberEmail, attendingWorkshop, setAttendingWorkshop, attendingRockersNight, setAttendingRockersNight }}
+        />
+      )}
 
-  if (registration && registration.status === 'Pending Payment') {
-    return (
-      <PaymentPending
-        registration={registration} error={error} loading={loading} isCancelling={isCancelling}
-        paymentFile={paymentFile} setPaymentFile={setPaymentFile} isDragging={isDragging}
-        handlePaymentUpload={handlePaymentUpload} handleCancelRegistration={handleCancelRegistration}
-        onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-      />
-    );
-  }
+      {registration && registration.status === 'Pending Payment' && (
+        <PaymentPending
+          key="pending"
+          registration={registration} error={error} loading={loading} isCancelling={isCancelling}
+          paymentFile={paymentFile} setPaymentFile={setPaymentFile} isDragging={isDragging}
+          handlePaymentUpload={handlePaymentUpload} handleCancelRegistration={handleCancelRegistration}
+          onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+        />
+      )}
 
-  if (registration) {
-    return <EventTicket registration={registration} />;
-  }
-
-  return null;
+      {registration && registration.status !== 'Pending Payment' && (
+        <EventTicket key="ticket" registration={registration} />
+      )}
+    </AnimatePresence>
+  );
 }
 
 // ==========================================
 // 2. PRESENTATIONAL UI COMPONENTS
 // ==========================================
 
+const viewVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" as const } },
+  exit: { opacity: 0, scale: 0.98, transition: { duration: 0.2 } }
+};
+
+const stepVariants = {
+  hidden: (direction: number) => ({ opacity: 0, x: direction > 0 ? 40 : -40 }),
+  visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" as const } },
+  exit: (direction: number) => ({ opacity: 0, x: direction < 0 ? 40 : -40, transition: { duration: 0.2 } })
+};
+
 function UnregisteredBanner({ onRegister }: { onRegister: () => void }) {
   return (
-    <div className="h-fit self-start group relative overflow-hidden rounded-3xl shadow-xl bg-irms-dark animate-in fade-in zoom-in-95 duration-500">
-      <div className="absolute inset-0 bg-linear-to-br from-slate-900/90 via-irms-blue/80 to-irms-blue/40 pointer-events-none"></div>
+    <motion.div
+      variants={viewVariants} initial="hidden" animate="visible" exit="exit"
+      className="h-fit self-start group relative overflow-hidden rounded-3xl shadow-xl bg-irms-dark"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-irms-blue/80 to-irms-blue/40 pointer-events-none"></div>
       <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
 
-      <div className="hidden sm:block absolute -top-32 -right-32 w-120 h-120 bg-blue-400 opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"></div>
+      <div className="hidden sm:block absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-blue-400 opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"></div>
 
       <div className="relative p-6 sm:p-10 flex flex-col text-white w-full z-10">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-3 sm:mb-4 tracking-tight leading-tight w-full drop-shadow-sm">
@@ -157,24 +173,35 @@ function UnregisteredBanner({ onRegister }: { onRegister: () => void }) {
           </div>
         </div>
 
-        <button onClick={onRegister} className="relative overflow-hidden w-full sm:w-max bg-white text-irms-blue font-bold px-8 py-3.5 sm:py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2 group/btn">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={onRegister}
+          className="relative overflow-hidden w-full sm:w-max bg-white text-irms-blue font-bold px-8 py-3.5 sm:py-4 rounded-xl hover:scale-[1.02] transition-all shadow-xl flex items-center justify-center gap-2 group/btn"
+        >
           <span className="relative z-10">Register Now</span>
           <ArrowRight size={20} className="relative z-10 group-hover/btn:translate-x-1 transition-transform" />
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function RegistrationForm({ step, handleNext, handleBack, handleRegister, error, clearError, loading, currentFee, form }: any) {
   return (
-    <div className="h-fit self-start bg-slate-100 border border-slate-300 rounded-3xl shadow-xl animate-in slide-in-from-right-8 fade-in duration-300 flex flex-col overflow-hidden">
-      <div className="p-5 sm:p-6 border-b border-slate-200 bg-white">
+    <motion.div
+      variants={viewVariants} initial="hidden" animate="visible" exit="exit"
+      className="h-fit self-start bg-slate-100 border border-slate-300 rounded-3xl shadow-xl flex flex-col overflow-hidden"
+    >
+      <div className="p-5 sm:p-6 border-b border-slate-200 bg-white z-20 relative">
         <div className="flex items-center justify-between mb-5 sm:mb-6">
           <div className="flex items-center gap-3 sm:gap-4">
-            <button onClick={handleBack} className="p-2 sm:p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:text-irms-dark hover:shadow-sm transition-all">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={handleBack}
+              className="p-2 sm:p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:text-irms-dark hover:shadow-sm transition-colors"
+            >
               <ArrowLeft size={18} />
-            </button>
+            </motion.button>
             <div>
               <h3 className="font-bold text-base sm:text-lg text-slate-800 leading-tight mb-1">Registration</h3>
               <p className="text-[11px] sm:text-xs text-slate-500 font-medium">Step {step} of 3</p>
@@ -182,126 +209,159 @@ function RegistrationForm({ step, handleNext, handleBack, handleRegister, error,
           </div>
         </div>
         <div className="flex gap-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-          <div className={`h-full bg-irms-blue transition-all duration-500 ease-out ${step === 1 ? 'w-1/3' : step === 2 ? 'w-2/3' : 'w-full'}`} />
+          <motion.div
+            className="h-full bg-irms-blue"
+            initial={{ width: `${((step - 1) / 3) * 100}%` }}
+            animate={{ width: `${(step / 3) * 100}%` }}
+            transition={{ ease: "easeInOut", duration: 0.4 }}
+          />
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5">
-        {error && error !== 'EMAIL_ERROR' && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl flex items-center gap-2 animate-in fade-in">
-            <AlertCircle size={16} className="shrink-0" />
-            <p className="font-medium text-xs sm:text-sm">{error}</p>
-          </div>
-        )}
+      <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5 overflow-hidden">
+        <AnimatePresence mode="popLayout">
+          {error && error !== 'EMAIL_ERROR' && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl flex items-center gap-2"
+            >
+              <AlertCircle size={16} className="shrink-0" />
+              <p className="font-medium text-xs sm:text-sm">{error}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {step === 1 && (
-          <div className="animate-in slide-in-from-right-4 fade-in">
-            <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Select Your Category</label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {(Object.keys(PRICING) as RegistrationCategory[]).map((cat) => (
-                <button
-                  key={cat} onClick={() => form.setCategory(cat)}
-                  className={`relative flex flex-row sm:flex-col items-center sm:justify-center justify-start gap-3 sm:gap-4 p-3.5 sm:p-5 border-2 rounded-2xl transition-all shadow-sm ${
-                    form.category === cat ? 'border-irms-blue bg-blue-50/80 ring-2 sm:ring-4 ring-irms-blue/10 scale-[1.01] sm:scale-[1.02]' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
-                  }`}
-                >
-                  {form.category === cat && <div className="absolute top-1/2 -translate-y-1/2 right-4 sm:top-3 sm:translate-y-0 sm:right-3 text-irms-blue"><CheckCircle2 size={18}/></div>}
-                  <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl shrink-0 ${form.category === cat ? 'bg-irms-blue text-white shadow-inner' : 'bg-slate-100 text-slate-400'}`}>
-                    {PRICING[cat].icon}
-                  </div>
-                  <span className={`font-bold text-sm text-left sm:text-center pr-6 sm:pr-0 leading-tight ${form.category === cat ? 'text-irms-blue' : 'text-slate-700'}`}>{cat === 'Industry/Practitioner' ? 'Practitioner' : cat}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="animate-in slide-in-from-right-4 fade-in">
-            <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Are you an IRMS Member?</label>
-            <div className="flex flex-col gap-4 sm:gap-5 bg-white p-4 sm:p-5 rounded-2xl border shadow-sm border-slate-200">
-              <div className="flex p-1.5 bg-slate-100 rounded-xl w-full sm:w-fit">
-                <button
-                  onClick={() => form.setIsMember(true)}
-                  className={`flex-1 sm:flex-none px-4 sm:px-8 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${form.isMember ? 'bg-irms-blue text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
-                >
-                  Yes, Member
-                </button>
-                <button
-                  onClick={() => { form.setIsMember(false); clearError(); }}
-                  className={`flex-1 sm:flex-none px-4 sm:px-8 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${!form.isMember ? 'bg-irms-blue text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
-                >
-                  No, Non-Member
-                </button>
+        <AnimatePresence mode="wait" custom={1}>
+          {step === 1 && (
+            <motion.div key="step1" custom={1} variants={stepVariants} initial="hidden" animate="visible" exit="exit">
+              <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Select Your Category</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {(Object.keys(PRICING) as RegistrationCategory[]).map((cat) => (
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    key={cat} onClick={() => form.setCategory(cat)}
+                    className={`relative flex flex-row sm:flex-col items-center sm:justify-center justify-start gap-3 sm:gap-4 p-3.5 sm:p-5 border-2 rounded-2xl transition-colors shadow-sm ${
+                      form.category === cat ? 'border-irms-blue bg-blue-50/80 ring-2 sm:ring-4 ring-irms-blue/10' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
+                    }`}
+                  >
+                    <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl shrink-0 transition-colors ${form.category === cat ? 'bg-irms-blue text-white shadow-inner' : 'bg-slate-100 text-slate-400'}`}>
+                      {PRICING[cat].icon}
+                    </div>
+                    <span className={`font-bold text-sm text-left sm:text-center pr-6 sm:pr-0 leading-tight transition-colors ${form.category === cat ? 'text-irms-blue' : 'text-slate-700'}`}>{cat === 'Industry/Practitioner' ? 'Practitioner' : cat}</span>
+                  </motion.button>
+                ))}
               </div>
+            </motion.div>
+          )}
 
-              {form.isMember && (
-                <div className="animate-in slide-in-from-top-2 fade-in duration-300">
-                  <label className="block text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Verification Email</label>
-                  <input
-                    type="email"
-                    placeholder="Enter registered IRMS Email"
-                    value={form.memberEmail}
-                    onChange={(e) => { form.setMemberEmail(e.target.value); if(error === 'EMAIL_ERROR') clearError(); }}
-                    className={`w-full h-11 px-4 border-2 rounded-xl outline-none transition-all placeholder:text-slate-400 text-base font-medium bg-slate-50 ${error === 'EMAIL_ERROR' ? 'border-rose-500 focus:ring-4 focus:ring-rose-500/10' : 'border-slate-200 focus:ring-4 focus:ring-irms-blue/10 focus:border-irms-blue'}`}
-                  />
-                  {error === 'EMAIL_ERROR' ? (
-                    <p className="text-[11px] sm:text-xs text-rose-600 font-bold mt-1.5 flex items-center gap-1"><AlertCircle size={12}/> Please enter your registered email.</p>
-                  ) : (
-                    <p className="text-[11px] sm:text-xs text-slate-500 mt-1.5 font-medium flex items-center gap-1.5"><Clock size={12}/> Will be verified against our database.</p>
+          {step === 2 && (
+            <motion.div key="step2" custom={1} variants={stepVariants} initial="hidden" animate="visible" exit="exit">
+              <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Are you an IRMS Member?</label>
+              <div className="flex flex-col bg-white p-4 sm:p-5 rounded-2xl border shadow-sm border-slate-200">
+                <div className="flex p-1.5 bg-slate-100 rounded-xl w-full sm:w-fit">
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => form.setIsMember(true)}
+                    className={`flex-1 sm:flex-none px-4 sm:px-8 py-2 text-xs sm:text-sm font-bold rounded-lg transition-colors ${form.isMember ? 'bg-irms-blue text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
+                  >
+                    Yes, Member
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => { form.setIsMember(false); clearError(); }}
+                    className={`flex-1 sm:flex-none px-4 sm:px-8 py-2 text-xs sm:text-sm font-bold rounded-lg transition-colors ${!form.isMember ? 'bg-irms-blue text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
+                  >
+                    No, Non-Member
+                  </motion.button>
+                </div>
+
+                <AnimatePresence>
+                  {form.isMember && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                      animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <label className="block text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Verification Email</label>
+                      <input
+                        type="email"
+                        placeholder="Enter registered IRMS Email"
+                        value={form.memberEmail}
+                        onChange={(e) => { form.setMemberEmail(e.target.value); if(error === 'EMAIL_ERROR') clearError(); }}
+                        className={`w-full h-11 px-4 border-2 rounded-xl outline-none transition-colors placeholder:text-slate-400 text-base font-medium bg-slate-50 ${error === 'EMAIL_ERROR' ? 'border-rose-500 focus:ring-4 focus:ring-rose-500/10' : 'border-slate-200 focus:ring-4 focus:ring-irms-blue/10 focus:border-irms-blue'}`}
+                      />
+                      {error === 'EMAIL_ERROR' ? (
+                        <p className="text-[11px] sm:text-xs text-rose-600 font-bold mt-1.5 flex items-center gap-1"><AlertCircle size={12}/> Please enter your registered email.</p>
+                      ) : (
+                        <p className="text-[11px] sm:text-xs text-slate-500 mt-1.5 font-medium flex items-center gap-1.5"><Clock size={12}/> Will be verified against our database.</p>
+                      )}
+                    </motion.div>
                   )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="animate-in slide-in-from-right-4 fade-in">
-            <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Event RSVP</label>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                { state: form.attendingWorkshop, setter: form.setAttendingWorkshop, title: "Pre-Conference Workshops", desc: "14 July 2026. Specialized sessions." },
-                { state: form.attendingRockersNight, setter: form.setAttendingRockersNight, title: "Rockers Night", desc: "15 July 2026. Gala dinner." }
-              ].map((item, idx) => (
-                <div key={idx} onClick={() => item.setter(!item.state)} className={`group flex items-start gap-3 p-3 sm:p-4 border-2 rounded-2xl cursor-pointer transition-all select-none shadow-sm ${item.state ? 'border-irms-blue bg-blue-50/80' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
-                  <div className={`mt-0.5 flex shrink-0 items-center justify-center w-5 h-5 rounded-md border-2 transition-colors ${item.state ? 'bg-irms-blue border-irms-blue text-white' : 'border-slate-300 bg-slate-50 group-hover:border-irms-blue/50'}`}>
-                    {item.state && <CheckCircle2 size={14} strokeWidth={3} />}
-                  </div>
-                  <div>
-                    <span className={`block font-bold text-sm mb-0.5 ${item.state ? 'text-irms-blue' : 'text-slate-800'}`}>{item.title}</span>
-                    <span className="block text-xs text-slate-500 font-medium">{item.desc}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="bg-white shadow-sm p-4 sm:p-5 rounded-2xl border border-slate-200 flex items-center justify-between mt-4">
-              <div>
-                <p className="text-[11px] sm:text-xs text-slate-500 font-bold mb-0.5 uppercase tracking-wide">Total Fee Due</p>
-                <p className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight flex items-baseline gap-1">
-                  <span className="text-sm sm:text-base text-slate-400 font-medium">Rp</span>
-                  {currentFee.toLocaleString('id-ID')}
-                </p>
+                </AnimatePresence>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div key="step3" custom={1} variants={stepVariants} initial="hidden" animate="visible" exit="exit">
+              <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Event RSVP</label>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  { state: form.attendingWorkshop, setter: form.setAttendingWorkshop, title: "Pre-Conference Workshops", desc: "14 July 2026. Specialized sessions." },
+                  { state: form.attendingRockersNight, setter: form.setAttendingRockersNight, title: "Rockers Night", desc: "15 July 2026. Gala dinner." }
+                ].map((item, idx) => (
+                  <motion.div
+                    whileTap={{ scale: 0.98 }}
+                    key={idx} onClick={() => item.setter(!item.state)}
+                    className={`group flex items-start gap-3 p-3 sm:p-4 border-2 rounded-2xl cursor-pointer transition-colors select-none shadow-sm ${item.state ? 'border-irms-blue bg-blue-50/80' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                  >
+                    <div className={`mt-0.5 flex shrink-0 items-center justify-center w-5 h-5 rounded-md border-2 transition-colors ${item.state ? 'bg-irms-blue border-irms-blue text-white' : 'border-slate-300 bg-slate-50 group-hover:border-irms-blue/50'}`}>
+                      {item.state && <CheckCircle2 size={14} strokeWidth={3} />}
+                    </div>
+                    <div>
+                      <span className={`block font-bold text-sm mb-0.5 transition-colors ${item.state ? 'text-irms-blue' : 'text-slate-800'}`}>{item.title}</span>
+                      <span className="block text-xs text-slate-500 font-medium">{item.desc}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="bg-white shadow-sm p-4 sm:p-5 rounded-2xl border border-slate-200 flex items-center justify-between mt-4">
+                <div>
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-bold mb-0.5 uppercase tracking-wide">Total Fee Due</p>
+                  <p className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight flex items-baseline gap-1">
+                    <span className="text-sm sm:text-base text-slate-400 font-medium">Rp</span>
+                    {currentFee.toLocaleString('id-ID')}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="pt-4 border-t border-slate-200">
           <div className="flex justify-end gap-3 w-full">
             {step < 3 ? (
-              <button onClick={handleNext} className="w-full sm:w-auto bg-irms-blue text-white px-8 py-3 rounded-xl text-sm sm:text-base font-bold hover:bg-[#002b5c] transition-all flex justify-center items-center gap-2 shadow-md">
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={handleNext}
+                className="w-full sm:w-auto bg-irms-blue text-white px-8 py-3 rounded-xl text-sm sm:text-base font-bold hover:bg-[#002b5c] transition-colors flex justify-center items-center gap-2 shadow-md"
+              >
                 Continue <ArrowRight size={18} />
-              </button>
+              </motion.button>
             ) : (
-              <button onClick={handleRegister} disabled={loading} className="w-full sm:w-auto bg-irms-blue text-white px-8 py-3 rounded-xl text-sm sm:text-base font-bold hover:bg-[#002b5c] hover:shadow-lg transition-all disabled:opacity-70 flex items-center justify-center gap-2 shadow-md">
+              <motion.button
+                whileTap={{ scale: loading ? 1 : 0.97 }}
+                onClick={handleRegister} disabled={loading}
+                className="w-full sm:w-auto bg-irms-blue text-white px-8 py-3 rounded-xl text-sm sm:text-base font-bold hover:bg-[#002b5c] transition-colors disabled:opacity-70 flex items-center justify-center gap-2 shadow-md"
+              >
                 {loading ? <><Loader2 size={18} className="animate-spin" /> Processing...</> : 'Confirm & Proceed'}
-              </button>
+              </motion.button>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -318,8 +378,11 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
   }, [paymentFile]);
 
   return (
-    <div className="h-fit self-start bg-slate-100 border border-slate-300 rounded-3xl overflow-hidden shadow-xl animate-in slide-in-from-bottom-8 fade-in duration-500">
-      <div className="bg-linear-to-r from-amber-50 to-white border-b border-amber-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <motion.div
+      variants={viewVariants} initial="hidden" animate="visible" exit="exit"
+      className="h-fit self-start bg-slate-100 border border-slate-300 rounded-3xl overflow-hidden shadow-xl"
+    >
+      <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3 z-10">
           <div className="bg-amber-100 p-2.5 rounded-xl text-amber-700 shadow-sm"><CreditCard size={20} /></div>
           <div>
@@ -334,7 +397,13 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
       </div>
 
       <div className="p-4 sm:p-5 flex flex-col gap-4">
-        {error && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm rounded-xl font-medium flex gap-2 items-center"><AlertCircle size={16}/>{error}</div>}
+        <AnimatePresence>
+          {error && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm rounded-xl font-medium flex gap-2 items-center">
+              <AlertCircle size={16}/>{error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div className="bg-white shadow-sm p-4 rounded-2xl border border-slate-200 flex flex-col justify-center h-full">
@@ -351,26 +420,29 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
             </div>
           </div>
 
-          <div
+          <motion.div
+            whileHover={{ scale: isDragging ? 1.01 : 1.005 }}
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-            className={`relative border-2 border-dashed rounded-2xl p-4 text-center flex flex-col items-center justify-center min-h-30 h-full transition-all duration-200 overflow-hidden shadow-sm ${
-              isDragging ? 'border-irms-blue bg-blue-50/50 scale-[1.01]' : 'border-slate-300 hover:border-slate-400 bg-white'
+            className={`relative border-2 border-dashed rounded-2xl p-4 text-center flex flex-col items-center justify-center min-h-[120px] h-full transition-colors overflow-hidden shadow-sm ${
+              isDragging ? 'border-irms-blue bg-blue-50/50' : 'border-slate-300 hover:border-slate-400 bg-white'
             }`}
           >
             <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setPaymentFile(e.target.files?.[0] || null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
 
-            {previewUrl ? (
-              <div className="relative w-full max-w-30 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm z-10 group">
-                <Image src={previewUrl} alt="Preview" fill className="object-cover group-hover:opacity-50 transition-opacity" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                  <span className="text-white text-xs font-bold flex items-center gap-1.5"><Upload size={12}/> Replace</span>
-                </div>
-              </div>
-            ) : (
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors z-10 relative border border-slate-100 ${isDragging ? 'bg-irms-blue text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>
-                <Upload size={16} className={`${isDragging ? 'animate-bounce' : ''}`} />
-              </div>
-            )}
+            <AnimatePresence mode="wait">
+              {previewUrl ? (
+                <motion.div key="preview" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-[120px] h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm z-10 group">
+                  <Image src={previewUrl} alt="Preview" fill className="object-cover group-hover:opacity-50 transition-opacity" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                    <span className="text-white text-xs font-bold flex items-center gap-1.5"><Upload size={12}/> Replace</span>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div key="icon" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors z-10 relative border border-slate-100 ${isDragging ? 'bg-irms-blue text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>
+                  <Upload size={16} className={`${isDragging ? 'animate-bounce' : ''}`} />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <h4 className="text-xs sm:text-sm font-bold text-slate-800 mb-0.5 mt-2 relative z-10 line-clamp-1 px-2">
               {paymentFile ? paymentFile.name : 'Upload Payment Proof'}
@@ -378,22 +450,31 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
             <p className="text-[10px] text-slate-500 font-medium relative z-10">
               {paymentFile ? `${(paymentFile.size / 1024 / 1024).toFixed(2)} MB • Click to change` : 'Drag & drop or click'}
             </p>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-          <button onClick={handleCancelRegistration} disabled={isCancelling || loading} className="sm:col-span-1 w-full px-4 py-2.5 sm:py-3 rounded-xl font-bold text-sm border-2 border-slate-300 text-slate-600 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all flex justify-center items-center gap-2 disabled:opacity-50 shadow-sm">
-            {isCancelling ? <Loader2 className="animate-spin" size={16}/> : <><Trash2 size={16}/> Cancel</>}
-          </button>
-          <button onClick={handlePaymentUpload} disabled={loading || !paymentFile} className="sm:col-span-2 w-full bg-irms-blue text-white font-bold px-4 py-2.5 sm:py-3 rounded-xl text-sm hover:bg-[#002b5c] hover:shadow-xl hover:shadow-irms-blue/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2 shadow-md">
+        <div className="flex flex-nowrap items-center gap-3 pt-1 w-full shrink-0">
+          <motion.button
+            whileTap={{ scale: isCancelling || loading ? 1 : 0.97 }}
+            onClick={handleCancelRegistration}
+            disabled={isCancelling || loading}
+            className="flex-[1] min-w-0 px-2 py-3 rounded-xl font-bold text-xs sm:text-sm border-2 border-slate-300 text-slate-600 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors flex justify-center items-center gap-1.5 shadow-sm disabled:opacity-50 shrink-0"
+          >
+            {isCancelling ? <Loader2 className="animate-spin" size={16}/> : <><Trash2 size={16}/></>}
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: loading || !paymentFile ? 1 : 0.97 }}
+            onClick={handlePaymentUpload}
+            disabled={loading || !paymentFile}
+            className="flex-[2] min-w-0 bg-irms-blue text-white font-bold px-4 py-3 rounded-xl text-xs sm:text-sm hover:bg-[#002b5c] transition-colors flex justify-center items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          >
             {loading ? <><Loader2 className="animate-spin" size={16}/> Verifying...</> : 'Submit Proof'}
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
-
 function EventTicket({ registration }: any) {
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -405,11 +486,14 @@ function EventTicket({ registration }: any) {
   const statusConfig = getStatusConfig(registration.status);
 
   return (
-    <div className="h-fit self-start bg-slate-100 border border-slate-300 rounded-4xl shadow-xl animate-in zoom-in-95 fade-in duration-500 relative overflow-hidden flex flex-col group">
-      <div className="absolute -left-4 top-19 sm:top-21 w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
-      <div className="absolute -right-4 top-19 sm:top-21 w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
+    <motion.div
+      variants={viewVariants} initial="hidden" animate="visible" exit="exit"
+      className="h-fit self-start bg-slate-100 border border-slate-300 rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col group"
+    >
+      <div className="absolute left-[-16px] top-[76px] sm:top-[84px] w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
+      <div className="absolute right-[-16px] top-[76px] sm:top-[84px] w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
 
-      <div className="bg-linear-to-r from-slate-50 to-white p-5 sm:p-6 pb-6 sm:pb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b-2 border-dashed border-slate-300 relative">
+      <div className="bg-gradient-to-r from-slate-50 to-white p-5 sm:p-6 pb-6 sm:pb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b-2 border-dashed border-slate-300 relative">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="bg-irms-blue text-white p-3 sm:p-3.5 rounded-2xl shadow-lg shadow-irms-blue/20"><Ticket size={20} className="sm:w-6 sm:h-6" /></div>
           <div>
@@ -445,7 +529,14 @@ function EventTicket({ registration }: any) {
             </div>
           </div>
         </div>
+
+        <div className="hidden sm:flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl bg-white shadow-sm min-w-[140px] transition-colors">
+          <div className="p-2 bg-slate-50 rounded-xl mb-3 border border-slate-100">
+            <QrCode size={52} className="text-slate-800" strokeWidth={1.5} />
+          </div>
+          <p className="text-[9px] sm:text-[10px] text-slate-500 font-mono text-center uppercase font-bold tracking-widest">Scan at Venue</p>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
