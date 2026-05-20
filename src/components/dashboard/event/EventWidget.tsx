@@ -149,10 +149,10 @@ function UnregisteredBanner({ onRegister }: { onRegister: () => void }) {
       variants={viewVariants} initial="hidden" animate="visible" exit="exit"
       className="h-fit self-start group relative overflow-hidden rounded-3xl shadow-xl bg-irms-dark"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-irms-blue/80 to-irms-blue/40 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-slate-900/90 via-irms-blue/80 to-irms-blue/40 pointer-events-none"></div>
       <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
 
-      <div className="hidden sm:block absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-blue-400 opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"></div>
+      <div className="hidden sm:block absolute -top-32 -right-32 w-120 h-120 bg-blue-400 opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"></div>
 
       <div className="relative p-6 sm:p-10 flex flex-col text-white w-full z-10">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-3 sm:mb-4 tracking-tight leading-tight w-full drop-shadow-sm">
@@ -423,7 +423,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
           <motion.div
             whileHover={{ scale: isDragging ? 1.01 : 1.005 }}
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-            className={`relative border-2 border-dashed rounded-2xl p-4 text-center flex flex-col items-center justify-center min-h-[120px] h-full transition-colors overflow-hidden shadow-sm ${
+            className={`relative border-2 border-dashed rounded-2xl p-4 text-center flex flex-col items-center justify-center min-h-30 h-full transition-colors overflow-hidden shadow-sm ${
               isDragging ? 'border-irms-blue bg-blue-50/50' : 'border-slate-300 hover:border-slate-400 bg-white'
             }`}
           >
@@ -431,7 +431,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
 
             <AnimatePresence mode="wait">
               {previewUrl ? (
-                <motion.div key="preview" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-[120px] h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm z-10 group">
+                <motion.div key="preview" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-30 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm z-10 group">
                   <Image src={previewUrl} alt="Preview" fill className="object-cover group-hover:opacity-50 transition-opacity" />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
                     <span className="text-white text-xs font-bold flex items-center gap-1.5"><Upload size={12}/> Replace</span>
@@ -458,7 +458,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
             whileTap={{ scale: isCancelling || loading ? 1 : 0.97 }}
             onClick={handleCancelRegistration}
             disabled={isCancelling || loading}
-            className="flex-[1] min-w-0 px-2 py-3 rounded-xl font-bold text-xs sm:text-sm border-2 border-slate-300 text-slate-600 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors flex justify-center items-center gap-1.5 shadow-sm disabled:opacity-50 shrink-0"
+            className="flex-1 min-w-0 px-2 py-3 rounded-xl font-bold text-xs sm:text-sm border-2 border-slate-300 text-slate-600 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors flex justify-center items-center gap-1.5 shadow-sm disabled:opacity-50 shrink-0"
           >
             {isCancelling ? <Loader2 className="animate-spin" size={16}/> : <><Trash2 size={16}/></>}
           </motion.button>
@@ -466,7 +466,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
             whileTap={{ scale: loading || !paymentFile ? 1 : 0.97 }}
             onClick={handlePaymentUpload}
             disabled={loading || !paymentFile}
-            className="flex-[2] min-w-0 bg-irms-blue text-white font-bold px-4 py-3 rounded-xl text-xs sm:text-sm hover:bg-[#002b5c] transition-colors flex justify-center items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+            className="flex-2 min-w-0 bg-irms-blue text-white font-bold px-4 py-3 rounded-xl text-xs sm:text-sm hover:bg-[#002b5c] transition-colors flex justify-center items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
             {loading ? <><Loader2 className="animate-spin" size={16}/> Verifying...</> : 'Submit Proof'}
           </motion.button>
@@ -475,6 +475,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
     </motion.div>
   );
 }
+
 function EventTicket({ registration }: any) {
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -488,12 +489,12 @@ function EventTicket({ registration }: any) {
   return (
     <motion.div
       variants={viewVariants} initial="hidden" animate="visible" exit="exit"
-      className="h-fit self-start bg-slate-100 border border-slate-300 rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col group"
+      className="h-fit self-start bg-slate-100 border border-slate-300 rounded-4xl shadow-xl relative overflow-hidden flex flex-col group"
     >
-      <div className="absolute left-[-16px] top-[76px] sm:top-[84px] w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
-      <div className="absolute right-[-16px] top-[76px] sm:top-[84px] w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
+      <div className="absolute -left-4 top-19 sm:top-21 w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
+      <div className="absolute -right-4 top-19 sm:top-21 w-8 h-8 bg-irms-light rounded-full border border-slate-300 z-10 shadow-inner hidden sm:block"></div>
 
-      <div className="bg-gradient-to-r from-slate-50 to-white p-5 sm:p-6 pb-6 sm:pb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b-2 border-dashed border-slate-300 relative">
+      <div className="bg-linear-to-r from-slate-50 to-white p-5 sm:p-6 pb-6 sm:pb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b-2 border-dashed border-slate-300 relative">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="bg-irms-blue text-white p-3 sm:p-3.5 rounded-2xl shadow-lg shadow-irms-blue/20"><Ticket size={20} className="sm:w-6 sm:h-6" /></div>
           <div>
@@ -530,7 +531,7 @@ function EventTicket({ registration }: any) {
           </div>
         </div>
 
-        <div className="hidden sm:flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl bg-white shadow-sm min-w-[140px] transition-colors">
+        <div className="hidden sm:flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl bg-white shadow-sm min-w-35 transition-colors">
           <div className="p-2 bg-slate-50 rounded-xl mb-3 border border-slate-100">
             <QrCode size={52} className="text-slate-800" strokeWidth={1.5} />
           </div>
