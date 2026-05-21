@@ -2,72 +2,77 @@
 
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import FrozenRoute from "./FrozenRoute";
+
+function getPageLevel(path: string): number {
+  if (path === "/dashboard/register") return 0;
+  if (path === "/") return 1;
+  if (path.startsWith("/schedule")) return 2;
+  if (path === "/dashboard") return 3;
+  if (path.startsWith("/dashboard/submission")) return 4;
+  return 1;
+}
 
 export default function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  const [isAnimating, setIsAnimating] = useState(false);
+  const currentLevel = getPageLevel(pathname);
+  const prevLevelRef = useRef(currentLevel);
+
+  const isForward = currentLevel >= prevLevelRef.current;
 
   useEffect(() => {
-    setIsAnimating(true);
-    const timeout = setTimeout(() => {
-      setIsAnimating(false);
-    }, 1000);
-
-    return () => clearTimeout(timeout);
-  }, [pathname]);
-
-  const isDashboard = pathname.startsWith("/dashboard");
+    prevLevelRef.current = currentLevel;
+  }, [currentLevel]);
 
   const variants: Variants = {
-    initial: (isDash: boolean) => ({
-      y: isDash ? "100vh" : 0,
-      x: isDash ? 0 : "100vw",
+    initial: (isForward: boolean) => ({
+      x: isForward ? "100vw" : "-100vw",
       opacity: 1,
     }),
     animate: {
-      y: 0,
       x: 0,
       opacity: 1,
       transition: {
         duration: 0.9,
-        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+        ease: [0.22, 1, 0.36, 1],
       },
     },
-    exit: (isDash: boolean) => ({
-      y: isDash ? "-100vh" : 0,
-      x: isDash ? 0 : "-100vw",
+    exit: (isForward: boolean) => ({
+      x: isForward ? "-100vw" : "100vw",
       opacity: 1,
       transition: {
         duration: 0.9,
-        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+        ease: [0.22, 1, 0.36, 1],
       },
     }),
   };
 
   return (
-    <>
-      {isAnimating && (
-        <div className="fixed inset-0 z-9999 touch-none" />
-      )}
-
-      <AnimatePresence mode="popLayout" custom={isDashboard}>
+    <div className="grid w-full">
+      <AnimatePresence custom={isForward}>
         <motion.div
           key={pathname}
-          custom={isDashboard}
+          custom={isForward}
           variants={variants}
           initial="initial"
           animate="animate"
           exit="exit"
           className="w-full bg-white origin-top shadow-xl"
+          style={{ gridArea: "1 / 1 / 2 / 2" }}
+          // onAnimationStart={() => {
+          //   document.body.style.pointerEvents = "none";
+          // }}
+          // onAnimationComplete={() => {
+          //   document.body.style.pointerEvents = "auto";
+          // }}
         >
           <FrozenRoute>
             {children}
           </FrozenRoute>
         </motion.div>
       </AnimatePresence>
-    </>
+    </div>
   );
 }
