@@ -3,10 +3,17 @@ import { NextResponse } from "next/server";
 
 export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isPortalRoute = req.nextUrl.pathname.startsWith("/dashboard/portal");
+  const pathname = req.nextUrl.pathname;
 
-  if (isPortalRoute && !isLoggedIn) {
+  const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isRegisterRoute = pathname.startsWith("/dashboard/register");
+
+  if (isDashboardRoute && !isRegisterRoute && !isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard/register", req.nextUrl));
+  }
+
+  if (isRegisterRoute && isLoggedIn) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
   return NextResponse.next();
