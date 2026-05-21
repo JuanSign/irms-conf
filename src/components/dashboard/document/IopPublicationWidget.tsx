@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, Clock, AlertCircle, Upload, ArrowRight, CreditCard, BookOpen, Loader2, Trash2 } from "lucide-react";
 import { createIopApplication, confirmIopPaymentProof, cancelIopApplication } from "@/app/(public)/dashboard/submission/[id]/actions";
-import { getPaymentProofUploadUrl } from "@/actions/files"; 
+import { getPaymentProofUploadUrl } from "@/actions/files";
 import Image from "next/image";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { IopPublication } from "@/db/schema";
@@ -22,11 +23,17 @@ const viewVariants: Variants = {
 };
 
 export default function IopPublicationWidget({ abstractId, iopData }: IopPublicationWidgetProps) {
+  const router = useRouter();
+  const [activeData, setActiveData] = useState<IopPublication | null | undefined>(iopData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    setActiveData(iopData);
+  }, [iopData]);
 
   useEffect(() => {
     if (!paymentFile) { setPreviewUrl(null); return; }
@@ -40,7 +47,12 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
   const handleApply = async () => {
     setLoading(true); setError('');
     const res = await createIopApplication(abstractId);
-    if (res?.error) setError(res.error);
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      setActiveData({ abstractId, status: 'Pending Payment' } as IopPublication);
+      router.refresh();
+    }
     setLoading(false);
   };
 
@@ -57,6 +69,9 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
 
       const confirmRes = await confirmIopPaymentProof(abstractId, fileUrl);
       if (confirmRes?.error) throw new Error(confirmRes.error);
+
+      setActiveData(prev => prev ? { ...prev, status: 'Verification Pending', paymentProofUrl: fileUrl } : null);
+      router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred.");
     } finally {
@@ -67,7 +82,13 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
   const handleCancel = async () => {
     setLoading(true); setError('');
     const res = await cancelIopApplication(abstractId);
-    if (res?.error) setError(res.error);
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      setActiveData(null);
+      setPaymentFile(null);
+      router.refresh();
+    }
     setLoading(false);
   };
 
@@ -79,13 +100,13 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
       </div>
 
       <AnimatePresence mode="wait">
-        {!iopData && (
+        {!activeData && (
           <motion.div key="banner" variants={viewVariants} initial="hidden" animate="visible" exit="exit" className="relative overflow-hidden rounded-2xl bg-irms-dark p-6 sm:p-8 text-white">
-            <div className="absolute inset-0 bg-linear-to-br from-slate-900/90 via-[#002b5c]/80 to-irms-blue/40 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(to_bottom_right,var(--color-slate-900)_0%,#002b5c_50%,var(--color-irms-blue)_100%)] opacity-90 pointer-events-none"></div>
             <div className="relative z-10">
               <h4 className="text-xl sm:text-2xl font-extrabold mb-2">Publish your Abstract</h4>
               <p className="text-blue-100/80 text-sm mb-6 max-w-md">Your abstract has been accepted! You are now eligible to propose this manuscript for publication in the IOP Conference Series.</p>
-              
+
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/10 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
                 <div>
                   <p className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Publication Fee</p>
@@ -100,7 +121,7 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
           </motion.div>
         )}
 
-        {iopData && iopData.status === 'Pending Payment' && (
+        {activeData && activeData.status === 'Pending Payment' && (
           <motion.div key="payment" variants={viewVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
             <div className="bg-amber-50 border-b border-amber-200 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -111,10 +132,10 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
                 </div>
               </div>
             </div>
-            
+
             <div className="p-5 flex flex-col gap-4">
               {error && <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl font-medium flex gap-2 items-center"><AlertCircle size={14}/>{error}</div>}
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white shadow-sm p-4 rounded-xl border border-slate-200 flex flex-col justify-center">
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Transfer To</p>
@@ -126,7 +147,7 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
                   </div>
                 </div>
 
-                <div 
+                <div
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
                   onDrop={(e) => { e.preventDefault(); setIsDragging(false); if (e.dataTransfer.files[0]) setPaymentFile(e.dataTransfer.files[0]); }}
@@ -154,17 +175,17 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
           </motion.div>
         )}
 
-        {iopData && iopData.status !== 'Pending Payment' && (
+        {activeData && activeData.status !== 'Pending Payment' && (
           <motion.div key="status" variants={viewVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between">
             <div>
               <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">IOP Application Status</p>
               <div className="flex items-center gap-2">
-                {iopData.status === 'Verified' ? <CheckCircle2 size={18} className="text-emerald-500" /> : <Clock size={18} className="text-amber-500" />}
-                <p className="font-extrabold text-slate-800">{iopData.status}</p>
+                {activeData.status === 'Verified' ? <CheckCircle2 size={18} className="text-emerald-500" /> : <Clock size={18} className="text-amber-500" />}
+                <p className="font-extrabold text-slate-800">{activeData.status}</p>
               </div>
             </div>
-            {iopData.status === 'Verification Pending' && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-bold uppercase">Under Review</span>}
-            {iopData.status === 'Verified' && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase">Approved</span>}
+            {activeData.status === 'Verification Pending' && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-bold uppercase">Under Review</span>}
+            {activeData.status === 'Verified' && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase">Approved</span>}
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Ticket, Calendar, CheckCircle2, Clock, AlertCircle,
   Upload, ArrowRight, MapPin, ArrowLeft, CreditCard,
@@ -18,10 +19,11 @@ const PRICING = {
   'Student': { member: 500000, nonMember: 500000, icon: <GraduationCap size={24}/> },
 };
 
-// ==========================================
-// 1. MAIN CONTAINER
-// ==========================================
 export default function EventWidget({ registration }: { registration: EventRegistration | null | undefined }) {
+  const router = useRouter();
+
+  const [activeRegistration, setActiveRegistration] = useState<EventRegistration | null | undefined>(registration);
+
   const [isRegistering, setIsRegistering] = useState(false);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -39,10 +41,31 @@ export default function EventWidget({ registration }: { registration: EventRegis
 
   const currentFee = PRICING[category][isMember ? 'member' : 'nonMember'];
 
+  useEffect(() => {
+    setActiveRegistration(registration);
+  }, [registration]);
+
   const handleRegister = async () => {
     setLoading(true); setError('');
     const res = await createEventRegistration({ category, isMember, memberEmail, amount: currentFee, attendingWorkshop, attendingRockersNight });
-    if (res?.error) setError(res.error);
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      setActiveRegistration({
+        id: 'PENDING',
+        userId: 'temp',
+        category,
+        isIrmsMember: isMember,
+        irmsMemberId: memberEmail,
+        amount: currentFee,
+        attendingWorkshop,
+        attendingRockersNight,
+        status: 'Pending Payment',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      } as any);
+      router.refresh();
+    }
     setLoading(false);
   };
 
@@ -63,6 +86,8 @@ export default function EventWidget({ registration }: { registration: EventRegis
       const confirmRes = await confirmPaymentProof(fileUrl);
       if (confirmRes?.error) throw new Error(confirmRes.error);
 
+      setActiveRegistration(prev => prev ? { ...prev, status: 'Verification Pending', paymentProofUrl: fileUrl } : null);
+      router.refresh();
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred during upload.");
     } finally {
@@ -73,7 +98,15 @@ export default function EventWidget({ registration }: { registration: EventRegis
   const handleCancelRegistration = async () => {
     setIsCancelling(true); setError('');
     const res = await cancelEventRegistration();
-    if (res?.error) setError(res.error);
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      setActiveRegistration(null);
+      setPaymentFile(null);
+      setIsRegistering(false);
+      setStep(1);
+      router.refresh();
+    }
     setIsCancelling(false);
   };
 
@@ -97,11 +130,11 @@ export default function EventWidget({ registration }: { registration: EventRegis
 
   return (
     <AnimatePresence mode="wait" initial={false}>
-      {!registration && !isRegistering && (
+      {!activeRegistration && !isRegistering && (
         <UnregisteredBanner key="banner" onRegister={() => setIsRegistering(true)} />
       )}
 
-      {!registration && isRegistering && (
+      {!activeRegistration && isRegistering && (
         <RegistrationForm
           key="form"
           step={step} handleNext={handleNextStep} handleBack={handlePrevStep} handleRegister={handleRegister}
@@ -110,26 +143,22 @@ export default function EventWidget({ registration }: { registration: EventRegis
         />
       )}
 
-      {registration && registration.status === 'Pending Payment' && (
+      {activeRegistration && activeRegistration.status === 'Pending Payment' && (
         <PaymentPending
           key="pending"
-          registration={registration} error={error} loading={loading} isCancelling={isCancelling}
+          registration={activeRegistration} error={error} loading={loading} isCancelling={isCancelling}
           paymentFile={paymentFile} setPaymentFile={setPaymentFile} isDragging={isDragging}
           handlePaymentUpload={handlePaymentUpload} handleCancelRegistration={handleCancelRegistration}
           onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
         />
       )}
 
-      {registration && registration.status !== 'Pending Payment' && (
-        <EventTicket key="ticket" registration={registration} />
+      {activeRegistration && activeRegistration.status !== 'Pending Payment' && (
+        <EventTicket key="ticket" registration={activeRegistration} />
       )}
     </AnimatePresence>
   );
 }
-
-// ==========================================
-// 2. PRESENTATIONAL UI COMPONENTS
-// ==========================================
 
 const viewVariants = {
   hidden: { opacity: 0, y: 20, scale: 0.98 },
@@ -149,9 +178,8 @@ function UnregisteredBanner({ onRegister }: { onRegister: () => void }) {
       variants={viewVariants} initial="hidden" animate="visible" exit="exit"
       className="h-fit self-start group relative overflow-hidden rounded-3xl shadow-xl bg-irms-dark"
     >
-      <div className="absolute inset-0 bg-linear-to-br from-slate-900/90 via-irms-blue/80 to-irms-blue/40 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom_right,var(--color-slate-900)_0%,#002b5c_50%,var(--color-irms-blue)_100%)] opacity-90 pointer-events-none"></div>
       <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
-
       <div className="hidden sm:block absolute -top-32 -right-32 w-120 h-120 bg-blue-400 opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"></div>
 
       <div className="relative p-6 sm:p-10 flex flex-col text-white w-full z-10">
@@ -499,7 +527,7 @@ function EventTicket({ registration }: any) {
           <div className="bg-irms-blue text-white p-3 sm:p-3.5 rounded-2xl shadow-lg shadow-irms-blue/20"><Ticket size={20} className="sm:w-6 sm:h-6" /></div>
           <div>
             <h3 className="font-extrabold text-lg sm:text-xl text-slate-800 tracking-tight">IRMS 2026 Pass</h3>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-bold font-mono tracking-widest mt-0.5 sm:mt-1">ID: {registration.id.split('-')[0].toUpperCase()}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-bold font-mono tracking-widest mt-0.5 sm:mt-1">ID: {registration.id?.split('-')[0]?.toUpperCase() || 'PENDING'}</p>
           </div>
         </div>
         <div className={`flex items-center w-fit gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold rounded-xl border ${statusConfig.color} shadow-sm`}>
