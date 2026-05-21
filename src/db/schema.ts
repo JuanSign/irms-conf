@@ -40,6 +40,21 @@ export const iopPaymentStatusEnum = pgEnum('iop_payment_status', [
   'Rejected'
 ]);
 
+export const slideStatusEnum = pgEnum('slide_status', [
+  'Under Review',
+  'Accepted',
+  'Rejected'
+]);
+
+export const slideSubmissions = pgTable("slide_submissions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  abstractId: uuid("abstract_id").references(() => abstracts.id, { onDelete: 'cascade' }).notNull().unique(),
+  fileUrl: text("file_url").notNull(),
+  status: slideStatusEnum("status").default("Under Review").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+});
+
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -167,7 +182,8 @@ export const abstractsRelations = relations(abstracts, ({ one, many }) => ({
   comments: many(abstractComments),
   reviews: many(abstractReviews),
   assignments: many(abstractAssignments),
-  iopPublication: one(iopPublications, { fields: [abstracts.id], references: [iopPublications.abstractId] })
+  iopPublication: one(iopPublications, { fields: [abstracts.id], references: [iopPublications.abstractId] }),
+  slideSubmission: one(slideSubmissions, { fields: [abstracts.id], references: [slideSubmissions.abstractId] })
 }));
 
 export const abstractCoauthorsRelations = relations(abstractCoauthors, ({ one }) => ({
@@ -242,3 +258,4 @@ export type NewAbstractReview = typeof abstractReviews.$inferInsert;
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type NewEventRegistration = typeof eventRegistrations.$inferInsert;
 export type IopPublication = typeof iopPublications.$inferSelect;
+export type SlideSubmission = typeof slideSubmissions.$inferSelect;

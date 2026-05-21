@@ -11,6 +11,7 @@ import {
   AlertCircle, Clock, Download, PenTool
 } from "lucide-react";
 import IopPublicationWidget from "@/components/dashboard/document/IopPublicationWidget";
+import SlidesSubmissionWidget from "@/components/dashboard/document/SlidesSubmissionWidget";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -39,7 +40,8 @@ export default async function AbstractDetailPage({ params }: { params: Promise<{
       coauthors: { with: { user: true } },
       comments: { with: { admin: true } },
       reviews: { with: { admin: true } },
-      iopPublication: true
+      iopPublication: true,
+      slideSubmission: true
     }
   });
 
@@ -128,6 +130,8 @@ export default async function AbstractDetailPage({ params }: { params: Promise<{
                 </div>
               </div>
             </div>
+
+            <SlidesSubmissionWidget abstractId={abstractData.id} slideData={abstractData.slideSubmission} />
 
             {abstractData.status === 'Accepted' && (
               <IopPublicationWidget abstractId={abstractData.id} iopData={abstractData.iopPublication} />
