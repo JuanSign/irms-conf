@@ -333,7 +333,15 @@ function RegistrationForm({ step, handleNext, handleBack, handleRegister, error,
 
           {step === 3 && (
             <motion.div key="step3" custom={1} variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-              <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-3">Event RSVP</label>
+              <div className="mb-4">
+                <label className="block text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest mb-1.5">
+                  Event RSVP
+                </label>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide shadow-sm">
+                  <CheckCircle2 size={14} className="text-emerald-600" />
+                  Free of additional charge
+                </div>
+              </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
                   { state: form.attendingWorkshop, setter: form.setAttendingWorkshop, title: "Pre-Conference Workshops", desc: "14 July 2026. Specialized sessions." },
