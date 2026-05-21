@@ -21,7 +21,7 @@ export default async function RegisterPage() {
             className="object-cover opacity-30 mix-blend-overlay"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-br from-slate-900/95 via-[#002b5c]/90 to-irms-blue/60" />
+          <div className="absolute inset-0 bg-linear-to-br from-slate-900/20 via-[#002b5c]/40 to-irms-blue/20" />
         </div>
         <div className="relative z-10 -mt-10">
           <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-6 tracking-tight">
