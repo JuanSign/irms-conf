@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Clock, AlertCircle, Upload, ArrowRight, CreditCard, BookOpen, Loader2, Trash2 } from "lucide-react";
+import { CheckCircle2, Clock, AlertCircle, Upload, ArrowRight, CreditCard, BookOpen, Loader2, Trash2, FileText, Download } from "lucide-react";
 import { createIopApplication, confirmIopPaymentProof, cancelIopApplication } from "@/app/(public)/dashboard/submission/[id]/actions";
 import { getPaymentProofUploadUrl } from "@/actions/files";
 import Image from "next/image";
@@ -15,6 +15,12 @@ interface IopPublicationWidgetProps {
 }
 
 const IOP_FEE = 1200000;
+
+const IOP_DOCUMENTS = [
+  { name: "Guideline", file: "Guideline.pdf", path: "/doc/Guideline.pdf", type: "PDF Document" },
+  { name: "Instruction", file: "Instruction.pdf", path: "/doc/Instruction.pdf", type: "PDF Document" },
+  { name: "Template", file: "Template.doc", path: "/doc/Template.doc", type: "Word Document" }
+];
 
 const viewVariants: Variants = {
   hidden: { opacity: 0, y: 15, scale: 0.98 },
@@ -189,6 +195,44 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
           </motion.div>
         )}
       </AnimatePresence>
+
+      {activeData && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+          className="mt-6 pt-6 border-t border-slate-200"
+        >
+          <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">
+            Required Documents & Templates
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {IOP_DOCUMENTS.map((doc, idx) => (
+              <a
+                key={idx}
+                href={doc.path}
+                download={doc.file}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-irms-blue hover:bg-blue-50/30 transition-colors group"
+              >
+                <div className="bg-white p-2 border border-slate-200 rounded-lg text-slate-400 group-hover:border-irms-blue/30 group-hover:text-irms-blue transition-colors shrink-0">
+                  <FileText size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-slate-700 group-hover:text-irms-blue truncate">
+                    {doc.name}
+                  </p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                    {doc.type}
+                  </p>
+                </div>
+                <Download size={16} className="text-slate-300 group-hover:text-irms-blue shrink-0" />
+              </a>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </section>
   );
 }
