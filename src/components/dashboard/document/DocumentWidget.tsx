@@ -47,7 +47,7 @@ export default function DocumentWidget({ abstracts, currentUserId }: DocumentWid
   return (
     <motion.section
       variants={containerVariants}
-      initial="hidden"
+      initial={false}
       animate="visible"
       className="bg-white border border-slate-200 rounded-3xl shadow-lg shadow-slate-200/40 flex flex-col h-full overflow-hidden"
     >

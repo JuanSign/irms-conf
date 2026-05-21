@@ -96,7 +96,7 @@ export default function EventWidget({ registration }: { registration: EventRegis
   }, []);
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       {!registration && !isRegistering && (
         <UnregisteredBanner key="banner" onRegister={() => setIsRegistering(true)} />
       )}
