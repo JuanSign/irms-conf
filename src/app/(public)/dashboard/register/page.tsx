@@ -11,7 +11,7 @@ export default async function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] mt-20 flex w-full bg-white">
+    <div className="min-h-screen pt-20 flex w-full bg-white">
       <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-irms-dark flex-col justify-center p-12 lg:p-20">
         <div className="absolute inset-0 z-0">
           <Image
