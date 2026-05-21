@@ -30,18 +30,24 @@ export default function PageTransition({ children }: { children: ReactNode }) {
     initial: (isForward: boolean) => ({
       x: isForward ? "100vw" : "-100vw",
       opacity: 1,
+      zIndex: 10,
     }),
     animate: {
       x: 0,
       opacity: 1,
+      zIndex: 10,
       transition: {
         duration: 0.9,
         ease: [0.22, 1, 0.36, 1],
       },
+      transitionEnd: {
+        transform: "none",
+      }
     },
     exit: (isForward: boolean) => ({
       x: isForward ? "-100vw" : "100vw",
       opacity: 1,
+      zIndex: 1,
       transition: {
         duration: 0.9,
         ease: [0.22, 1, 0.36, 1],
@@ -51,7 +57,7 @@ export default function PageTransition({ children }: { children: ReactNode }) {
 
   return (
     <div className="grid w-full">
-      <AnimatePresence custom={isForward}>
+      <AnimatePresence custom={isForward} initial={false}>
         <motion.div
           key={pathname}
           custom={isForward}

@@ -11,7 +11,7 @@ export default async function PublicLayout({
   const session = await auth();
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden">
+    <div className="flex min-h-screen flex-col overflow-x-clip">
       <Navbar session={session} />
       <main className="flex-1 relative">
         <PageTransition>
