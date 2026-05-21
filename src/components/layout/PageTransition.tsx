@@ -16,19 +16,20 @@ function getPageLevel(path: string): number {
 
 export default function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-
   const currentLevel = getPageLevel(pathname);
   const prevLevelRef = useRef(currentLevel);
-
-  const isForward = currentLevel >= prevLevelRef.current;
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
+    isFirstRender.current = false;
     prevLevelRef.current = currentLevel;
   }, [currentLevel]);
 
+  const isForward = currentLevel >= prevLevelRef.current;
+
   const variants: Variants = {
     initial: (isForward: boolean) => ({
-      x: isForward ? "100vw" : "-100vw",
+      x: isFirstRender.current ? 0 : (isForward ? "100vw" : "-100vw"),
       opacity: 1,
       zIndex: 10,
     }),
@@ -57,7 +58,7 @@ export default function PageTransition({ children }: { children: ReactNode }) {
 
   return (
     <div className="grid w-full">
-      <AnimatePresence custom={isForward} initial={false}>
+      <AnimatePresence custom={isForward}>
         <motion.div
           key={pathname}
           custom={isForward}
@@ -67,12 +68,6 @@ export default function PageTransition({ children }: { children: ReactNode }) {
           exit="exit"
           className="w-full bg-white origin-top shadow-xl"
           style={{ gridArea: "1 / 1 / 2 / 2" }}
-          // onAnimationStart={() => {
-          //   document.body.style.pointerEvents = "none";
-          // }}
-          // onAnimationComplete={() => {
-          //   document.body.style.pointerEvents = "auto";
-          // }}
         >
           <FrozenRoute>
             {children}
