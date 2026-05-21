@@ -18,7 +18,7 @@ const detailedEvents = [
     title: "Pre Event (Workshop)",
     status: "upcoming",
     description: "Kick off the conference with specialized, hands-on workshops led by industry experts. These intensive sessions are designed to provide deep technical insights and practical skills in applied rock mechanics.",
-    location: "éL Hotel Bandung"
+    location: "Holiday Inn Bandung Pasteur"
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const detailedEvents = [
     title: "Keynote & QnA and Rockers Night",
     status: "upcoming",
     description: "The main conference opens with inspiring keynote speeches from global leaders in rock engineering, followed by interactive Q&A. The day concludes with the exclusive 'Rockers Night' gala dinner for networking and celebration.",
-    location: "éL Hotel Bandung"
+    location: "Holiday Inn Bandung Pasteur"
   },
   {
     id: 4,
@@ -34,7 +34,7 @@ const detailedEvents = [
     title: "Keynote & QnA and Paralel Session",
     status: "upcoming",
     description: "The final day features additional expert keynotes and extensive parallel technical sessions, where researchers and practitioners present their accepted papers across various specialized topics.",
-    location: "éL Hotel Bandung"
+    location: "Holiday Inn Bandung Pasteur"
   }
 ];
 
