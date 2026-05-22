@@ -19,7 +19,7 @@ const IOP_FEE = 1200000;
 const IOP_DOCUMENTS = [
   { name: "Guideline", file: "Guideline.pdf", path: "/doc/Guideline.pdf", type: "PDF Document" },
   { name: "Instruction", file: "Instruction.pdf", path: "/doc/Instruction.pdf", type: "PDF Document" },
-  { name: "Template", file: "Template.doc", path: "/doc/Template.doc", type: "Word Document" }
+  { name: "Template", file: "Template.doc", path: "/doc/Template.docx", type: "Word Document" }
 ];
 
 const viewVariants: Variants = {
