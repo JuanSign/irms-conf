@@ -13,10 +13,10 @@ function getInitials(name: string) {
   return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 }
 
-function StatusSelect({ 
-  id, currentStatus, options, onUpdate, colors 
-}: { 
-  id: string, currentStatus: string, options: string[], onUpdate: (id: string, val: string) => Promise<any>, colors: Record<string, string> 
+function StatusSelect({
+  id, currentStatus, options, onUpdate, colors
+}: {
+  id: string, currentStatus: string, options: string[], onUpdate: (id: string, val: string) => Promise<any>, colors: Record<string, string>
 }) {
   const [isPending, startTransition] = useTransition();
   const [optimistic, setOptimistic] = useState(currentStatus);
@@ -54,39 +54,59 @@ function SearchableSelect({ options, placeholder, label, name }: { options: { id
   }, [query, options]);
 
   return (
-    <div className="relative flex-1 w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    <div className="relative flex-1 w-full min-w-0">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
       <input type="hidden" name={name} value={selected?.id || ""} required />
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-gray-400" />
+
+      {selected ? (
+        <div className="flex items-center justify-between w-full rounded-lg border border-blue-200 bg-blue-50 py-2.5 px-3 text-sm shadow-sm transition-colors min-w-0">
+          <span className="font-medium text-blue-800 truncate pr-2 block">{selected.label}</span>
+          <button
+            type="button"
+            onClick={() => setSelected(null)}
+            className="text-blue-500 hover:text-blue-700 shrink-0"
+            title="Clear selection"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
-        <input
-          type="text"
-          className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors border bg-gray-50 focus:bg-white"
-          placeholder={selected ? selected.label : placeholder}
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
-          onFocus={() => setIsOpen(true)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        />
-        {isOpen && (
-          <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-sm shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {filtered.length === 0 ? (
-              <li className="px-4 py-3 text-gray-500 text-center">No results found.</li>
-            ) : (
-              filtered.map((opt) => (
-                <li key={opt.id} className="relative cursor-pointer select-none px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                  onClick={() => { setSelected(opt); setQuery(""); setIsOpen(false); }}>
-                  {opt.label}
-                </li>
-              ))
-            )}
-          </ul>
-        )}
-      </div>
-      {selected && (
-        <button type="button" onClick={() => setSelected(null)} className="mt-1.5 text-xs text-red-500 hover:text-red-700 transition-colors font-medium">Clear selection</button>
+      ) : (
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors border bg-gray-50 focus:bg-white"
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
+            onFocus={() => setIsOpen(true)}
+            onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+          />
+          {isOpen && (
+            <ul className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-sm shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+              {filtered.length === 0 ? (
+                <li className="px-4 py-3 text-gray-500 text-center">No results found.</li>
+              ) : (
+                filtered.map((opt) => (
+                  <li
+                    key={opt.id}
+                    className="relative cursor-pointer select-none px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setSelected(opt);
+                      setQuery("");
+                      setIsOpen(false);
+                    }}
+                  >
+                    {opt.label}
+                  </li>
+                ))
+              )}
+            </ul>
+          )}
+        </div>
       )}
     </div>
   );
@@ -150,9 +170,9 @@ export function RegistrationsTab({ registrations }: { registrations: EventRegist
                 ) : <span className="text-gray-400 text-xs italic">No file</span>}
               </td>
               <td className="px-6 py-4">
-                <StatusSelect 
+                <StatusSelect
                   id={r.id} currentStatus={r.status} options={['Pending Payment', 'Verification Pending', 'Verified', 'Rejected']}
-                  onUpdate={updateRegistrationStatus} colors={paymentColors} 
+                  onUpdate={updateRegistrationStatus} colors={paymentColors}
                 />
               </td>
             </tr>
@@ -188,9 +208,9 @@ export function IopTab({ iopPublications }: { iopPublications: IopDetail[] }) {
                 ) : <span className="text-gray-400 text-xs">Awaiting upload</span>}
               </td>
               <td className="px-6 py-4">
-                <StatusSelect 
+                <StatusSelect
                   id={i.id} currentStatus={i.status} options={['Pending Payment', 'Verification Pending', 'Verified', 'Rejected']}
-                  onUpdate={updateIopStatus} colors={paymentColors} 
+                  onUpdate={updateIopStatus} colors={paymentColors}
                 />
               </td>
             </tr>
@@ -224,9 +244,9 @@ export function SlidesTab({ slides }: { slides: SlideDetail[] }) {
                 <a href={s.fileUrl} target="_blank" className="inline-flex bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-md text-xs font-medium hover:bg-blue-100 transition"><ExternalLink size={14} className="mr-1.5"/> View Deck</a>
               </td>
               <td className="px-6 py-4">
-                <StatusSelect 
+                <StatusSelect
                   id={s.id} currentStatus={s.status} options={['Under Review', 'Accepted', 'Rejected']}
-                  onUpdate={updateSlideStatus} colors={slideColors} 
+                  onUpdate={updateSlideStatus} colors={slideColors}
                 />
               </td>
             </tr>
@@ -275,7 +295,7 @@ export function AbstractsTab({ abstracts }: { abstracts: AbstractDetail[] }) {
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-12"></th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[45%]">Paper & Author</th>
-              <th 
+              <th
                 className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer hover:bg-gray-200/50 transition-colors group select-none"
                 onClick={() => setProgressSort(prev => prev === 'asc' ? 'desc' : prev === 'desc' ? null : 'asc')}
               >
@@ -339,9 +359,9 @@ export function AbstractsTab({ abstracts }: { abstracts: AbstractDetail[] }) {
                       )}
                     </td>
                     <td className="px-6 py-5 align-top">
-                      <StatusSelect 
+                      <StatusSelect
                         id={ab.id} currentStatus={ab.status} options={['Submitted', 'Under Review', 'Revision Required', 'Accepted', 'Rejected']}
-                        onUpdate={updateAbstractStatus} colors={abstractColors} 
+                        onUpdate={updateAbstractStatus} colors={abstractColors}
                       />
                     </td>
                   </tr>
@@ -357,8 +377,8 @@ export function AbstractsTab({ abstracts }: { abstracts: AbstractDetail[] }) {
                                 <div className="bg-red-100 text-red-600 p-2 rounded-md"><FileText size={20} /></div>
                                 <span className="text-sm font-medium text-gray-700 truncate">{ab.fileName}</span>
                               </div>
-                              <a 
-                                href={ab.path} 
+                              <a
+                                href={ab.path}
                                 download={ab.fileName}
                                 target="_blank" rel="noopener noreferrer"
                                 className="flex items-center space-x-1.5 bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
@@ -384,7 +404,7 @@ export function AbstractsTab({ abstracts }: { abstracts: AbstractDetail[] }) {
                                         <span className="inline-flex items-center text-xs font-medium text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200"><Clock size={12} className="mr-1" /> Pending</span>
                                       )}
                                     </div>
-                                    
+
                                     {asgn.isReviewed && (
                                       <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
                                         <div className="flex justify-between border-b border-gray-50 pb-1">
@@ -536,6 +556,17 @@ export function AdminsTab({ admins, abstracts }: { admins: AdminDetail[], abstra
   return (
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 animate-in fade-in duration-300">
       <div className="xl:col-span-2 space-y-6">
+        <div className="rounded-2xl border border-blue-100 border-l-4 border-l-blue-500 bg-white p-6 shadow-sm relative">
+          <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center"><FileText className="mr-2 h-5 w-5 text-blue-500" /> Assign Paper to Reviewer</h3>
+          <form onSubmit={handleAssign} className="flex flex-col lg:flex-row gap-5 items-start lg:items-end w-full min-w-0">
+            <SearchableSelect label="Select Reviewer" name="adminId" placeholder="Search by name..." options={admins.map(a => ({ id: a.id, label: `${a.name} (${a.role})` }))} />
+            <SearchableSelect label="Select Abstract" name="abstractId" placeholder="Search by title..." options={abstracts.map(a => ({ id: a.id, label: a.title }))} />
+            <button type="submit" disabled={loading} className="w-full lg:w-auto bg-blue-600 text-white px-8 py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium shadow-sm shrink-0">
+              Assign
+            </button>
+          </form>
+        </div>
+
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -585,17 +616,6 @@ export function AdminsTab({ admins, abstracts }: { admins: AdminDetail[], abstra
               </tbody>
             </table>
           </div>
-        </div>
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center"><FileText className="mr-2 h-5 w-5 text-blue-500" /> Assign Paper to Reviewer</h3>
-          <form onSubmit={handleAssign} className="flex flex-col md:flex-row gap-5 items-start md:items-end">
-            <SearchableSelect label="Select Reviewer" name="adminId" placeholder="Search by name..." options={admins.map(a => ({ id: a.id, label: `${a.name} (${a.role})` }))} />
-            <SearchableSelect label="Select Abstract" name="abstractId" placeholder="Search by title..." options={abstracts.map(a => ({ id: a.id, label: a.title }))} />
-            <button type="submit" disabled={loading} className="w-full md:w-auto bg-blue-600 text-white px-8 py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium shadow-sm">
-              Assign
-            </button>
-          </form>
         </div>
       </div>
 
