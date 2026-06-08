@@ -20,8 +20,13 @@ const speakers = [
     name: "Alessandro Maggioni",
     title: "Product Manager Soil and Rock Equipment",
     organization: "CONTROLS Group",
-    presentation: "Rock Testing for Uniaxial and Triaxial",
     image: "/image/Alessandro Maggioni.jpeg"
+  },
+  {
+    name: "Neal Harries",
+    title: "Director - Mine Monitoring APAC",
+    organization: "Hexagon Geosystems",
+    image: "/image/Neal Harries.jpg"
   },
 ];
 
@@ -70,7 +75,7 @@ const KeynoteSpeakers = () => {
                     {speaker.organization}
                   </p>
                 </div>
-                {speaker.presentation && (
+                {/* {speaker.presentation && (
                   <div className="mt-4 pt-4 border-t border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">
                       Presentation Topic
@@ -79,7 +84,7 @@ const KeynoteSpeakers = () => {
                       &quot;{speaker.presentation}&quot;
                     </p>
                   </div>
-                )}
+                )} */}
               </div>
             </motion.div>
           ))}
