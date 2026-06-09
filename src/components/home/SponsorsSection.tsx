@@ -1,76 +1,75 @@
-"use client";
-
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 
 const sponsors = [
-  { name: "Dahana", image: "/image/Dahana.png", size: "normal" },
-  { name: "Tura", image: "/image/Tura.png", size: "normal" },
-  { name: "Abel", image: "/image/Abel.png", size: "normal" },
+  // Large
   { name: "Hexagon", image: "/image/Hexagon.png", size: "large" },
   { name: "IDS Georadar", image: "/image/IDS Georadar.png", size: "large" },
   { name: "Leica Geosystems", image: "/image/Leica Geosystems.png", size: "large" },
-  { name: "Adaro", image: "/image/Adaro.png", size: "large" },
+  // Medium
+  { name: "Adaro", image: "/image/Adaro.png", size: "medium" },
+  // Small
+  { name: "Dahana", image: "/image/Dahana.png", size: "small" },
+  { name: "Tura", image: "/image/Tura.png", size: "small" },
+  { name: "Abel", image: "/image/Abel.png", size: "small" },
 ];
 
 const SponsorsSection = () => {
   const largeSponsors = sponsors.filter(sponsor => sponsor.size === "large");
-  const normalSponsors = sponsors.filter(sponsor => sponsor.size === "normal");
+  const mediumSponsors = sponsors.filter(sponsor => sponsor.size === "medium");
+  const smallSponsors = sponsors.filter(sponsor => sponsor.size === "small");
 
   return (
     <section className="py-20 bg-white border-t border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <span className="text-slate-400 font-bold text-xs tracking-widest uppercase">Proudly Supported By</span>
-        </motion.div>
+        
+        {/* Header */}
+        <div className="text-center mb-16">
+          <span className="text-slate-400 font-bold text-xs tracking-widest uppercase">
+            Proudly Supported By
+          </span>
+        </div>
 
         <div className="flex flex-col gap-16 md:gap-20">
           
           {/* Large Sponsors */}
           <div className="flex flex-wrap justify-center items-center gap-16 md:gap-24">
-            {largeSponsors.map((sponsor, idx) => (
-              <motion.div
-                key={sponsor.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: idx * 0.15 }}
-                className="relative w-52 h-28 sm:w-64 sm:h-32 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 transform hover:scale-105"
-              >
+            {largeSponsors.map((sponsor) => (
+              <div key={sponsor.name} className="relative w-48 h-24 sm:w-64 sm:h-32">
                 <Image
                   src={sponsor.image}
                   alt={`${sponsor.name} Logo`}
                   fill
                   className="object-contain"
                 />
-              </motion.div>
+              </div>
             ))}
           </div>
 
-          {/* Normal Sponsors */}
-          <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16">
-            {normalSponsors.map((sponsor, idx) => (
-              <motion.div
-                key={sponsor.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: idx * 0.15 }}
-                className="relative w-32 h-16 sm:w-40 sm:h-20 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 transform hover:scale-105"
-              >
+          {/* Medium Sponsors */}
+          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16">
+            {mediumSponsors.map((sponsor) => (
+              <div key={sponsor.name} className="relative w-40 h-24 sm:w-56 sm:h-28">
                 <Image
                   src={sponsor.image}
                   alt={`${sponsor.name} Logo`}
                   fill
                   className="object-contain"
                 />
-              </motion.div>
+              </div>
+            ))}
+          </div>
+
+          {/* Small Sponsors */}
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+            {smallSponsors.map((sponsor) => (
+              <div key={sponsor.name} className="relative w-24 h-12 sm:w-32 sm:h-16">
+                <Image
+                  src={sponsor.image}
+                  alt={`${sponsor.name} Logo`}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             ))}
           </div>
 
