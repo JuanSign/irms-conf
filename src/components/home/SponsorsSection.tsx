@@ -10,6 +10,7 @@ const sponsors = [
   { name: "Hexagon", image: "/image/Hexagon.png", size: "large" },
   { name: "IDS Georadar", image: "/image/IDS Georadar.png", size: "large" },
   { name: "Leica Geosystems", image: "/image/Leica Geosystems.png", size: "large" },
+  { name: "Adaro", image: "/image/Adaro.png", size: "large" },
 ];
 
 const SponsorsSection = () => {
@@ -30,6 +31,8 @@ const SponsorsSection = () => {
         </motion.div>
 
         <div className="flex flex-col gap-16 md:gap-20">
+          
+          {/* Large Sponsors */}
           <div className="flex flex-wrap justify-center items-center gap-16 md:gap-24">
             {largeSponsors.map((sponsor, idx) => (
               <motion.div
@@ -49,7 +52,9 @@ const SponsorsSection = () => {
               </motion.div>
             ))}
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20">
+
+          {/* Normal Sponsors */}
+          <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16">
             {normalSponsors.map((sponsor, idx) => (
               <motion.div
                 key={sponsor.name}
@@ -57,7 +62,7 @@ const SponsorsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: idx * 0.15 }}
-                className="relative w-40 h-20 sm:w-48 sm:h-24 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 transform hover:scale-105"
+                className="relative w-32 h-16 sm:w-40 sm:h-20 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 transform hover:scale-105"
               >
                 <Image
                   src={sponsor.image}
