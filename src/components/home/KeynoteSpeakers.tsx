@@ -26,7 +26,7 @@ const speakers = [
     name: "Neal Harries",
     title: "Director - Mine Monitoring APAC",
     organization: "Hexagon Geosystems",
-    image: "/image/Neal Harries.jpg"
+    image: "/image/Neal Harries.jpeg"
   },
 ];
 
