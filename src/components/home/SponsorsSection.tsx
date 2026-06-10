@@ -1,20 +1,15 @@
 import Image from 'next/image';
 
 const sponsors = [
-  // Large
-  { name: "Hexagon", image: "/image/Hexagon.png", size: "large" },
-  { name: "IDS Georadar", image: "/image/IDS Georadar.png", size: "large" },
-  { name: "Leica Geosystems", image: "/image/Leica Geosystems.png", size: "large" },
   // Medium
   { name: "Adaro", image: "/image/Adaro.png", size: "medium" },
   // Small
   { name: "Dahana", image: "/image/Dahana.png", size: "small" },
   { name: "Tura", image: "/image/Tura.png", size: "small" },
-  { name: "Abel", image: "/image/Abel.png", size: "small" },
+  { name: "Abel", size: "small", image: "/image/Abel.png" },
 ];
 
 const SponsorsSection = () => {
-  const largeSponsors = sponsors.filter(sponsor => sponsor.size === "large");
   const mediumSponsors = sponsors.filter(sponsor => sponsor.size === "medium");
   const smallSponsors = sponsors.filter(sponsor => sponsor.size === "small");
 
@@ -29,20 +24,18 @@ const SponsorsSection = () => {
           </span>
         </div>
 
-        <div className="flex flex-col gap-16 md:gap-20">
+        <div className="flex flex-col gap-8 md:gap-12">
           
           {/* Large Sponsors */}
-          <div className="flex flex-wrap justify-center items-center gap-16 md:gap-24">
-            {largeSponsors.map((sponsor) => (
-              <div key={sponsor.name} className="relative w-48 h-24 sm:w-64 sm:h-32">
-                <Image
-                  src={sponsor.image}
-                  alt={`${sponsor.name} Logo`}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ))}
+          <div className="w-full flex justify-center items-center">
+            <Image
+              src="/image/SPONSORS.jpeg"
+              alt="Main Large Sponsors"
+              width={1280} 
+              height={400} 
+              className="w-full h-auto object-contain"
+              priority 
+            />
           </div>
 
           {/* Medium Sponsors */}
