@@ -8,7 +8,7 @@ const speakers = [
     name: "Lufi Rachmad M.Eng",
     title: "Managing Director and Principal",
     organization: "GEOMINE Mining",
-    image: "/image/Lufi Rachmad.jpg"
+    image: "/image/Lufi Rachmad.jpeg"
   },
   {
     name: "Dr. techn. Indra Noer Hamdan, S.T., M.T.",
