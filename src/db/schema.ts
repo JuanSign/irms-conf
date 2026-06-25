@@ -46,6 +46,13 @@ export const slideStatusEnum = pgEnum('slide_status', [
   'Rejected'
 ]);
 
+export const iopPaperStatusEnum = pgEnum('iop_paper_status', [
+  'Pending Submission',
+  'Waiting For Verification',
+  'Verified',
+  'Rejected'
+]);
+
 export const slideSubmissions = pgTable("slide_submissions", {
   id: uuid("id").defaultRandom().primaryKey(),
   abstractId: uuid("abstract_id").references(() => abstracts.id, { onDelete: 'cascade' }).notNull().unique(),
@@ -90,6 +97,8 @@ export const iopPublications = pgTable("iop_publications", {
   abstractId: uuid("abstract_id").references(() => abstracts.id, { onDelete: 'cascade' }).notNull().unique(),
   paymentProofUrl: text("payment_proof_url"),
   status: iopPaymentStatusEnum("status").default("Pending Payment").notNull(),
+  fullPaperUrl: text("full_paper_url"),
+  paperStatus: iopPaperStatusEnum("paper_status").default("Pending Submission").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });

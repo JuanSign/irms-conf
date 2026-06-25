@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Clock, AlertCircle, Upload, ArrowRight, CreditCard, BookOpen, Loader2, Trash2, FileText, Download } from "lucide-react";
-import { createIopApplication, confirmIopPaymentProof, cancelIopApplication } from "@/app/(public)/dashboard/submission/[id]/actions";
-import { getPaymentProofUploadUrl } from "@/actions/files";
+import { CheckCircle2, Clock, AlertCircle, Upload, ArrowRight, CreditCard, BookOpen, Loader2, Trash2, FileText, Download, FileUp } from "lucide-react";
+import { createIopApplication, confirmIopPaymentProof, cancelIopApplication, submitIopFullPaper } from "@/app/(public)/dashboard/submission/[id]/actions";
+import { getPaymentProofUploadUrl, getFullPaperUploadUrl } from "@/actions/files";
 import Image from "next/image";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { IopPublication } from "@/db/schema";
+
+interface IopPublication {
+  abstractId: string;
+  status: 'Pending Payment' | 'Verification Pending' | 'Verified' | 'Rejected';
+  paymentProofUrl?: string | null;
+  paperStatus: 'Pending Submission' | 'Waiting For Verification' | 'Verified' | 'Rejected';
+  fullPaperUrl?: string | null;
+}
 
 interface IopPublicationWidgetProps {
   abstractId: string;
@@ -33,9 +40,13 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
   const [activeData, setActiveData] = useState<IopPublication | null | undefined>(iopData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isPaymentDragging, setIsPaymentDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const [paperFile, setPaperFile] = useState<File | null>(null);
+  const [isPaperDragging, setIsPaperDragging] = useState(false);
 
   useEffect(() => {
     setActiveData(iopData);
@@ -56,7 +67,7 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
     if (res?.error) {
       setError(res.error);
     } else {
-      setActiveData({ abstractId, status: 'Pending Payment' } as IopPublication);
+      setActiveData({ abstractId, status: 'Pending Payment', paperStatus: 'Pending Submission' } as IopPublication);
       router.refresh();
     }
     setLoading(false);
@@ -96,6 +107,39 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
       router.refresh();
     }
     setLoading(false);
+  };
+
+  const handlePaperUpload = async () => {
+    if (!paperFile) return setError("Please select a manuscript file.");
+    setLoading(true); setError('');
+
+    try {
+      const { presignedUrl, fileUrl, error: urlError } = await getFullPaperUploadUrl(paperFile.type, paperFile.name);
+      if (urlError || !presignedUrl || !fileUrl) throw new Error(urlError || "Upload failed.");
+
+      const uploadRes = await fetch(presignedUrl, { method: 'PUT', body: paperFile, headers: { 'Content-Type': paperFile.type } });
+      if (!uploadRes.ok) throw new Error("Cloud upload failed.");
+
+      const confirmRes = await submitIopFullPaper(abstractId, fileUrl);
+      if (confirmRes?.error) throw new Error(confirmRes.error);
+
+      setActiveData(prev => prev ? { ...prev, paperStatus: 'Waiting For Verification', fullPaperUrl: fileUrl } : null);
+      setPaperFile(null);
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || "An error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getPaperStatusConfig = (status: string) => {
+    switch (status) {
+      case 'Verified': return { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle2 size={16} /> };
+      case 'Rejected': return { color: 'bg-rose-50 text-rose-700 border-rose-200', icon: <AlertCircle size={16} /> };
+      case 'Waiting For Verification': return { color: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock size={16} /> };
+      default: return { color: 'bg-slate-50 text-slate-700 border-slate-200', icon: <FileUp size={16} /> };
+    }
   };
 
   return (
@@ -154,16 +198,16 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
                 </div>
 
                 <div
-                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                  onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
-                  onDrop={(e) => { e.preventDefault(); setIsDragging(false); if (e.dataTransfer.files[0]) setPaymentFile(e.dataTransfer.files[0]); }}
-                  className={`relative border-2 border-dashed rounded-xl p-4 text-center flex flex-col items-center justify-center min-h-30 transition-colors ${isDragging ? 'border-irms-blue bg-blue-50/50' : 'border-slate-300 bg-white'}`}
+                  onDragOver={(e) => { e.preventDefault(); setIsPaymentDragging(true); }}
+                  onDragLeave={(e) => { e.preventDefault(); setIsPaymentDragging(false); }}
+                  onDrop={(e) => { e.preventDefault(); setIsPaymentDragging(false); if (e.dataTransfer.files[0]) setPaymentFile(e.dataTransfer.files[0]); }}
+                  className={`relative border-2 border-dashed rounded-xl p-4 text-center flex flex-col items-center justify-center min-h-30 transition-colors ${isPaymentDragging ? 'border-irms-blue bg-blue-50/50' : 'border-slate-300 bg-white'}`}
                 >
                   <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setPaymentFile(e.target.files?.[0] || null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
                   {previewUrl ? (
                     <div className="relative w-full max-w-25 h-16 rounded-lg overflow-hidden border border-slate-200"><Image src={previewUrl} alt="Preview" fill className="object-cover" /></div>
                   ) : (
-                    <Upload size={20} className={`mb-2 ${isDragging ? 'text-irms-blue' : 'text-slate-400'}`} />
+                    <Upload size={20} className={`mb-2 ${isPaymentDragging ? 'text-irms-blue' : 'text-slate-400'}`} />
                   )}
                   <p className="text-xs font-bold text-slate-800 mt-2 line-clamp-1">{paymentFile ? paymentFile.name : 'Upload Proof'}</p>
                 </div>
@@ -181,28 +225,94 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
           </motion.div>
         )}
 
-        {activeData && activeData.status !== 'Pending Payment' && (
-          <motion.div key="status" variants={viewVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between">
+        {activeData && activeData.status === 'Verification Pending' && (
+          <motion.div key="payment_status" variants={viewVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">IOP Application Status</p>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment Status</p>
               <div className="flex items-center gap-2">
-                {activeData.status === 'Verified' ? <CheckCircle2 size={18} className="text-emerald-500" /> : <Clock size={18} className="text-amber-500" />}
-                <p className="font-extrabold text-slate-800">{activeData.status}</p>
+                <Clock size={18} className="text-amber-500" />
+                <p className="font-extrabold text-slate-800">Verification Pending</p>
               </div>
             </div>
-            {activeData.status === 'Verification Pending' && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-bold uppercase">Under Review</span>}
-            {activeData.status === 'Verified' && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase">Approved</span>}
+            <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-bold uppercase">Under Review</span>
+          </motion.div>
+        )}
+
+        {activeData && activeData.status === 'Verified' && (
+          <motion.div key="paper_submission" variants={viewVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white border-b border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h4 className="font-extrabold text-slate-800 text-base">Full Paper Manuscript</h4>
+                <p className="text-[11px] text-slate-500 font-medium mt-1 max-w-sm">Submit your full paper. Document will be verified by the admin committee.</p>
+              </div>
+              <div className={`flex items-center w-fit gap-2 px-3 py-1.5 text-[10px] sm:text-xs font-bold rounded-xl border ${getPaperStatusConfig(activeData.paperStatus).color} shadow-sm shrink-0`}>
+                {getPaperStatusConfig(activeData.paperStatus).icon} 
+                <span className="uppercase tracking-wider">{activeData.paperStatus}</span>
+              </div>
+            </div>
+
+            <div className="p-5 flex flex-col gap-4">
+              {error && <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl font-medium flex gap-2 items-center"><AlertCircle size={14}/>{error}</div>}
+
+              {activeData.fullPaperUrl && (
+                <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="bg-blue-50 p-2.5 rounded-lg text-irms-blue shrink-0"><FileText size={20} /></div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-800 truncate">Current Submission</p>
+                      <a href={activeData.fullPaperUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-irms-blue hover:underline truncate block font-medium mt-0.5">
+                        View uploaded document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeData.paperStatus !== 'Verified' && (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsPaperDragging(true); }}
+                  onDragLeave={(e) => { e.preventDefault(); setIsPaperDragging(false); }}
+                  onDrop={(e) => { e.preventDefault(); setIsPaperDragging(false); if (e.dataTransfer.files[0]) setPaperFile(e.dataTransfer.files[0]); }}
+                  className={`relative border-2 border-dashed rounded-xl p-6 text-center flex flex-col items-center justify-center transition-colors ${
+                    isPaperDragging ? 'border-irms-blue bg-blue-50/50' : 
+                    activeData.paperStatus === 'Rejected' ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300 bg-white hover:border-slate-400'
+                  }`}
+                >
+                  <input type="file" accept=".doc,.docx,.pdf" onChange={(e) => setPaperFile(e.target.files?.[0] || null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                  
+                  <div className={`p-3 rounded-full mb-3 ${isPaperDragging ? 'bg-irms-blue text-white' : 'bg-slate-100 text-slate-400'}`}>
+                    <Upload size={24} />
+                  </div>
+                  
+                  <h5 className="text-sm font-bold text-slate-800 mb-1">
+                    {paperFile ? paperFile.name : (activeData.fullPaperUrl ? 'Upload Replacement File' : 'Upload Full Paper')}
+                  </h5>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {paperFile ? `${(paperFile.size / 1024 / 1024).toFixed(2)} MB • Ready to submit` : 'Drag & drop or click to browse (.pdf, .doc, .docx)'}
+                  </p>
+                  
+                  {activeData.paperStatus === 'Rejected' && !paperFile && (
+                    <p className="text-[10px] text-rose-600 font-bold mt-3 bg-rose-100 px-3 py-1 rounded-md uppercase tracking-wider">
+                      Please resubmit corrections
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {activeData.paperStatus !== 'Verified' && paperFile && (
+                <div className="flex justify-end mt-2">
+                  <button onClick={handlePaperUpload} disabled={loading} className="w-full sm:w-auto bg-irms-blue text-white font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-[#002b5c] transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50">
+                    {loading ? <><Loader2 size={16} className="animate-spin" /> Processing...</> : 'Submit Manuscript'}
+                  </button>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {activeData && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="mt-6 pt-6 border-t border-slate-200"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4 }} className="mt-6 pt-6 border-t border-slate-200">
           <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">
             Required Documents & Templates
           </h4>
@@ -220,12 +330,8 @@ export default function IopPublicationWidget({ abstractId, iopData }: IopPublica
                   <FileText size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-slate-700 group-hover:text-irms-blue truncate">
-                    {doc.name}
-                  </p>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                    {doc.type}
-                  </p>
+                  <p className="text-sm font-bold text-slate-700 group-hover:text-irms-blue truncate">{doc.name}</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{doc.type}</p>
                 </div>
                 <Download size={16} className="text-slate-300 group-hover:text-irms-blue shrink-0" />
               </a>

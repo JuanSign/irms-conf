@@ -79,3 +79,21 @@ export async function cancelSlideSubmission(abstractId: string) {
     return { error: "Failed to delete slides." };
   }
 }
+
+export async function submitIopFullPaper(abstractId: string, fullPaperUrl: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized" };
+
+  try {
+    await db.update(iopPublications)
+      .set({ 
+        fullPaperUrl, 
+        paperStatus: 'Waiting For Verification' 
+      })
+      .where(eq(iopPublications.abstractId, abstractId));
+      
+    return { success: true };
+  } catch (error) {
+    return { error: "Failed to submit full paper." };
+  }
+}

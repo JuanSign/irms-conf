@@ -101,3 +101,32 @@ export async function getPaymentProofUploadUrl(contentType: string, fileName: st
     return { error: "Failed to generate secure upload link for payment proof." };
   }
 }
+
+export async function getFullPaperUploadUrl(contentType: string, fileName: string) {
+  const session = await auth();
+
+  if (!session?.user?.id || session.user.role !== "user") {
+    return { error: "Unauthorized." };
+  }
+
+  const fileId = randomUUID();
+  const extension = fileName.split('.').pop()?.toLowerCase() || 'pdf';
+  const objectKey = `iop_papers/${fileId}.${extension}`;
+
+  const command = new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: objectKey,
+    ContentType: contentType,
+  });
+
+  try {
+    const presignedUrl = await getSignedUrl(S3, command, { expiresIn: 3600 });
+    const baseUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, '');
+    const fileUrl = `${baseUrl}/${objectKey}`;
+
+    return { presignedUrl, fileUrl };
+  } catch (error) {
+    console.error('R2 Paper Presign Error:', error);
+    return { error: "Failed to generate secure upload link for full paper." };
+  }
+}
