@@ -14,7 +14,7 @@ const speakers = [
     name: "Dr. techn. Indra Noer Hamdan, S.T., M.T.",
     title: "Expert Team Member",
     organization: "Road Safety and Road Tunnels Commission",
-    image: "/image/Indra Noer.jpg"
+    image: "/image/Indra Noer.jpeg"
   },
   {
     name: "Alessandro Maggioni",
