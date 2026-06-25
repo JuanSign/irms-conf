@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useTransition, useMemo } from "react";
-import { createAdmin, assignAbstract, updateAbstractStatus, updateRegistrationStatus, updateIopStatus, updateSlideStatus } from "./actions";
+import { createAdmin, assignAbstract, updateAbstractStatus, updateRegistrationStatus, updateIopStatus, updateSlideStatus, updateIopPaperStatus } from "./actions";
 import { Search, ChevronDown, ChevronUp, Download, ExternalLink, CheckCircle2, Clock, FileText, CheckCircle, Ticket, Banknote, Users, BookOpen, PenTool, BarChart3, ArrowUpDown, UserCog, AlertCircle, MoreHorizontal } from "lucide-react";
 import { UserDetail, AdminDetail, AbstractDetail, EventRegistrationDetail, IopDetail, SlideDetail, DashboardStats } from "./types";
 
@@ -30,7 +30,7 @@ function StatusSelect({
   const currentClass = colors[optimistic] || 'border-gray-200 bg-gray-50 text-gray-700';
 
   return (
-    <div className={`relative inline-flex items-center rounded-lg border-2 ${isPending ? 'opacity-60 cursor-not-allowed' : ''} ${currentClass}`}>
+    <div className={`relative inline-flex items-center rounded-lg border-2 w-full max-w-xs ${isPending ? 'opacity-60 cursor-not-allowed' : ''} ${currentClass}`}>
       <select
         value={optimistic}
         onChange={handleChange}
@@ -114,6 +114,7 @@ function SearchableSelect({ options, placeholder, label, name }: { options: { id
 
 const abstractColors: Record<string, string> = { 'Submitted': 'border-purple-200 bg-purple-50 text-purple-700', 'Under Review': 'border-blue-200 bg-blue-50 text-blue-700', 'Revision Required': 'border-orange-200 bg-orange-50 text-orange-700', 'Accepted': 'border-green-200 bg-green-50 text-green-700', 'Rejected': 'border-red-200 bg-red-50 text-red-700' };
 const paymentColors: Record<string, string> = { 'Pending Payment': 'border-gray-200 bg-gray-50 text-gray-600', 'Verification Pending': 'border-yellow-200 bg-yellow-50 text-yellow-700', 'Verified': 'border-green-200 bg-green-50 text-green-700', 'Rejected': 'border-red-200 bg-red-50 text-red-700' };
+const paperColors: Record<string, string> = { 'Pending Submission': 'border-gray-200 bg-gray-50 text-gray-600', 'Waiting For Verification': 'border-yellow-200 bg-yellow-50 text-yellow-700', 'Verified': 'border-green-200 bg-green-50 text-green-700', 'Rejected': 'border-red-200 bg-red-50 text-red-700' };
 const slideColors: Record<string, string> = { 'Under Review': 'border-blue-200 bg-blue-50 text-blue-700', 'Accepted': 'border-green-200 bg-green-50 text-green-700', 'Rejected': 'border-red-200 bg-red-50 text-red-700' };
 const dotColors: Record<string, string> = { 'Submitted': 'bg-purple-500', 'Under Review': 'bg-blue-500', 'Revision Required': 'bg-orange-500', 'Accepted': 'bg-green-500', 'Rejected': 'bg-red-500' };
 
@@ -190,28 +191,41 @@ export function IopTab({ iopPublications }: { iopPublications: IopDetail[] }) {
       <table className="min-w-full divide-y divide-gray-200 text-sm">
         <thead className="bg-gray-50/80">
           <tr>
-            <th className="px-6 py-4 text-left font-semibold text-gray-500 w-[40%]">Abstract</th>
-            <th className="px-6 py-4 text-left font-semibold text-gray-500">Proof of Payment</th>
-            <th className="px-6 py-4 text-left font-semibold text-gray-500">Publication Status</th>
+            <th className="px-6 py-4 text-left font-semibold text-gray-500 w-[30%]">Abstract</th>
+            <th className="px-6 py-4 text-left font-semibold text-gray-500 w-[35%]">Payment Info</th>
+            <th className="px-6 py-4 text-left font-semibold text-gray-500 w-[35%]">Full Paper Status</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
           {iopPublications.map(i => (
             <tr key={i.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4">
+              <td className="px-6 py-4 align-top">
                 <div className="font-medium text-gray-900 leading-snug">{i.abstract.title}</div>
                 <div className="text-gray-500 text-xs mt-1">By: {i.abstract.author.name}</div>
               </td>
-              <td className="px-6 py-4">
-                {i.paymentProofUrl ? (
-                  <a href={i.paymentProofUrl} target="_blank" className="inline-flex bg-gray-900 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-gray-800 transition"><Download size={14} className="mr-1.5"/> Download</a>
-                ) : <span className="text-gray-400 text-xs">Awaiting upload</span>}
+              <td className="px-6 py-4 align-top">
+                <div className="flex flex-col gap-3">
+                  {i.paymentProofUrl ? (
+                    <a href={i.paymentProofUrl} target="_blank" className="inline-flex items-center w-fit bg-gray-900 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-gray-800 transition"><Download size={14} className="mr-1.5"/> Download Proof</a>
+                  ) : <span className="text-gray-400 text-xs italic inline-flex items-center h-8">Awaiting payment upload</span>}
+                  
+                  <StatusSelect
+                    id={i.id} currentStatus={i.status} options={['Pending Payment', 'Verification Pending', 'Verified', 'Rejected']}
+                    onUpdate={updateIopStatus} colors={paymentColors}
+                  />
+                </div>
               </td>
-              <td className="px-6 py-4">
-                <StatusSelect
-                  id={i.id} currentStatus={i.status} options={['Pending Payment', 'Verification Pending', 'Verified', 'Rejected']}
-                  onUpdate={updateIopStatus} colors={paymentColors}
-                />
+              <td className="px-6 py-4 align-top">
+                <div className="flex flex-col gap-3">
+                  {i.fullPaperUrl ? (
+                    <a href={i.fullPaperUrl} target="_blank" className="inline-flex items-center w-fit bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-md text-xs font-medium hover:bg-blue-100 transition"><Download size={14} className="mr-1.5"/> Download Paper</a>
+                  ) : <span className="text-gray-400 text-xs italic inline-flex items-center h-8">Awaiting manuscript upload</span>}
+                  
+                  <StatusSelect
+                    id={i.id} currentStatus={i.paperStatus} options={['Pending Submission', 'Waiting For Verification', 'Verified', 'Rejected']}
+                    onUpdate={updateIopPaperStatus} colors={paperColors}
+                  />
+                </div>
               </td>
             </tr>
           ))}

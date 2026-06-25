@@ -41,6 +41,8 @@ export type IopDetail = {
   id: string;
   paymentProofUrl: string | null;
   status: string;
+  fullPaperUrl: string | null;
+  paperStatus: string;
   abstract: { id: string; title: string; author: { name: string; email: string } };
   createdAt: Date;
 };

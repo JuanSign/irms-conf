@@ -55,7 +55,15 @@ export async function updateIopStatus(id: string, newStatus: string) {
     await db.update(iopPublications).set({ status: newStatus as any }).where(eq(iopPublications.id, id));
     revalidatePath("/admin/dashboard");
     return { success: true };
-  } catch (error) { return { error: "Failed to update IOP status" }; }
+  } catch (error) { return { error: "Failed to update IOP payment status" }; }
+}
+
+export async function updateIopPaperStatus(id: string, newStatus: string) {
+  try {
+    await db.update(iopPublications).set({ paperStatus: newStatus as any }).where(eq(iopPublications.id, id));
+    revalidatePath("/admin/dashboard");
+    return { success: true };
+  } catch (error) { return { error: "Failed to update IOP paper status" }; }
 }
 
 export async function updateSlideStatus(id: string, newStatus: string) {
