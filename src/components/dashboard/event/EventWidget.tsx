@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Ticket, Calendar, CheckCircle2, Clock, AlertCircle,
   Upload, ArrowRight, MapPin, ArrowLeft, CreditCard,
-  User, Building, GraduationCap, Loader2, QrCode, Trash2
+  User, Building, GraduationCap, Loader2, Trash2
 } from "lucide-react";
 import { EventRegistration, RegistrationCategory } from "@/types/event";
 import { createEventRegistration, confirmPaymentProof, cancelEventRegistration } from "./actions";
@@ -543,35 +543,39 @@ function EventTicket({ registration }: any) {
         </div>
       </div>
 
-      <div className="p-5 sm:p-6 pt-6 sm:pt-8 flex-1 flex flex-col sm:flex-row gap-5 sm:gap-6 bg-slate-100">
-        <div className="flex-1 space-y-5 sm:space-y-6">
-          <div className="grid grid-cols-2 gap-y-5 sm:gap-y-6 gap-x-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 sm:mb-1.5">Category</p>
-              <p className="font-extrabold text-sm sm:text-base text-slate-800">{registration.category === 'Industry/Practitioner' ? 'Practitioner' : registration.category}</p>
-            </div>
-            <div>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 sm:mb-1.5">Member Status</p>
-              <p className="font-extrabold text-sm sm:text-base text-slate-800 flex items-center gap-1.5">
-                {registration.isIrmsMember ? <><CheckCircle2 size={14} className="sm:w-4 sm:h-4 text-irms-blue"/> Verified</> : 'Non-Member'}
-              </p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 sm:mb-2.5">Granted Access</p>
-              <div className="flex flex-wrap gap-2 sm:gap-2.5">
-                <span className="bg-slate-800 text-white border border-slate-700 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide shadow-sm">Main Conference (16 Jul)</span>
-                {registration.attendingWorkshop && <span className="bg-slate-50 text-slate-700 border border-slate-200 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide">Workshops (14 Jul)</span>}
-                {registration.attendingRockersNight && <span className="bg-slate-50 text-slate-700 border border-slate-200 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide">Rockers Night (15 Jul)</span>}
-              </div>
-            </div>
+      <div className="p-5 sm:p-6 pt-6 sm:pt-8 flex flex-col gap-5 sm:gap-6 bg-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 sm:gap-y-6 gap-x-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 sm:mb-1.5">Category</p>
+            <p className="font-extrabold text-sm sm:text-base text-slate-800">{registration.category === 'Industry/Practitioner' ? 'Practitioner' : registration.category}</p>
           </div>
-        </div>
-
-        <div className="hidden sm:flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl bg-white shadow-sm min-w-35 transition-colors">
-          <div className="p-2 bg-slate-50 rounded-xl mb-3 border border-slate-100">
-            <QrCode size={52} className="text-slate-800" strokeWidth={1.5} />
+          <div>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 sm:mb-1.5">Member Status</p>
+            <p className="font-extrabold text-sm sm:text-base text-slate-800 flex items-center gap-1.5">
+              {registration.isIrmsMember ? <><CheckCircle2 size={14} className="sm:w-4 sm:h-4 text-irms-blue"/> Verified</> : 'Non-Member'}
+            </p>
           </div>
-          <p className="text-[9px] sm:text-[10px] text-slate-500 font-mono text-center uppercase font-bold tracking-widest">Scan at Venue</p>
+          <div className="col-span-1 sm:col-span-2">
+            <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2.5 sm:mb-3">Granted Access</p>
+            <ul className="flex flex-col gap-3">
+              <li className="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                <span className="text-sm font-bold text-slate-800">Main Conference <span className="ml-1 text-xs font-medium text-slate-500">(16 Jul)</span></span>
+              </li>
+              {registration.attendingWorkshop && (
+                <li className="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                  <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                  <span className="text-sm font-bold text-slate-800">Workshops <span className="ml-1 text-xs font-medium text-slate-500">(14 Jul)</span></span>
+                </li>
+              )}
+              {registration.attendingRockersNight && (
+                <li className="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                  <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                  <span className="text-sm font-bold text-slate-800">Rockers Night <span className="ml-1 text-xs font-medium text-slate-500">(15 Jul)</span></span>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </div>
     </motion.div>
