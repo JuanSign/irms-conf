@@ -8,26 +8,32 @@ const speakers = [
     name: "Lufi Rachmad M.Eng",
     title: "Managing Director and Principal",
     organization: "GEOMINE Mining",
-    image: "/image/Lufi Rachmad.jpeg"
+    image: "/image/keynote/Lufi Rachmad.jpeg"
   },
   {
     name: "Dr. techn. Indra Noer Hamdan, S.T., M.T.",
     title: "Expert Team Member",
     organization: "Road Safety and Road Tunnels Commission",
-    image: "/image/Indra Noer.jpeg"
+    image: "/image/keynote/Indra Noer.jpeg"
   },
   {
     name: "Alessandro Maggioni",
     title: "Product Manager Soil and Rock Equipment",
     organization: "CONTROLS Group",
-    image: "/image/Alessandro Maggioni.jpeg"
+    image: "/image/keynote/Alessandro Maggioni.jpeg"
   },
   {
     name: "Neal Harries",
     title: "Director - Mine Monitoring APAC",
     organization: "Hexagon Geosystems",
-    image: "/image/Neal Harries.jpeg"
+    image: "/image/keynote/Neal Harries.jpeg"
   },
+  {
+    name: "Okky Chandra Perdana, S.T., M.T.",
+    title: "Director",
+    organization: "PT. Anggun Permai Tekindo",
+    image: "/image/keynote/Okky Chandra.png"
+  }
 ];
 
 const KeynoteSpeakers = () => {
