@@ -37,7 +37,7 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter mb-6 leading-[1.1]"
           >
-            IRMS <span className="text-irms-red relative inline-block">
+            IRMS Conference <span className="text-irms-red relative inline-block">
               2026
               <svg className="absolute w-full h-3 -bottom-1 left-0 text-irms-red/60" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="transparent"/></svg>
             </span>

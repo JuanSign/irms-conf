@@ -22,7 +22,7 @@ const Welcome = () => {
 
               <div className="w-52 h-64 relative mb-6 mx-auto rounded-2xl overflow-hidden border-4 border-white shadow-md group-hover:shadow-xl transition-shadow duration-500">
                 <Image
-                  src="/image/Ridho Kresna Wattimena.jpg"
+                  src="/image/keynote/Ridho Kresna Wattimena.jpg"
                   alt="Ridho Kresna Wattimena"
                   fill
                   className="object-cover object-top group-hover:scale-105 transition-transform duration-700"

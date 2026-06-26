@@ -6,25 +6,53 @@ import { motion } from 'framer-motion';
 const workshops = [
   { 
     id: 1, 
-    presenter: "Anggun Permai Tekindo", 
+    presenterNode: <span className="text-sm font-bold text-irms-dark">Anggun Permai Tekindo</span>,
+    logos: [
+      "/image/sponsors/Anggun Permai Tekindo.png"
+    ],
     title: "Practical Application of Geotechnical Solutions for Risk Mitigation and Ground Support",
     icon: <ShieldCheck size={28} strokeWidth={1.5} />
   },
   { 
     id: 2, 
-    presenter: "Hexagon", 
+    presenterNode: <span className="text-sm font-bold text-irms-dark">Hexagon</span>,
+    logos: [
+      "/image/sponsors/Hexagon IDS Leica.png"
+    ],
     title: "Digital Monitoring and Data-Driven Decision-Making for Safer Mining Operations",
     icon: <Activity size={28} strokeWidth={1.5} />
   },
   { 
     id: 3, 
-    presenter: "Leapfrog", 
+    presenterNode: (
+      <div className="text-xs text-slate-500 leading-relaxed">
+        <span className="block"><strong className="text-irms-dark">PT Delta Nusantara</strong> as Bentley & Seequent Channel Partner</span>
+        <span className="block mt-1"><strong className="text-irms-dark">NGC Itenas</strong> as Bentley Training Partner</span>
+      </div>
+    ),
+    logos: [
+      "/image/sponsors/Bentley.png",
+      "/image/sponsors/Delta Sigma Nusantara.png",
+      "/image/sponsors/NGC.png",
+      "/image/sponsors/Seequent.png"
+    ],
     title: "3D Geological Modelling for Geotechnical and Rock Engineering Applications",
     icon: <Layers size={28} strokeWidth={1.5} />
   },
   { 
     id: 4, 
-    presenter: "Plaxis", 
+    presenterNode: (
+      <div className="text-xs text-slate-500 leading-relaxed">
+        <span className="block"><strong className="text-irms-dark">PT Delta Nusantara</strong> as Bentley & Seequent Channel Partner</span>
+        <span className="block mt-1"><strong className="text-irms-dark">NGC Itenas</strong> as Bentley Training Partner</span>
+      </div>
+    ),
+    logos: [
+      "/image/sponsors/Bentley.png",
+      "/image/sponsors/Delta Sigma Nusantara.png",
+      "/image/sponsors/NGC.png",
+      "/image/sponsors/Seequent.png"
+    ],
     title: "Numerical Modelling for Geotechnical and Rock Engineering Applications",
     icon: <Cpu size={28} strokeWidth={1.5} />
   },
@@ -85,20 +113,39 @@ const WorkshopSection = () => {
               transition={{ duration: 0.5, delay: idx * 0.15 }}
               className="group bg-white p-8 rounded-3xl border border-slate-200 hover:border-irms-blue/30 hover:shadow-xl hover:shadow-irms-blue/5 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
             >
-              <div className="flex justify-between items-start mb-6">
-                <div className="inline-block px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-full group-hover:bg-irms-red/5 group-hover:border-irms-red/20 transition-colors">
-                  <p className="text-xs font-bold text-slate-500 group-hover:text-irms-red transition-colors uppercase tracking-wider">
-                    Presented by <span className="text-irms-dark">{workshop.presenter}</span>
-                  </p>
-                </div>
-                <div className="text-slate-300 group-hover:text-irms-blue transition-colors group-hover:scale-110 transform duration-300">
+              
+              {/* Top: Icon & "Presented By" Label */}
+              <div className="flex justify-between items-start mb-4">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Presented By
+                </p>
+                <div className="text-slate-300 group-hover:text-irms-blue transition-colors group-hover:scale-110 transform duration-300 shrink-0">
                   {workshop.icon}
                 </div>
               </div>
+
+              {/* Logos Array */}
+              <div className="flex flex-wrap items-center gap-4 mb-4 min-h-[2.5rem]">
+                {workshop.logos.map((logoPath, i) => (
+                  <img 
+                    key={i} 
+                    src={logoPath} 
+                    alt="Presenter Logo" 
+                    className="h-8 max-w-[120px] object-contain filter grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                  />
+                ))}
+              </div>
+
+              {/* Presenter Description */}
+              <div className="mb-6 border-l-2 border-slate-100 pl-3 group-hover:border-irms-blue/30 transition-colors">
+                {workshop.presenterNode}
+              </div>
               
-              <h3 className="text-xl md:text-2xl font-extrabold text-irms-dark leading-snug mt-auto">
+              {/* Title (Pushed to bottom using mt-auto to keep cards aligned) */}
+              <h3 className="text-xl md:text-2xl font-extrabold text-irms-dark leading-snug mt-auto pt-5 border-t border-slate-50">
                 {workshop.title}
               </h3>
+
             </motion.div>
           ))}
         </div>
