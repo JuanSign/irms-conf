@@ -30,9 +30,9 @@ const speakers = [
   },
   {
     name: "Okky Chandra Perdana, S.T., M.T.",
-    title: "Director",
+    title: "Operational Director",
     organization: "PT. Anggun Permai Tekindo",
-    image: "/image/keynote/Okky Chandra.png"
+    image: "/image/keynote/Okky Chandra.jpg"
   }
 ];
 
