@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
       },
     }),
     db.query.admins.findMany({
-      columns: { id: true, name: true, username: true, role: true },
+      columns: { id: true, name: true, username: true, role: true, createdAt: true },
       with: { assignments: { with: { abstract: { columns: { id: true, title: true, status: true } } } } },
       orderBy: (a, { desc }) => [desc(a.createdAt)]
     }),
@@ -70,11 +70,32 @@ export default async function AdminDashboardPage() {
     }));
 
   const allAssignments = admins.flatMap(a => a.assignments);
-  const verifiedRevenue = registrations.filter(r => r.status === 'Verified').reduce((acc, curr) => acc + curr.amount, 0);
+  
+  const verifiedRegistrations = registrations.filter(r => r.status === 'Verified');
+  const verifiedRevenue = verifiedRegistrations.reduce((acc, curr) => acc + curr.amount, 0);
+  const verifiedIopCount = iopPublications.filter(iop => iop.status === 'Verified').length;
+
+  const getCategoryStats = (categoryName: string) => {
+    const filtered = verifiedRegistrations.filter(r => r.category === categoryName);
+    return {
+      total: filtered.length,
+      member: filtered.filter(r => r.isIrmsMember).length,
+      nonMember: filtered.filter(r => !r.isIrmsMember).length,
+    };
+  };
 
   const stats: DashboardStats = {
-    totalUsers: users.length, totalAbstracts: abstracts.length, totalRegistrations: registrations.length,
+    totalUsers: users.length, 
+    totalAbstracts: abstracts.length, 
+    totalRegistrations: registrations.length,
     verifiedRevenue,
+    verifiedRegistrationsCount: verifiedRegistrations.length,
+    verifiedIopCount,
+    registrationBreakdown: {
+      industry: getCategoryStats('Industry/Practitioner'),
+      academic: getCategoryStats('Academic'),
+      student: getCategoryStats('Student'),
+    },
     statusBreakdown: {
       accepted: abstracts.filter(a => a.status === 'Accepted').length,
       rejected: abstracts.filter(a => a.status === 'Rejected').length,

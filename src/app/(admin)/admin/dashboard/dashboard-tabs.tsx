@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition, useMemo } from "react";
 import { createAdmin, assignAbstract, updateAbstractStatus, updateRegistrationStatus, updateIopStatus, updateSlideStatus, updateIopPaperStatus } from "./actions";
-import { Search, ChevronDown, ChevronUp, Download, ExternalLink, CheckCircle2, Clock, FileText, CheckCircle, Ticket, Banknote, Users, BookOpen, PenTool, BarChart3, ArrowUpDown, UserCog, AlertCircle, MoreHorizontal } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, Download, ExternalLink, CheckCircle2, Clock, FileText, CheckCircle, Ticket, Banknote, Users, BookOpen, PenTool, BarChart3, ArrowUpDown, UserCog, AlertCircle, MoreHorizontal, Building, User, GraduationCap, Library } from "lucide-react";
 import { UserDetail, AdminDetail, AbstractDetail, EventRegistrationDetail, IopDetail, SlideDetail, DashboardStats } from "./types";
 
 function formatCurrency(amount: number) {
@@ -120,23 +120,101 @@ const dotColors: Record<string, string> = { 'Submitted': 'bg-purple-500', 'Under
 
 export function OverviewTab({ stats }: { stats: DashboardStats }) {
   const cards = [
-    { label: "Total Revenue", val: formatCurrency(stats.verifiedRevenue), icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-100" },
     { label: "Total Registrations", val: stats.totalRegistrations, icon: Ticket, color: "text-blue-600", bg: "bg-blue-100" },
     { label: "Abstracts Accepted", val: stats.statusBreakdown.accepted || 0, icon: CheckCircle, color: "text-purple-600", bg: "bg-purple-100" },
     { label: "Reviews Completed", val: `${stats.reviews.completed} / ${stats.reviews.total}`, icon: FileText, color: "text-orange-600", bg: "bg-orange-100" },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {cards.map((c, i) => (
-        <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-shadow">
-          <div className={`p-4 rounded-xl ${c.bg} ${c.color}`}><c.icon size={26} /></div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">{c.label}</p>
-            <h3 className="text-2xl font-bold text-gray-900 mt-0.5">{c.val}</h3>
+    <div className="space-y-6">
+      {/* Top Main Card: Total Revenue & Breakdown */}
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 xl:gap-8">
+        
+        <div className="flex items-center space-x-5 min-w-0 w-full xl:w-auto">
+          <div className="p-4 rounded-2xl bg-emerald-100 text-emerald-600 shrink-0 hidden sm:flex">
+            <Banknote size={40} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-1 flex items-center">
+              <Banknote size={16} className="mr-2 sm:hidden text-emerald-600 shrink-0" />
+              Total Verified Revenue
+            </p>
+            <h3 className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-gray-900 tracking-tight break-words">
+              {formatCurrency(stats.verifiedRevenue)}
+            </h3>
           </div>
         </div>
-      ))}
+
+        {/* Detailed Breakdown Group */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full xl:w-max shrink-0">
+          
+          <div className="flex items-start space-x-3 bg-gray-50 border border-gray-100 p-3 rounded-xl min-w-0">
+            <Building size={20} className="text-gray-400 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <div className="flex items-baseline space-x-1.5">
+                <span className="text-lg font-bold text-gray-900">{stats.registrationBreakdown.industry.total}</span>
+                <span className="text-xs font-medium text-gray-600 truncate">Industry</span>
+              </div>
+              <div className="text-[11px] text-gray-500 mt-0.5 truncate">
+                {stats.registrationBreakdown.industry.member} Mem / {stats.registrationBreakdown.industry.nonMember} Non
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start space-x-3 bg-gray-50 border border-gray-100 p-3 rounded-xl min-w-0">
+            <User size={20} className="text-gray-400 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <div className="flex items-baseline space-x-1.5">
+                <span className="text-lg font-bold text-gray-900">{stats.registrationBreakdown.academic.total}</span>
+                <span className="text-xs font-medium text-gray-600 truncate">Academic</span>
+              </div>
+              <div className="text-[11px] text-gray-500 mt-0.5 truncate">
+                {stats.registrationBreakdown.academic.member} Mem / {stats.registrationBreakdown.academic.nonMember} Non
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start space-x-3 bg-gray-50 border border-gray-100 p-3 rounded-xl min-w-0">
+            <GraduationCap size={20} className="text-gray-400 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <div className="flex items-baseline space-x-1.5">
+                <span className="text-lg font-bold text-gray-900">{stats.registrationBreakdown.student.total}</span>
+                <span className="text-xs font-medium text-gray-600 truncate">Student</span>
+              </div>
+              <div className="text-[11px] text-gray-500 mt-0.5 truncate">
+                {stats.registrationBreakdown.student.member} Mem / {stats.registrationBreakdown.student.nonMember} Non
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start space-x-3 bg-emerald-50 border border-emerald-100 p-3 rounded-xl min-w-0">
+            <Library size={20} className="text-emerald-500 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <div className="flex items-baseline space-x-1.5">
+                <span className="text-lg font-bold text-emerald-900">{stats.verifiedIopCount}</span>
+                <span className="text-xs font-medium text-emerald-700 truncate">Papers</span>
+              </div>
+              <div className="text-[11px] text-emerald-600/80 mt-0.5 truncate">
+                Verified IOP
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Bottom Sub-Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {cards.map((c, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-shadow">
+            <div className={`p-4 rounded-xl shrink-0 ${c.bg} ${c.color}`}><c.icon size={26} /></div>
+            <div className="min-w-0">
+              <p className="text-sm text-gray-500 font-medium truncate">{c.label}</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{c.val}</h3>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
