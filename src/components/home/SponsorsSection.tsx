@@ -15,12 +15,15 @@ const sponsors = {
   rockersNight: [
     { name: "Vale", image: "/image/sponsors/VALE.png" },
     { name: "Borneo Indobara", image: "/image/sponsors/PT BORNEO INDOBARA.png" },
-    { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.png" }
+    { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.png" },
+    { name: "PTFI", image: "/image/sponsors/PTFI.png" }
   ],
   sessionBreak: [
     { name: "Dahana", image: "/image/sponsors/Dahana.png" },
     { name: "Abel", image: "/image/sponsors/ABEL.png" },
-    { name: "Tura", image: "/image/sponsors/TURA.png" }
+    { name: "Tura", image: "/image/sponsors/TURA.png" },
+    { name: "J Resourcs", image: "/image/sponsors/J Resources.jpeg" },
+    { name: "Berau Coal", image: "/image/sponsors/Berau Coal.jpg" },
   ]
 };
 

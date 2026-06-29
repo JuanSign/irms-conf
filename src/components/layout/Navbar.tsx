@@ -28,7 +28,7 @@ const Navbar = ({ session }: { session: Session | null }) => {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative h-10 w-10">
               <Image
-                src="/logo/LOGO-SMALL.png"
+                src="/logo/LOGO NEW.jpg"
                 alt="IRMS Logo"
                 fill
                 priority
