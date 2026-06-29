@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const PRICING = {
   'Industry/Practitioner': { member: 1100000, nonMember: 1500000, icon: <Building size={24}/> },
   'Academic': { member: 600000, nonMember: 800000, icon: <User size={24}/> },
-  'Student': { member: 500000, nonMember: 500000, icon: <GraduationCap size={24}/> },
+  'Student': { member: 350000, nonMember: 500000, icon: <GraduationCap size={24}/> },
 };
 
 export default function EventWidget({ registration }: { registration: EventRegistration | null | undefined }) {
