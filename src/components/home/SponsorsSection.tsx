@@ -16,7 +16,8 @@ const sponsors = {
     { name: "Vale", image: "/image/sponsors/VALE.png" },
     { name: "Borneo Indobara", image: "/image/sponsors/PT BORNEO INDOBARA.png" },
     { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.png" },
-    { name: "PTFI", image: "/image/sponsors/PTFI.png" }
+    { name: "PTFI", image: "/image/sponsors/PTFI.png" },
+    { name: "ANTAM", image: "/image/sponsors/ANTAM.png" }
   ],
   sessionBreak: [
     { name: "Dahana", image: "/image/sponsors/Dahana.png" },
