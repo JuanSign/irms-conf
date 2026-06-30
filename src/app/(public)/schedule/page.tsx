@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const detailedEvents = [
   {
     id: 1,
-    date: "30 June 2026",
+    date: "5 July 2026",
     title: "Full Paper Submission",
     status: "active",
     description: "Submit your final, camera-ready full paper through our portal. All submissions undergo a rigorous final technical review by the scientific committee before inclusion in the official conference proceedings.",
