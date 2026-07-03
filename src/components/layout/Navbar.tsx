@@ -17,6 +17,7 @@ const Navbar = ({ session }: { session: Session | null }) => {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Schedule', href: '/schedule' },
+    { name: 'Program', href: '/program' },
     { name: 'Committee', href: '/committee' },
     { name: 'Dashboard', href: '/dashboard' },
   ];
