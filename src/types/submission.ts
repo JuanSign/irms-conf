@@ -44,4 +44,10 @@ export interface AbstractSubmission {
   coauthors?: {
     user: AuthorSearchResult;
   }[];
+  slideSubmission?: {
+    id: string;
+    status: string;
+    fileUrl: string;
+    createdAt: Date;
+  } | null;
 }

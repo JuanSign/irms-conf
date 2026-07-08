@@ -113,7 +113,14 @@ export default function SlidesSubmissionWidget({ abstractId, slideData }: Slides
             <div className="p-5 sm:p-6 flex flex-col gap-5">
               <div>
                 <h4 className="font-extrabold text-slate-800 mb-1">{activeData ? 'Resubmit Slides' : 'Submit Your Slides'}</h4>
-                <p className="text-xs sm:text-sm text-slate-500">To present at the IRMS Conference, you must submit your presentation slides for committee review.</p>
+                <p className="text-xs sm:text-sm text-slate-500 mb-4">To present at the IRMS Conference, you must submit your presentation slides for committee review.</p>
+                
+                <div className="flex items-start gap-2.5 p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl">
+                  <Clock size={16} className="text-indigo-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-indigo-900 leading-relaxed font-medium">
+                    <strong className="font-extrabold text-indigo-950">Time Allocation:</strong> There will be a total of 15 minutes for your presentation session, divided into <strong className="font-extrabold text-indigo-950">12 minutes</strong> for presenting and <strong className="font-extrabold text-indigo-950">3 minutes</strong> for Q&A.
+                  </p>
+                </div>
               </div>
 
               {error && <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl font-medium flex gap-2 items-center"><AlertCircle size={14}/>{error}</div>}

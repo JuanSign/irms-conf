@@ -19,7 +19,7 @@ export default async function DashboardPage() {
     with: {
       registration: true,
       abstracts: {
-        with: { comments: true, coauthors: true },
+        with: { comments: true, coauthors: true, slideSubmission: true },
       },
       coauthoredAbstracts: {
         with: {
@@ -38,10 +38,22 @@ export default async function DashboardPage() {
   const primaryAbstracts = userData.abstracts || [];
   const coAuthoredAbstracts = userData.coauthoredAbstracts?.map(ca => ca.abstract) || [];
 
-  const allAbstracts = [...primaryAbstracts, ...coAuthoredAbstracts].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  const currentUserId = session.user.id;
 
+  const allAbstracts = [...primaryAbstracts, ...coAuthoredAbstracts].sort((a, b) => {
+    // 1. Priority: Accepted status first
+    if (a.status === 'Accepted' && b.status !== 'Accepted') return -1;
+    if (a.status !== 'Accepted' && b.status === 'Accepted') return 1;
+
+    // 2. Priority: Primary author first
+    const aIsPrimary = a.writerId === currentUserId;
+    const bIsPrimary = b.writerId === currentUserId;
+    if (aIsPrimary && !bIsPrimary) return -1;
+    if (!aIsPrimary && bIsPrimary) return 1;
+
+    // 3. Fallback: Newest first
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
   const hasAbstracts = allAbstracts.length > 0;
 
   return (
