@@ -131,17 +131,17 @@ export function OverviewTab({ stats }: { stats: DashboardStats }) {
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 xl:gap-8">
         
         <div className="flex items-center space-x-5 min-w-0 w-full xl:w-auto">
-          <div className="p-4 rounded-2xl bg-emerald-100 text-emerald-600 shrink-0 hidden sm:flex">
-            <Banknote size={40} />
+          <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600 shrink-0 hidden sm:flex">
+            <Banknote size={28} />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-1 flex items-center">
               <Banknote size={16} className="mr-2 sm:hidden text-emerald-600 shrink-0" />
               Total Verified Revenue
             </p>
-            <h3 className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-gray-900 tracking-tight break-words">
+            <p className="text-lg sm:text-xl font-bold text-gray-900 break-words">
               {formatCurrency(stats.verifiedRevenue)}
-            </h3>
+            </p>
           </div>
         </div>
 
