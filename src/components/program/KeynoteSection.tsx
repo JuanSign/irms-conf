@@ -63,7 +63,11 @@ const speakers = [
     title: "Product Manager Soil and Rock Equipment",
     organization: "CONTROLS Group",
     image: "/image/keynote/Alessandro Maggioni.jpeg",
-    bio: ["To Be Announced (TBA)"],
+    bio: [
+      "Alessandro Maggioni serves as the Product Manager of the Soil Mechanics business unit at CONTROLS Group, a position he has held since November 2011. He specializes in testing equipment for the construction industries, managing both standard and advanced equipment for soil mechanics laboratories.",
+      "He holds a Master of Science and a Bachelor of Science in Civil Engineering from the Politecnico di Milano. His foundational education includes a Scientific High School Degree from the Istituto Statale di Istruzione Superiore “Leonardo da Vinci” in Cologno Monzese."
+    ],
+    sessionTitle: "Rock Testing for Uniaxial and Triaxial",
     sessionOverview: ["To Be Announced (TBA)"]
   }
 ];
