@@ -10,12 +10,12 @@ const sponsors = {
   gold: [
     { name: "Adaro", image: "/image/sponsors/adaro.png" },
     { name: "New Module International", image: "/image/sponsors/PT NEW MODULE INTERNATIONAL.png" },
-    { name: "Anggun Permai Tekindo", image: "/image/sponsors/Anggun Permai Tekindo.png" }
+    { name: "Anggun Permai Tekindo", image: "/image/sponsors/Anggun Permai Tekindo.png" },
+    { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.png" }
   ],
   rockersNight: [
     { name: "Vale", image: "/image/sponsors/VALE.png" },
     { name: "Borneo Indobara", image: "/image/sponsors/PT BORNEO INDOBARA.png" },
-    { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.png" },
     { name: "PTFI", image: "/image/sponsors/PTFI.png" },
     { name: "ANTAM", image: "/image/sponsors/ANTAM.png" }
   ],
