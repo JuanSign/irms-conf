@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Ticket, Calendar, CheckCircle2, Clock, AlertCircle,
   Upload, ArrowRight, MapPin, ArrowLeft, CreditCard,
-  User, Building, GraduationCap, Loader2, Trash2
+  User, Building, GraduationCap, Loader2, Trash2, Wallet
 } from "lucide-react";
 import { EventRegistration, RegistrationCategory } from "@/types/event";
 import { createEventRegistration, confirmPaymentProof, cancelEventRegistration } from "./actions";
@@ -199,6 +199,10 @@ function UnregisteredBanner({ onRegister }: { onRegister: () => void }) {
             <div className="bg-white/10 text-white p-1.5 sm:p-2 rounded-xl"><MapPin size={18} /></div>
             <div><p className="font-bold text-xs sm:text-sm text-white/90">Bandung, Indonesia</p></div>
           </div>
+          <div className="flex items-center gap-2 sm:gap-3 bg-black/30 rounded-2xl p-3 sm:p-4 border border-white/10 backdrop-blur-sm shadow-inner">
+            <div className="bg-white/10 text-emerald-400 p-1.5 sm:p-2 rounded-xl"><Wallet size={18} /></div>
+            <div><p className="font-bold text-xs sm:text-sm text-emerald-400">On-Site Payment Available</p></div>
+          </div>
         </div>
 
         <motion.button
@@ -362,15 +366,26 @@ function RegistrationForm({ step, handleNext, handleBack, handleRegister, error,
                   </motion.div>
                 ))}
               </div>
-              <div className="bg-white shadow-sm p-4 sm:p-5 rounded-2xl border border-slate-200 flex items-center justify-between mt-4">
-                <div>
-                  <p className="text-[11px] sm:text-xs text-slate-500 font-bold mb-0.5 uppercase tracking-wide">Total Fee Due</p>
-                  <p className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight flex items-baseline gap-1">
-                    <span className="text-sm sm:text-base text-slate-400 font-medium">Rp</span>
-                    {currentFee.toLocaleString('id-ID')}
-                  </p>
+              
+              <div className="bg-white shadow-sm p-4 sm:p-5 rounded-2xl border border-slate-200 flex flex-col gap-3 mt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] sm:text-xs text-slate-500 font-bold mb-0.5 uppercase tracking-wide">Total Fee Due</p>
+                    <p className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight flex items-baseline gap-1">
+                      <span className="text-sm sm:text-base text-slate-400 font-medium">Rp</span>
+                      {currentFee.toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                   <Wallet size={16} className="text-slate-500 shrink-0 mt-0.5" />
+                   <p className="text-[10px] sm:text-[11px] font-medium text-slate-600 leading-relaxed">
+                     <span className="font-bold text-slate-700 block mb-0.5">Payment Options Available:</span> 
+                     You can complete a fast-track Bank Transfer on the next screen, or choose to pay On-Site at the registration desk (Cash/Card/QRIS).
+                   </p>
                 </div>
               </div>
+
             </motion.div>
           )}
         </AnimatePresence>
@@ -391,7 +406,7 @@ function RegistrationForm({ step, handleNext, handleBack, handleRegister, error,
                 onClick={handleRegister} disabled={loading}
                 className="w-full sm:w-auto bg-irms-blue text-white px-8 py-3 rounded-xl text-sm sm:text-base font-bold hover:bg-[#002b5c] transition-colors disabled:opacity-70 flex items-center justify-center gap-2 shadow-md"
               >
-                {loading ? <><Loader2 size={18} className="animate-spin" /> Processing...</> : 'Confirm & Proceed'}
+                {loading ? <><Loader2 size={18} className="animate-spin" /> Processing...</> : 'Confirm Registration'}
               </motion.button>
             )}
           </div>
@@ -423,7 +438,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
           <div className="bg-amber-100 p-2.5 rounded-xl text-amber-700 shadow-sm"><CreditCard size={20} /></div>
           <div>
             <h3 className="font-extrabold text-slate-800 text-lg tracking-tight">Payment Required</h3>
-            <p className="text-slate-500 font-medium text-xs mt-0.5">Awaiting transfer completion.</p>
+            <p className="text-slate-500 font-medium text-xs mt-0.5">Please choose a payment method below.</p>
           </div>
         </div>
         <div className="bg-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 text-center sm:text-right">
@@ -432,7 +447,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
         </div>
       </div>
 
-      <div className="p-4 sm:p-5 flex flex-col gap-4">
+      <div className="p-4 sm:p-5 flex flex-col gap-6">
         <AnimatePresence>
           {error && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm rounded-xl font-medium flex gap-2 items-center">
@@ -441,55 +456,84 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-white shadow-sm p-4 rounded-2xl border border-slate-200 flex flex-col justify-center h-full">
-            <div className="mb-3">
-              <p className="text-[10px] text-slate-500 font-bold mb-0.5 uppercase tracking-wider">Transfer To</p>
-              <p className="text-slate-800 font-bold text-sm">Bank Negara Indonesia (BNI)</p>
-              <p className="text-slate-600 text-xs font-medium">Simon Heru Prassetyo</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-wider">Account Number</p>
-              <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 w-fit">
-                <p className="text-base sm:text-lg text-slate-800 font-mono tracking-wider font-extrabold">0623293023</p>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-5 h-5 rounded-full bg-irms-blue text-white flex items-center justify-center text-[10px] font-bold shadow-sm">1</div>
+            <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest">Bank Transfer (Fast Track)</h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-white shadow-sm p-4 rounded-2xl border border-slate-200 flex flex-col justify-center h-full">
+              <div className="mb-3">
+                <p className="text-[10px] text-slate-500 font-bold mb-0.5 uppercase tracking-wider">Transfer To</p>
+                <p className="text-slate-800 font-bold text-sm">Bank Negara Indonesia (BNI)</p>
+                <p className="text-slate-600 text-xs font-medium">Simon Heru Prassetyo</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-wider">Account Number</p>
+                <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 w-fit">
+                  <p className="text-base sm:text-lg text-slate-800 font-mono tracking-wider font-extrabold">0623293023</p>
+                </div>
               </div>
             </div>
+
+            <motion.div
+              whileHover={{ scale: isDragging ? 1.01 : 1.005 }}
+              onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+              className={`relative border-2 border-dashed rounded-2xl p-4 text-center flex flex-col items-center justify-center min-h-30 h-full transition-colors overflow-hidden shadow-sm ${
+                isDragging ? 'border-irms-blue bg-blue-50/50' : 'border-slate-300 hover:border-slate-400 bg-white'
+              }`}
+            >
+              <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setPaymentFile(e.target.files?.[0] || null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+
+              <AnimatePresence mode="wait">
+                {previewUrl ? (
+                  <motion.div key="preview" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-30 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm z-10 group">
+                    <Image src={previewUrl} alt="Preview" fill className="object-cover group-hover:opacity-50 transition-opacity" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                      <span className="text-white text-xs font-bold flex items-center gap-1.5"><Upload size={12}/> Replace</span>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div key="icon" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors z-10 relative border border-slate-100 ${isDragging ? 'bg-irms-blue text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>
+                    <Upload size={16} className={`${isDragging ? 'animate-bounce' : ''}`} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <h4 className="text-xs sm:text-sm font-bold text-slate-800 mb-0.5 mt-2 relative z-10 line-clamp-1 px-2">
+                {paymentFile ? paymentFile.name : 'Upload Payment Proof'}
+              </h4>
+              <p className="text-[10px] text-slate-500 font-medium relative z-10">
+                {paymentFile ? `${(paymentFile.size / 1024 / 1024).toFixed(2)} MB • Click to change` : 'Drag & drop or click'}
+              </p>
+            </motion.div>
           </div>
-
-          <motion.div
-            whileHover={{ scale: isDragging ? 1.01 : 1.005 }}
-            onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-            className={`relative border-2 border-dashed rounded-2xl p-4 text-center flex flex-col items-center justify-center min-h-30 h-full transition-colors overflow-hidden shadow-sm ${
-              isDragging ? 'border-irms-blue bg-blue-50/50' : 'border-slate-300 hover:border-slate-400 bg-white'
-            }`}
-          >
-            <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setPaymentFile(e.target.files?.[0] || null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
-
-            <AnimatePresence mode="wait">
-              {previewUrl ? (
-                <motion.div key="preview" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-30 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-sm z-10 group">
-                  <Image src={previewUrl} alt="Preview" fill className="object-cover group-hover:opacity-50 transition-opacity" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                    <span className="text-white text-xs font-bold flex items-center gap-1.5"><Upload size={12}/> Replace</span>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div key="icon" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors z-10 relative border border-slate-100 ${isDragging ? 'bg-irms-blue text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>
-                  <Upload size={16} className={`${isDragging ? 'animate-bounce' : ''}`} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <h4 className="text-xs sm:text-sm font-bold text-slate-800 mb-0.5 mt-2 relative z-10 line-clamp-1 px-2">
-              {paymentFile ? paymentFile.name : 'Upload Payment Proof'}
-            </h4>
-            <p className="text-[10px] text-slate-500 font-medium relative z-10">
-              {paymentFile ? `${(paymentFile.size / 1024 / 1024).toFixed(2)} MB • Click to change` : 'Drag & drop or click'}
-            </p>
-          </motion.div>
         </div>
 
-        <div className="flex flex-nowrap items-center gap-3 pt-1 w-full shrink-0">
+        <div className="relative pt-2 pb-1">
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-300"></div></div>
+          <div className="relative flex justify-center"><span className="bg-slate-100 px-3 text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">OR</span></div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[10px] font-bold shadow-sm">2</div>
+            <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-widest">Pay On-Site at Venue</h4>
+          </div>
+          <div className="bg-white shadow-sm p-4 sm:p-5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start gap-4 hover:border-slate-300 transition-colors">
+            <div className="bg-blue-50 p-3 rounded-xl text-irms-blue shadow-inner shrink-0 mt-1">
+              <Wallet size={24} />
+            </div>
+            <div>
+              <h5 className="text-sm font-extrabold text-slate-800 mb-1">Settle at the Registration Desk</h5>
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                Your spot is successfully secured! If you prefer not to transfer now, you can skip the upload and pay directly at the venue using Cash, Credit/Debit Card, or QRIS. <span className="font-bold text-slate-700">Just present this screen or your registered email upon arrival.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-nowrap items-center gap-3 pt-2 w-full shrink-0">
           <motion.button
             whileTap={{ scale: isCancelling || loading ? 1 : 0.97 }}
             onClick={handleCancelRegistration}
@@ -504,7 +548,7 @@ function PaymentPending({ registration, error, loading, isCancelling, paymentFil
             disabled={loading || !paymentFile}
             className="flex-2 min-w-0 bg-irms-blue text-white font-bold px-4 py-3 rounded-xl text-xs sm:text-sm hover:bg-[#002b5c] transition-colors flex justify-center items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
-            {loading ? <><Loader2 className="animate-spin" size={16}/> Verifying...</> : 'Submit Proof'}
+            {loading ? <><Loader2 className="animate-spin" size={16}/> Verifying...</> : 'Submit Transfer Proof'}
           </motion.button>
         </div>
       </div>
