@@ -11,7 +11,7 @@ const sponsors = {
     { name: "Adaro", image: "/image/sponsors/adaro.png" },
     { name: "New Module International", image: "/image/sponsors/PT NEW MODULE INTERNATIONAL.png" },
     { name: "Anggun Permai Tekindo", image: "/image/sponsors/Anggun Permai Tekindo.png" },
-    { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.png" }
+    { name: "Orica", image: "/image/sponsors/ORICA Digital Solutions.jpeg" }
   ],
   rockersNight: [
     { name: "Vale", image: "/image/sponsors/VALE.png" },
@@ -25,6 +25,7 @@ const sponsors = {
     { name: "Tura", image: "/image/sponsors/TURA.png" },
     { name: "J Resourcs", image: "/image/sponsors/J Resources.jpeg" },
     { name: "Berau Coal", image: "/image/sponsors/Berau Coal.jpg" },
+    { name: "The Purnomo Yusgiantoro Center", image: "/image/sponsors/The Purnomo Yusgiantoro.jpeg" },
   ]
 };
 
@@ -32,9 +33,9 @@ const SponsorsSection = () => {
   return (
     <section className="py-24 bg-white border-t border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Main Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
@@ -48,7 +49,7 @@ const SponsorsSection = () => {
 
         {/* Vertical Stack for Hierarchy */}
         <div className="flex flex-col gap-12 md:gap-16">
-          
+
           {/* 1. Platinum Sponsor */}
           <div className="flex flex-col items-center w-full">
             <h3 className="text-slate-400 font-bold text-sm tracking-widest uppercase mb-6 sm:mb-8">
@@ -56,7 +57,7 @@ const SponsorsSection = () => {
             </h3>
             <div className="w-full flex justify-center items-center px-4">
               {sponsors.platinum.map((sponsor, idx) => (
-                <motion.div 
+                <motion.div
                   key={sponsor.name}
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -83,7 +84,7 @@ const SponsorsSection = () => {
             </h3>
             <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16 w-full">
               {sponsors.gold.map((sponsor, idx) => (
-                <motion.div 
+                <motion.div
                   key={sponsor.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -109,7 +110,7 @@ const SponsorsSection = () => {
             </h3>
             <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-12 w-full">
               {sponsors.rockersNight.map((sponsor, idx) => (
-                <motion.div 
+                <motion.div
                   key={sponsor.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -135,7 +136,7 @@ const SponsorsSection = () => {
             </h3>
             <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-8 md:gap-10 w-full">
               {sponsors.sessionBreak.map((sponsor, idx) => (
-                <motion.div 
+                <motion.div
                   key={sponsor.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
